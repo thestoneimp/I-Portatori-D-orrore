@@ -34,6 +34,16 @@
       </div>
       <p id="status"></p>
     </div>
+
+    <!-- 🔹 L'app è pensata SOLO per l'uso in orizzontale: in verticale
+         blocca tutto con questo messaggio, invece di mostrare una
+         schermata mal adattata. -->
+    <div id="avvisoRuotaSchermo" class="avviso-ruota-schermo">
+      <div class="avviso-ruota-icona">📱↻</div>
+      <p>Ruota il dispositivo</p>
+      <p class="avviso-ruota-sottotitolo">L'app funziona solo in orizzontale</p>
+    </div>
+
     <script src="script.js"></script>
     <div id="tabelloneNascosto" style="display: none"></div>
 
@@ -63,6 +73,18 @@
           navigator.serviceWorker.register("service-worker.js").catch(() => {});
         });
       }
+
+      // 🔹 Tentativo di blocco effettivo dell'orientamento (funziona solo su
+      // Android/Chrome, e solo se l'app è installata come PWA a schermo
+      // intero): dove non è supportato, resta comunque l'avviso CSS
+      // "Ruota il dispositivo" a impedire l'uso in verticale.
+      function tentaBloccoLandscape() {
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock("landscape").catch(() => {});
+        }
+      }
+      tentaBloccoLandscape();
+      document.addEventListener("click", tentaBloccoLandscape, { once: true });
     </script>
   </body>
 </html>

@@ -7351,6 +7351,32 @@ function elementoSchermataAttiva() {
   );
 }
 
+// 🔹 Calcola il numero di colonne della griglia di selezione personaggi
+// (#gridSelezionePG / #gridCarteIniziali) in base allo spazio realmente
+// disponibile: quante schede da almeno MIN_CARD px entrano su una riga, poi
+// distribuisce le righe in modo bilanciato (mai una riga orfana con 1 sola
+// scheda, es. 5+1 → diventa 3+3). Richiamata da adattaSchermataAllaFinestra
+// PRIMA di misurare l'altezza, così la scala tiene conto del layout finale.
+function adattaGrigliaSelezionePersonaggi() {
+  const griglie = document.querySelectorAll(".grid-selezione-pg");
+  griglie.forEach((grid) => {
+    const n = grid.children.length;
+    if (!n) return;
+
+    const MIN_CARD = 170;
+    const GAP = 14;
+    const disponibile = grid.clientWidth || window.innerWidth;
+
+    let maxColonne = Math.max(1, Math.floor((disponibile + GAP) / (MIN_CARD + GAP)));
+    maxColonne = Math.min(maxColonne, n);
+
+    const righe = Math.ceil(n / maxColonne);
+    const colonne = Math.ceil(n / righe);
+
+    grid.style.setProperty("--colonne-schede", colonne);
+  });
+}
+
 function adattaSchermataAllaFinestra() {
   const el = elementoSchermataAttiva();
 
@@ -7359,9 +7385,22 @@ function adattaSchermataAllaFinestra() {
     return;
   }
 
+  adattaGrigliaSelezionePersonaggi();
+
+  // 🔹 Misurazione a due passaggi: con "justify-content:center" (di
+  // default) il contenuto che eccede l'altezza sfora per metà SOPRA il
+  // bordo superiore, e quella parte non risulta in scrollHeight (che
+  // parte sempre dall'angolo in alto a sinistra) — la misura risulterebbe
+  // quindi più piccola del reale. Attivando prima la classe che porta
+  // l'allineamento in alto, tutto l'eccesso finisce sotto ed è misurabile
+  // per intero; solo dopo si decide se serve davvero tenerla attiva.
+  el.classList.add("contenuto-eccede");
   const naturaleW = Math.max(el.scrollWidth, el.offsetWidth);
   const naturaleH = Math.max(el.scrollHeight, el.offsetHeight);
-  if (!naturaleW || !naturaleH) return;
+  if (!naturaleW || !naturaleH) {
+    el.classList.remove("contenuto-eccede");
+    return;
+  }
 
   const MARGINE = 16;
   const disponibileW = window.innerWidth - MARGINE;
@@ -7377,6 +7416,13 @@ function adattaSchermataAllaFinestra() {
   document.body.style.transform = `scale(${scala})`;
   document.documentElement.style.overflow =
     scalaCalcolata < SCALA_MINIMA_ADATTAMENTO ? "auto" : "hidden";
+
+  // Se il contenuto non entra ed è centrato verticalmente (flex + justify-
+  // content:center), l'eccesso sfora anche SOPRA lo schermo, non solo
+  // sotto: in quel caso passa ad allineamento in alto (vedi CSS
+  // .contenuto-eccede) così l'eccesso resta solo in basso, dove la scala
+  // lo riporta comunque a schermo.
+  el.classList.toggle("contenuto-eccede", scalaCalcolata < 1);
 }
 
 // 🔹 Punto unico richiamato da resize/rotazione/cambio schermata: decide da
@@ -7405,6 +7451,14 @@ new MutationObserver(() => schedulaAdattamento(120)).observe(document.body, {
   childList: true,
   subtree: true,
 });
+
+// 🔹 I font web (Google Fonts) si caricano in modo asincrono: la prima
+// misurazione può avvenire con il font di riserva (più piccolo/stretto) e
+// il testo si allarga poco dopo quando il font vero arriva, senza che
+// nessun'altra delle condizioni sopra se ne accorga da sola.
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => schedulaAdattamento(50));
+}
 
 //GESTIONE ZOOM
 

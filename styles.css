@@ -188,26 +188,62 @@ h1, h2, h3 {
   }
 }
 
-/* Landscape su schermi bassi (telefono ruotato): abilita lo scroll
-   interno invece di tagliare pulsanti/elementi fuori dallo schermo.
-   Non tocca desktop/tablet dove l'altezza è normalmente sufficiente. */
-@media (max-height: 500px) {
-  .schermata-iniziale {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    justify-content: flex-start;
-    padding: 16px 0;
+/* 🔹 Avviso "ruota il dispositivo": nascosto di default, coperto in
+   verticale sopra a QUALSIASI schermata (z-index massimo, fuori da
+   .container quindi immune all'adattamento automatico). */
+.avviso-ruota-schermo {
+  display: none;
+}
+
+@media (orientation: portrait) {
+  .avviso-ruota-schermo {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    text-align: center;
+    padding: 24px;
   }
 
-  .schermata-scenario {
-    padding: 20px 20px 80px;
+  .avviso-ruota-icona {
+    font-size: 3.5rem;
+    animation: ruotaIcona 1.6s ease-in-out infinite;
   }
 
-  .finestra-dialogo-png {
-    max-height: 60vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  .avviso-ruota-schermo p {
+    font-family: var(--font-title);
+    letter-spacing: 1px;
+    font-size: 1.4rem;
+    margin: 0;
   }
+
+  .avviso-ruota-sottotitolo {
+    font-family: var(--font-vhs) !important;
+    font-size: 1.1rem !important;
+    color: var(--text-muted);
+    letter-spacing: 0.03em !important;
+  }
+}
+
+@keyframes ruotaIcona {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-90deg); }
+}
+
+/* 🔹 Applicata via JS (adattaSchermataAllaFinestra) solo quando il
+   contenuto della schermata non entra nello schermo: passa da centrato a
+   allineato in alto, così l'eccesso di contenuto resta solo in basso
+   (dove la scala automatica lo riporta comunque a schermo) invece che
+   sforare anche sopra il bordo superiore. */
+.schermata-iniziale.contenuto-eccede {
+  justify-content: flex-start;
+  padding-top: 24px;
 }
 
 button {
@@ -1380,25 +1416,26 @@ button.casuale:hover {
   justify-content: center;
 }
 
-/* Griglia a righe centrate che va a capo */
+/* Griglia con numero di colonne calcolato in JS (vedi
+   adattaGrigliaSelezionePersonaggi in script.js): evita righe sbilanciate
+   (es. 5+1) e usa una riga sola quando lo schermo è abbastanza largo. */
 .grid-selezione-pg {
-  display: flex;
-  flex-wrap: wrap; /* righe multiple */
-  justify-content: center; /* centra ogni riga incompleta */
+  display: grid;
+  grid-template-columns: repeat(var(--colonne-schede, 3), minmax(0, 1fr));
+  justify-items: stretch;
   gap: 14px;
-  /* Larghezza tarata per 3 schede per riga (3*220 + 2*14 ≈ 688px):
-     con più personaggi (espansioni future) andranno a capo a gruppi di
-     3 invece di sbilanciarsi (es. 5+1) */
-  max-width: 700px;
+  max-width: 100%;
+  width: 100%;
   margin: 0 auto;
   padding: 8px 12px;
+  box-sizing: border-box;
 }
 
 .pg-card {
-  box-sizing: border-box; /* padding e bordo inclusi nei 200/220px, non sommati sopra */
-  flex: 1 1 200px; /* si adatta allo spazio, ma non scende sotto 200px */
-  max-width: 220px;
-  min-width: 200px; /* evita lo “schiacciamento” con 1–2 card */
+  box-sizing: border-box; /* padding e bordo inclusi, non sommati sopra */
+  width: 100%;
+  max-width: 260px;
+  justify-self: center;
   min-height: 240px;
   background: #111;
   border: 2px solid #333;
