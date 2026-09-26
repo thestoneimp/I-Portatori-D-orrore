@@ -778,7 +778,7 @@ button.casuale:hover {
 .side-menu {
   position: fixed;
   top: 0;
-  left: -350px; /* esce del tutto dallo schermo */
+  left: 0;
   width: 300px;
   height: 100vh;
   background-color: var(--bg-panel);
@@ -787,12 +787,23 @@ button.casuale:hover {
   border-right: 2px solid #2e1418;
   overflow-y: auto;
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.8);
-  transition: left 0.3s ease;
+  /* 🔹 Nascosto tramite transform (invece di "left:-350px") apposta:
+     essendo ora dentro #gameFit, che scala tutto attorno al proprio
+     centro ("transform-origin: top center"), un offset assoluto in
+     pixel come "-350px" non resta più garantito fuori dallo schermo a
+     qualunque scala — più la scala si riduce, più quell'offset viene
+     "tirato" verso il centro, rivelando parzialmente il pannello anche
+     da chiuso. "translateX(-100%)" invece è relativo alla larghezza del
+     pannello stesso: resta sempre esattamente un pannello-intero fuori
+     dal proprio bordo sinistro, qualunque sia la scala applicata
+     dall'antenato. */
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
   z-index: 1000;
 }
 
 .side-menu.open {
-  left: 0;
+  transform: translateX(0);
 }
 
 .side-menu button {
@@ -959,7 +970,7 @@ button.casuale:hover {
 #menuImpostazioni {
   position: fixed;
   top: 0;
-  right: -350px; /* nascosto a destra */
+  right: 0;
   width: 300px;
   height: 100vh;
   background-color: #222;
@@ -967,12 +978,16 @@ button.casuale:hover {
   padding: 20px;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
   overflow-y: auto;
-  transition: right 0.3s ease;
+  /* 🔹 Stesso motivo del .side-menu qui sopra: transform relativo alla
+     propria larghezza invece di un offset assoluto in px, per restare
+     davvero fuori schermo a qualunque scala di adattamento. */
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
   z-index: 1001;
 }
 
 #menuImpostazioni.open {
-  right: 0;
+  transform: translateX(0);
 }
 
 #menuImpostazioni h3 {

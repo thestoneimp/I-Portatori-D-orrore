@@ -7319,6 +7319,23 @@ function adattaGameScreenAllaFinestra() {
   const tabellone = document.getElementById("tabelloneDinamico");
   if (!gameFit || !gameViewport || !tabellone) return;
 
+  // 🔹 FIX BUG "menu che si vede già socchiuso": la schermata precedente
+  // (selezione personaggi, scenario, ecc.) lascia su <body> un
+  // transform:scale(...) applicato da adattaSchermataAllaFinestra(). Quando
+  // si passa al tabellone di gioco, il body viene svuotato con
+  // innerHTML (che sostituisce solo i FIGLI, non le proprietà di stile del
+  // <body> stesso), quindi quello scale residuo restava applicato e
+  // "raddoppiava" l'effetto sul tabellone e sui menu laterali (che sono
+  // fratelli di #gameViewport, quindi figli diretti di <body>): con
+  // transform-origin:top-center, quello scale residuo tirava verso il
+  // centro anche i menu chiusi (posizionati fuori schermo con un offset
+  // negativo), rendendoli parzialmente visibili senza nemmeno averli
+  // aperti. Il tabellone di gioco gestisce la propria scala per intero
+  // tramite #gameFit, quindi qui il body va sempre riportato a "nessuna
+  // scala".
+  document.body.style.transform = "";
+  document.documentElement.style.overflow = "";
+
   // offsetWidth/offsetHeight riflettono la dimensione NATURALE (di layout),
   // non influenzata da un transform già applicato in precedenza.
   const naturaleW = Math.max(tabellone.scrollWidth, tabellone.offsetWidth);
