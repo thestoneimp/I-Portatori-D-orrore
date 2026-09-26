@@ -1,13 +1,12 @@
 // ============================
 // 📌 0. ELEMENTI "PERSISTENTI" FUORI DA <body>
 // ============================
-// Il sipario di transizione e l'avviso "ruota il dispositivo" devono
-// restare visibili anche quando document.body.innerHTML viene sostituito
-// per intero (cambio schermata): spostandoli sotto <html>, che non viene
-// mai ricreato, sopravvivono a qualunque cambio schermata invece di
-// sparire dopo il primo utilizzo.
+// L'avviso "ruota il dispositivo" deve restare visibile anche quando
+// document.body.innerHTML viene sostituito per intero (cambio schermata):
+// spostandolo sotto <html>, che non viene mai ricreato, sopravvive a
+// qualunque cambio schermata invece di sparire dopo il primo utilizzo.
 (function rendiPersistentiElementiFuoriSchermo() {
-  ["siparioTransizione", "avvisoRuotaSchermo", "navOverlay", "gameCornerOverlay"].forEach((id) => {
+  ["avvisoRuotaSchermo", "navOverlay", "gameCornerOverlay"].forEach((id) => {
     const el = document.getElementById(id);
     if (el && el.parentElement !== document.documentElement) {
       document.documentElement.appendChild(el);
@@ -1058,35 +1057,60 @@ function generaPreviewTabellone() {
   const container = document.getElementById("previewTabellone");
   if (!container) return;
 
-  const tabelloneOrig = document
-    .getElementById("tabelloneNascosto")
-    .querySelector(".griglia-tabellone");
+  // 🔹 Il clone dell'anteprima viene creato e misurato UNA SOLA VOLTA per
+  // questa schermata (dimensione naturale del tabellone: fissa finché non
+  // si cambia scenario). I ricalcoli successivi (resize, ecc.) riusano lo
+  // stesso clone già presente e si limitano ad aggiornarne scala/posizione
+  // — MAI a distruggerlo e ricrearlo con innerHTML="". Quella distruzione/
+  // ricreazione era una mutazione del DOM che il MutationObserver globale
+  // (vedi più sotto) scambiava per un cambio schermata, riavviando un altro
+  // ricalcolo che a sua volta ripeteva la stessa distruzione: un loop
+  // infinito che si autoalimentava ogni ~60ms (bug reale corretto — la
+  // schermata sembrava "flickerare" di continuo).
+  let clone = container.querySelector(".griglia-preview-tabellone");
+  let naturaleW, naturaleH;
 
-  if (!tabelloneOrig) {
-    console.warn("❌ Tabellone nascosto non trovato.");
-    return;
+  if (!clone) {
+    const tabelloneOrig = document
+      .getElementById("tabelloneNascosto")
+      ?.querySelector(".griglia-tabellone");
+
+    if (!tabelloneOrig) {
+      console.warn("❌ Tabellone nascosto non trovato.");
+      return;
+    }
+
+    clone = tabelloneOrig.cloneNode(true);
+    clone.className = "griglia-preview-tabellone";
+    clone.style.margin = "0";
+    clone.style.transformOrigin = "top left";
+
+    // Misurato FUORI dal flusso (position:absolute, invisibile): se
+    // comparisse subito a dimensione naturale (enorme), sposterebbe
+    // temporaneamente la posizione del container (centrato verticalmente),
+    // falsando il calcolo dello spazio disponibile fatto qui sotto.
+    clone.style.position = "absolute";
+    clone.style.visibility = "hidden";
+    clone.style.pointerEvents = "none";
+    clone.style.transform = "none";
+    container.appendChild(clone);
+
+    naturaleW = clone.scrollWidth;
+    naturaleH = clone.scrollHeight;
+    if (!naturaleW || !naturaleH) {
+      clone.remove();
+      return;
+    }
+    container._naturaleTabellone = { naturaleW, naturaleH };
+
+    // Torna in flusso normale: la scala/posizione definitiva viene
+    // applicata subito sotto, insieme a quella di ogni ricalcolo successivo.
+    clone.style.position = "";
+    clone.style.visibility = "";
+    clone.style.pointerEvents = "";
+  } else {
+    ({ naturaleW, naturaleH } = container._naturaleTabellone);
   }
-
-  const clone = tabelloneOrig.cloneNode(true);
-
-  // Applica lo stile corretto per la preview
-  clone.className = "griglia-preview-tabellone";
-  clone.style.transform = "none"; // misuriamo la dimensione naturale prima di scalare
-
-  // 🔹 Il clone viene misurato FUORI dal flusso (position:absolute,
-  // invisibile) invece di sostituire subito il contenuto: se lo si
-  // inserisse a piena grandezza nel flusso normale, il container
-  // "ballerebbe" temporaneamente a un'altezza enorme, e siccome .container
-  // è centrato verticalmente (justify-content:center), questo sposterebbe
-  // anche la posizione (getBoundingClientRect().top) misurata subito dopo
-  // — falsando il calcolo dello spazio verticale disponibile. Lasciando
-  // invece il contenuto precedente (o vuoto) al suo posto durante la
-  // misurazione, la posizione resta stabile. Si sostituisce tutto solo
-  // alla fine, con la scala già corretta.
-  clone.style.position = "absolute";
-  clone.style.visibility = "hidden";
-  clone.style.pointerEvents = "none";
-  container.appendChild(clone);
 
   // 🔹 La scala non è più un valore fisso (0.6): su schermi bassi in
   // landscape lasciava uscire l'anteprima dal fondo dello schermo. Si
@@ -1094,13 +1118,6 @@ function generaPreviewTabellone() {
   // cui l'anteprima è posizionata (che dipende dal layout: sotto al testo
   // se impilata, accanto se in due colonne) e la si scala di conseguenza,
   // così l'anteprima non sfora mai, qualunque sia il layout.
-  const naturaleW = clone.scrollWidth;
-  const naturaleH = clone.scrollHeight;
-  if (!naturaleW || !naturaleH) {
-    clone.remove();
-    return;
-  }
-
   const disponibileW = container.clientWidth || naturaleW;
 
   // 🔹 L'icona verde "Avanti" è fissa in basso a destra, proprio sopra
@@ -1134,16 +1151,9 @@ function generaPreviewTabellone() {
   const larghezzaScalata = naturaleW * scala;
   const offsetX = Math.max(0, (disponibileW - larghezzaScalata) / 2);
 
-  // Ora si applica il risultato finale: si sostituisce il contenuto del
-  // container con l'unico clone, in flusso normale, già alla scala giusta.
-  clone.style.position = "";
-  clone.style.visibility = "";
-  clone.style.pointerEvents = "";
-  clone.style.margin = "0";
-  clone.style.transformOrigin = "top left";
+  // Ora si applica il risultato: solo transform/dimensioni, nessuna
+  // rimozione/reinserimento del clone (vedi commento in cima alla funzione).
   clone.style.transform = `translateX(${offsetX}px) scale(${scala})`;
-  container.innerHTML = "";
-  container.appendChild(clone);
   container.style.height = `${naturaleH * scala}px`;
   container.style.overflow = "hidden";
 }
@@ -7637,20 +7647,6 @@ function adattaSchermataAllaFinestra() {
   el.classList.toggle("contenuto-eccede", scalaCalcolata < 1);
 }
 
-// 🔹 Sipario di transizione: coperto SUBITO (in modo sincrono, prima che il
-// browser disegni il fotogramma successivo) quando cambia schermata, e
-// scoperto solo a calcolo/scala completati — così non si vede mai il
-// "salto" dalla dimensione naturale a quella adattata.
-function elementoSipario() {
-  return document.getElementById("siparioTransizione");
-}
-function mostraSipario() {
-  elementoSipario()?.classList.add("attivo");
-}
-function nascondiSipario() {
-  elementoSipario()?.classList.remove("attivo");
-}
-
 // 🔹 Punto unico richiamato da resize/rotazione/cambio schermata: decide da
 // solo quale dei due adattamenti (gioco o resto dell'app) applicare.
 let _adattaTuttoTimeout = null;
@@ -7661,16 +7657,9 @@ function adattaTuttoAllaFinestra() {
     adattaSchermataAllaFinestra();
   }
 }
-function schedulaAdattamento(ritardo = 150, scopriSipario = false) {
+function schedulaAdattamento(ritardo = 150) {
   clearTimeout(_adattaTuttoTimeout);
-  _adattaTuttoTimeout = setTimeout(() => {
-    adattaTuttoAllaFinestra();
-    if (scopriSipario) {
-      // due rAF: aspetta che il browser disegni davvero il layout con la
-      // nuova scala prima di scoprire, non solo che lo script sia finito.
-      requestAnimationFrame(() => requestAnimationFrame(nascondiSipario));
-    }
-  }, ritardo);
+  _adattaTuttoTimeout = setTimeout(adattaTuttoAllaFinestra, ritardo);
 }
 
 window.addEventListener("resize", () => schedulaAdattamento(150));
@@ -7681,15 +7670,13 @@ window.addEventListener("orientationchange", () => schedulaAdattamento(300));
 // quelle future — risulta adattata senza dover richiamare la funzione a
 // mano da ogni punto del codice che genera nuovo HTML.
 //
-// Il sipario si accende SOLO per un vero cambio schermata (nodi rimossi:
-// una document.body.innerHTML= o un container.innerHTML= sostituisce
-// tutto), non per piccole aggiunte come l'animazione del testo dello
-// scenario (che aggiunge singoli span senza mai rimuovere nulla): altrimenti
-// lampeggerebbe ad ogni parola.
+// Un vero cambio schermata (nodi rimossi: una document.body.innerHTML= o un
+// container.innerHTML= sostituisce tutto) ricalcola più in fretta (60ms)
+// di una piccola aggiunta come l'animazione del testo dello scenario (che
+// aggiunge singoli span senza mai rimuovere nulla, 150ms va benissimo).
 new MutationObserver((mutazioni) => {
   const cambioSchermata = mutazioni.some((m) => m.removedNodes.length > 0);
-  if (cambioSchermata) mostraSipario();
-  schedulaAdattamento(cambioSchermata ? 60 : 150, cambioSchermata);
+  schedulaAdattamento(cambioSchermata ? 60 : 150);
 }).observe(document.body, {
   childList: true,
   subtree: true,
@@ -7703,16 +7690,15 @@ if (document.fonts && document.fonts.ready) {
   document.fonts.ready.then(() => schedulaAdattamento(50));
 }
 
-// 🔹 Primo caricamento della pagina: il sipario parte già acceso (impostato
-// direttamente nell'HTML), e viene tolto solo dopo il primo calcolo, una
-// volta che anche i font sono pronti.
+// 🔹 Primo caricamento della pagina: primo calcolo non appena i font sono
+// pronti.
 Promise.all([
   new Promise((res) => {
     if (document.readyState === "complete") res();
     else window.addEventListener("load", res, { once: true });
   }),
   document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve(),
-]).then(() => schedulaAdattamento(0, true));
+]).then(() => schedulaAdattamento(0));
 
 //GESTIONE ZOOM
 
