@@ -964,7 +964,11 @@ button.casuale:hover {
 /* Avatar segnaposto */
 .avatar-placeholder {
   width: 100%;
-  height: 150px;
+  /* 🔹 Proporzionale all'altezza dello schermo (non più un fisso 150px):
+     su un telefono in landscape molto basso, questa singola immagine
+     segnaposto era una delle voci più pesanti nel far sforare in
+     altezza le schede personaggio, costringendo a scorrere. */
+  height: clamp(64px, 20vh, 150px);
   background-color: #333;
   color: #aaa;
   display: flex;
@@ -1514,11 +1518,11 @@ button.casuale:hover {
   display: grid;
   grid-template-columns: repeat(var(--colonne-schede, 3), minmax(0, 1fr));
   justify-items: stretch;
-  gap: 14px;
+  gap: clamp(8px, 1.6vh, 14px);
   max-width: 100%;
   width: 100%;
   margin: 0 auto;
-  padding: 8px 12px;
+  padding: clamp(4px, 1vh, 8px) 12px;
   box-sizing: border-box;
 }
 
@@ -1527,11 +1531,13 @@ button.casuale:hover {
   width: 100%;
   max-width: 260px;
   justify-self: center;
-  min-height: 240px;
+  /* 🔹 Come .avatar-placeholder qui sopra: proporzionale all'altezza
+     disponibile invece di un fisso 240px. */
+  min-height: clamp(120px, 30vh, 240px);
   background: #111;
   border: 2px solid #333;
   border-radius: 10px;
-  padding: 12px;
+  padding: clamp(8px, 1.6vh, 12px);
   text-align: center;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
@@ -1542,8 +1548,9 @@ button.casuale:hover {
 }
 
 .pg-card .pg-name {
-  margin: 8px 0 10px;
+  margin: clamp(4px, 1vh, 8px) 0 clamp(6px, 1.2vh, 10px);
   font-weight: 600;
+  font-size: clamp(0.85rem, 2.3vh, 1rem);
 }
 
 .pg-card.selected {
@@ -1552,12 +1559,15 @@ button.casuale:hover {
 }
 
 .pg-card .pg-toggle-btn {
-  padding: 8px 10px;
+  padding: clamp(5px, 1vh, 8px) 6px;
+  margin: 0;
   border: none;
   border-radius: 8px;
   background: #444;
   color: #fff;
   cursor: pointer;
+  font-size: clamp(0.68rem, 1.7vh, 0.85rem);
+  line-height: 1.2;
 }
 .pg-card.selected .pg-toggle-btn {
   background: #0ea5e9; /* azzurrino */
@@ -1567,14 +1577,15 @@ button.casuale:hover {
 
 .initial-card .initial-details {
   width: 100%;
-  margin-top: 6px;
-  padding: 10px;
+  margin-top: clamp(4px, 1vh, 6px);
+  padding: clamp(6px, 1.4vh, 10px);
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: clamp(4px, 1vh, 8px);
+  font-size: clamp(0.8rem, 2.1vh, 0.95rem);
   /* niente overflow: le righe vanno a capo */
 }
 .initial-card .initial-details .row {

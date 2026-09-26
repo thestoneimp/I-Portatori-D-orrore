@@ -7397,7 +7397,7 @@ function adattaGrigliaSelezionePersonaggi() {
     const n = grid.children.length;
     if (!n) return;
 
-    const MIN_CARD = 125; // soglia minima di leggibilità: sotto, meglio andare a capo
+    const MIN_CARD = 95; // soglia minima di leggibilità: sotto, meglio andare a capo
     const GAP = 14;
     const disponibile = grid.clientWidth || window.innerWidth;
 
