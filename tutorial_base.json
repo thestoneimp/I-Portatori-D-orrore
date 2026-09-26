@@ -1,0 +1,136 @@
+[
+  {
+    "categoria": "Scopo e Obiettivi",
+    "voci": [
+      {
+        "titolo": "Scopo del Gioco",
+        "testo": "Lo scopo del gioco è uno e uno soltanto: soddisfare le <strong>Condizioni di Vittoria</strong> descritte nella carta <span class='tutorial-link' data-voce='Obiettivo Personale'>Obiettivo Personale</span> che vi è stata assegnata (a meno che non stiate giocando in <span class='tutorial-link' data-voce='Gioco in Solitaria'>Solitaria</span>). Ognuno dei giocatori, quindi, vince in maniera differente dagli altri. Non conoscendo quale siano le <strong>Condizioni di Vittoria</strong> dei vostri compagni, fidarvi di loro potrebbe rivelarsi fatale. Alcuni degli <span class='tutorial-link' data-voce='Obiettivo Personale'>Obiettivi Personali</span> prevedono la vittoria solitaria, altri quella di gruppo. Il vostro compito è quello di soddisfare le condizioni del vostro Obiettivo prima che tutti gli <span class='tutorial-link' data-voce='Obiettivi Comuni Obbligatori'>Obiettivi Comuni Obbligatori</span> siano stati completati, o prima che il <span class='tutorial-link' data-voce='Contatore Minacce'>Contatore Minacce</span> (in alto) raggiunga lo 0, cercando di evitare, nel mentre, che i vostri Personaggi finiscano tutti <span class='tutorial-link' data-voce='Fuori Combattimento'>Fuori Combattimento</span>."
+      },
+      {
+        "titolo": "Obiettivo Personale",
+        "testo": "Se non state giocando in <span class='tutorial-link' data-voce='Gioco in Solitaria'>Solitaria</span>, durante la preparazione della partita vi è stata assegnata una carta <strong>Obiettivo Personale</strong>, da dover leggere e mantenere segreta. In essa sono riportate le <strong>Condizioni di Vittoria</strong> che dovrete soddisfare per poter vincere la partita. Queste potranno prevedere la vostra vittoria in solitaria o assieme al resto del gruppo. Vi è consentito mentire, bluffare o raggirare gli altri facendogli credere di avere determinate condizioni piuttosto di altre, ma non vi sarà mai permesso di rivelare la vostra carta <strong>Obiettivo Personale</strong> a nessuno (a meno che non sia la carta stessa a dirvelo). Pena, la sconfitta immediata e la rimozione dal gioco! Stessa sorte toccherà, ovviamente, a chiunque tenterà di 'sbirciare' le carte <strong>Obiettivo Personale</strong> degli altri giocatori."
+      },
+      {
+        "titolo": "Obiettivi Comuni Obbligatori",
+        "testo": "Se state giocando in <span class='tutorial-link' data-voce='Gioco in Solitaria'>Solitaria</span>, o se il vostro Obiettivo Personale lo richiede, gli Obiettivi Comuni Obbligatori devono essere completati tutti affinché vinciate la Partita. Ogni Scenario può avere uno o più Obiettivi Comuni Obbligatori iniziali, ma durante il gioco, a seconda del fato e delle vostre scelte, questi potrebbero aumentare, diminuire o cambiare totalmente. Allo stesso modo, durante il gioco potreste sbloccare degli <span class='tutorial-link' data-voce='Obiettivi Comuni Opzionali'>Obiettivi Comuni Opzionali</span>. Questi, come il nome suggerisce, non andranno completati obbligatoriamente per poter vincere (a meno che il vostro <span class='tutorial-link' data-voce='Obiettivo Personale'>Obiettivo Personale</span> non lo richieda). Potete tenere traccia di tutti gli Obiettivi Comuni, sia Obbligatori che Opzionali, attraverso il Menu Obbiettivi, richiamabile dal tasto in alto a sinistra dello schermo.",
+        "freccia": true,
+        "posizioneFreccia": "top-left"
+      },
+      {
+        "titolo": "Obiettivi Comuni Opzionali",
+        "testo": "A differenza degli <span class='tutorial-link' data-voce='Obiettivi Comuni Obbligatori'>Obiettivi Comuni Obbligatori</span>, quelli Opzionali non devono essere completati obbligatoriamente per vincere la Partita (a meno che il vostro <span class='tutorial-link' data-voce='Obiettivo Personale'>Obiettivo Personale</span> non dica il cotrario). Ciò nonostante, completare tali Obiettivi è altamente consigliato, poiché potrebbero farvi ottenere utili ricompense, oltre a permettervi di sbloccare il <span class='tutorial-link' data-voce='Finali Multipli'> Vero Finale</span> di ogni Scenario. Ma non vi fate ingolosire troppo. Ricordatevi che il <span class='tutorial-link' data-voce='Contatore Minacce'>Contatore Minacce</span> non aspetta certo voi!"
+      },
+
+      {
+        "titolo": "Gioco in Solitaria",
+        "testo": "Se state giocando in <strong>solitaria</strong>, non avete un <span class='tutorial-link' data-voce='Obiettivo Personale'>Obiettivo Personale</span>. Per vincere, vi basterà completare tutti gli <span class='tutorial-link' data-voce='Obiettivi Comuni Obbligatori'>Obiettivi Comuni Obbligatori</span> presenti in gioco."
+      },
+      {
+        "titolo": "Finali Multipli",
+        "testo": "Seppur generati casualmente, sia nella composizione della <span class='tutorial-link' data-voce='Plancia di Gioco'>Plancia di Gioco</span>, che nella generazione degli Eventi, ogni Scenario ha un filone narrativo principale che, a seconda degli <strong>Obiettivi Comuni</strong> che riuscirete a sbloccare e completare (siano essi <strong>Obbligatori</strong> o <strong>Opzionali</strong>), conduce ad uno dei <strong>finali multipli</strong> possibili per quello Scenario. Sappiate, però, che fra essi, si cela solo un unico, <strong>Vero Finale</strong>. Non preoccupatevi, qualora riuscirete a raggiungerlo, ve ne accorgerete di certo!"
+      }
+    ]
+  },
+  {
+    "categoria": "Fasi di Gioco e Turni",
+    "voci": [
+      {
+        "titolo": "Fase Giocatori",
+        "testo": "La <strong>Fase Giocatori</strong> è una delle due fasi in cui si divide il gioco. Come il nome lascia intendere, è la fase in cui i Giocatori, uno alla volta, svolgono il proprio <span class='tutorial-link' data-voce='Turno di Gioco'>Turno di Gioco</span>. Una volta che ogni Giocatore avrà terminato il proprio turno, si passa automaticamente alla <span class='tutorial-link' data-voce='Fase Minacce'>Fase Minacce</span>."
+      },
+      {
+        "titolo": "Fase Minacce",
+        "testo": "Quando tutti i giocatori hanno svolto il proprio <span class='tutorial-link' data-voce='Turno di Gioco'>Turno di Gioco</span> durante la <span class='tutorial-link' data-voce='Fase Giocatori'>Fase Giocatori</span>, inizierà automaticamente la <strong>Fase Minacce</strong>. Durante questa fase, vengono gestite, per l'appunto, tutte le minacce presenti in gioco, a cominciare dal <span class='tutorial-link' data-voce='Contatore Minacce'>Contatore Minacce</span>, per proseguire poi con la gestione dei Personaggi Malvagi, dei Mostri o degli Eventi Negativi presenti in gioco. Allo stesso modo, durante questa fase potrebbero essere generate nuove minacce al fine di non rendervi la vita troppo facile. Tutto ciò il più delle volte verrà gestito automaticamente dall'applicazione, e voi non dovrete far altro che seguire le istruzioni che appariranno a schermo."
+      },
+      {
+        "titolo": "Ordine dei Turni",
+        "testo": "Durante la <span class='tutorial-link' data-voce='Fase Giocatori'>Fase Giocatori</span>, all'inizio di ogni <span class='tutorial-link' data-voce='Turno di Gioco'>Turno di Gioco</span>, vi verrà chiesto chi sarà a svolgere il turno. L'ordine dei turni potrà variare continuamente, e dipenderà dal valore di <span class='tutorial-link' data-voce='Rapidità'>Rapidità</span> che i personaggi possiedono <strong>nel momento in cui vi viene chiesto chi sarà il prossimo ad agire</strong>. In caso ci siano due o più personaggi con lo stesso valore <span class='tutorial-link' data-voce='Rapidità'>Rapidità</span>, costoro possono scegliere se accordarsi su chi agisce prima degli altri, oppure se eseguire uno spareggio con metodi classici quali una conta o una morra cinese. Se, invece, c'è un unico Personaggio con il valore <span class='tutorial-link' data-voce='Rapidità'>Rapidità</span> più alto, non può decidere di far giocare prima qualcun altro al suo posto. Nessuno gli vieta, però, di iniziare il turno e terminarlo immediatamente senza compiere azioni, saltandolo del tutto. Inoltre, tenete bene a mente che esistono <span class='tutorial-link' data-voce='Abilità'>Abilità</span> o <span class='tutorial-link' data-voce='Carte Utilità'>Carte Utilità</span> in grado di cambiare l'ordine dei turni. Ovviamente, se state giocando in Solitaria, questo problema non si pone."
+      },
+      {
+        "titolo": "Turno di Gioco",
+        "testo": "All'inizio del proprio <strong>Turno di Gioco</strong>, è possibile <span class='tutorial-link' data-voce='Rinnovare una carta'>Rinnovare</span> (girare a faccia in su) fino a 2 carte <span class='tutorial-link' data-voce='Esaurire una carta'>Esaurite</span> (girate a faccia in giù) fra quelle possedute dal proprio Personaggio. Subito dopo, si procede con lo svolgimento del turno, durante il quale il Personaggio può eseguire le seguenti <strong>Azioni</strong> in qualsiasi ordine desideri: compiere un singolo <span class='tutorial-link' data-voce='Movimento'>Movimento</span>; <span class='tutorial-link' data-voce='Interazione'>Interagire</span> con gli elementi del luogo in cui si trova; effettuare Scambi con uno o più personaggi presenti nel suo stesso luogo; utilizzare un qualsiasi numero di Abilità, Oggetti o Carte Speciali. Una volta che il giocatore ha esaurito tutte le sue possibili <strong>Azioni</strong>, oppure ogniqualvolta ne abbia desiderio, può premere il pulsante <strong>Termina Turno</strong> posizionato in basso."
+      },
+      {
+        "titolo": "Movimento",
+        "testo": "Ogni personaggio ha un valore di <strong>movimento</strong> indicato nell'angolo in alto a destra della propria <span class='tutorial-link' data-voce='Carta Personaggio'>Carta Personaggio</span>. Tale valore può variare a seconda della <span class='tutorial-link' data-voce='Vitalità'>Vitalità</span> attuale del Personaggio. Il valore di <strong>movimento</strong> indica di quante <span class='tutorial-link' data-voce='Carte Luogo'>Carte Luogo</span> può spostarsi durante il <span class='tutorial-link' data-voce='Turno di Gioco'>Turno di Gioco</span>. Il vostro Personaggio può muoversi <strong>orizzontalmente</strong> attraversando le carte <strong>adiacenti</strong> del <span class='tutorial-link' data-voce='Piani'>Piano</span> in cui si trova, a patto che non ci siano <span class='tutorial-link' data-voce='Sbarramenti'>Sbarramenti</span> fra una carta e l'altra ad interrompere il percorso. Può, inoltre, muoversi <strong>verticalmente</strong> attraversando <span class='tutorial-link' data-voce='Carte Luogo'>Carte Luogo</span> <strong>adiacenti</strong> dei piani limitrofi, a patto che ci sia una <span class='tutorial-link' data-voce='Scale'>Scala</span> a collegare i piani. Quando avete scelto la <span class='tutorial-link' data-voce='Carte Luogo'>Carta Luogo</span> in cui muovere il vostro Personaggio, vi basterà premere su di essa nella <span class='tutorial-link' data-voce='Plancia di Gioco Digitale'>Plancia di Gioco Digitale</span>. Se il luogo NON è raggiungibile, apparirà un messaggio ad informarvi del motivo. Altrimenti, il vostro Personaggio si muoverà automaticamente verso il luogo scelto. In tal caso, spostate allo stesso modo la vostra <span class='tutorial-link' data-voce='Carta Personaggio'>Carta Personaggio</span> sulla <span class='tutorial-link' data-voce='Plancia di Gioco'>Plancia di Gioco</span> reale. Una volta mosso il vostro Personaggio, indipendentemente da quante <span class='tutorial-link' data-voce='Carte Luogo'>Carte Luogo</span> ha percorso, la sua azione di movimento sarà esaurita e non potrà muoversi una seconda volta."
+      },
+      {
+        "titolo": "Esplorazione",
+        "testo": "Quando il vostro personaggio termina il proprio <span class='tutorial-link' data-voce='Movimento'>Movimento</span> su una <span class='tutorial-link' data-voce='Carte Luogo'>Carta Luogo</span> non ancora esplorata, essa viene <strong>Esplorata</strong> automaticamente. Quando una <span class='tutorial-link' data-voce='Carte Luogo'>Carta Luogo</span> viene esplorata, giratela a faccia in su nella <span class='tutorial-link' data-voce='Plancia di Gioco'>Plancia di Gioco</span> <strong>reale</strong>, rivelando così di che luogo si tratta."
+      },
+      {
+        "titolo": "Interazione",
+        "testo": "Ogni personaggio ha un valore di Movimento indicato sulla propria carta. Può muoversi fino a quel numero di luoghi per turno."
+      }
+    ]
+  },
+  {
+    "categoria": "Elementi Del Gioco",
+    "voci": [
+      {
+        "titolo": "Plancia di Gioco",
+        "testo": "La <strong>Plancia di Gioco</strong> rappresenta la <strong>struttura</strong> del luogo in cui i Personaggi si trovano. Essa è costituita da un numero ben preciso di <span class='tutorial-link' data-voce='Carte Luogo'>Carte Luogo</span>, posizionate secondo le indicazioni assegnate ad inizio Scenario. Attraverso di esse i Personaggi controllati dai Giocatori potranno <span class='tutorial-link' data-voce='Movimento'>muoversi</span>, <span class='tutorial-link' data-voce='Esplorazione'>esplorare</span> ed <span class='tutorial-link' data-voce='Interazione'>interagire</span> al fine di completare i propri Obiettivi. Per compiere questo tipo di azioni durante il loro Turno, i Giocatori dovranno innazitutto interagire con la <span class='tutorial-link' data-voce='Plancia di Gioco Digitale'>Plancia di Gioco Digitale</span> presente in quest'app, per verificare che tali azioni siano consentite."
+      },
+      {
+        "titolo": "Plancia di Gioco Digitale",
+        "testo": "Si tratta della versione digitale della <span class='tutorial-link' data-voce='Plancia di Gioco'>Plancia di Gioco</span>, ovvero la sua riproduzione all'interno di questa applicazione. Attraverso di essa avrete modo di 'comunicare' all'applicazione i <span class='tutorial-link' data-voce='Movimento'>movimenti</span> del vostro Personaggio, potrete tentare di <span class='tutorial-link' data-voce='Esplorazione'>esplorare</span> luoghi, o <span class='tutorial-link' data-voce='Interazione'>interagire</span> con luoghi già eplorati."
+      },
+      {
+        "titolo": "Carte Luogo",
+        "testo": "Le <strong>Carte Luogo</strong> costituiscono lo scheletro del gioco, andando a comporre la <span class='tutorial-link' data-voce='Plancia di Gioco'>Plancia di Gioco</span>. Ognuna di esse possiede un codice alfanumerico unico sul dorso (A01; A02; A03 e così via) che la identifica, permettendo le interazioni fra la Plancia di Gioco <strong>reale</strong>, dinanzi a voi, e quella <strong>digitale</strong> presente in questa applicazione. All'inizio di ogni partita, esse vanno posizionate a <strong>faccia in giù</strong> seguendo le istruzioni descritte dallo Scenario. Tutte le <strong>Carte Luogo</strong> a faccia in giù sono considerate <strong>NON</strong> <span class='tutorial-link' data-voce='Esplorazione'>Esplorate</span>, e fintanto rimarranno tali non sarà possibile <span class='tutorial-link' data-voce='Interazione'>Interagire</span> con gli elementi presenti al loro interno. Una volta esplorate, le carte luogo vanno girate a faccia in su, rivelando così la loro composizione. Ogni carta luogo è differente dalle altre, sia per il nome, per l'immagine, o per la presenza di elementi al suo interno con cui potrete interagire. Alcune carte luogo presentano, inoltre, delle regole speciali, valide solamente quando ci si trova al loro interno."
+      },
+      {
+        "titolo": "Scale",
+        "testo": "Le <strong>Scale</strong> collegano due piani adiacenti, permettendo ai Personaggi di <span class='tutorial-link' data-voce='Movimento'>muoversi</span> verticalmente fra essi. Le <strong>Scale</strong> sono presenti solamente in determinate <span class='tutorial-link' data-voce='Carte Luogo'>Carte Luogo</span> e appaiono solamente quando queste vengono <span class='tutorial-link' data-voce='Esplorazione'>Esplorate</span>."
+      },
+      {
+        "titolo": "Piani",
+        "testo": "La <span class='tutorial-link' data-voce='Plancia di Gioco'>Plancia di Gioco</span> è composta da molteplici <span class='tutorial-link' data-voce='Carte Luogo'>Carte Luogo</span> disposte su diverse <strong>linee</strong> poste una sopra l'altra. Tali <strong>linee</strong> vanno a formare i <strong>Piani</strong> dell'edificio in cui si svolgono i vari Scenari. Ogni <strong>Piano</strong> è collegato a quelli adiacenti da <span class='tutorial-link' data-voce='Scale'>Scale</span> (inizialmente nascoste), che permettono ai Personaggi di muoversi da un piano all'altro."
+      },
+      {
+        "titolo": "Sbarramenti",
+        "testo": "Gli sbarramenti bloccano il passaggio tra due luoghi. Possono essere rimossi con oggetti o abilità specifiche."
+      },
+      {
+        "titolo": "Contatore Minacce",
+        "testo": "Il <strong>Contatore Minacce</strong> scandisce la durata del gioco, nonché il numero di <span class='tutorial-link' data-voce='Turno di Gioco'>Turni</span> concessi ai Giocatori per poter completare i propri <span class='tutorial-link' data-voce='Scopo del Gioco'>Obiettivi</span> (Personali o Comuni). Il countdown del <strong>Contatore Minacce</strong> parte da un numero che varia a seconda dello Scenario, del numero di Giocatori, e della difficoltà scelta. All'inizio di ogni <span class='tutorial-link' data-voce='Fase Minacce'>Fase Minacce</span>, il contatore calerà di uno. Inoltre, durante il gioco potrà diminuire ulteriormente o aumentare, con l'uso di determinate carte, o all'accadere di determinati eventi. Se il contatore arriva a 0, la partita termina.",
+        "freccia": true,
+        "posizioneFreccia": "top-center"
+      }
+    ]
+  },
+  {
+    "categoria": "Personaggi e Abilità",
+    "voci": [
+      {
+        "titolo": "Carta Personaggio",
+        "testo": "La Plancia di gioco rappresenta la <strong>struttura</strong> del luogo in cui i Personaggi si trovano. Essa è costituita da un numero ben preciso di Carte Luogo, posizionate secondo le indicazioni assegnate ad inizio Scenario. Attraverso di esse i Personaggi controllati dai Giocatori potranno <span class='tutorial-link' data-voce='Movimento'>muoversi</span>, <span class='tutorial-link' data-voce='Esplorazione'>esplorare</span> ed <span class='tutorial-link' data-voce='Interazione'>interagire</span> al fine di completare i propri Obiettivi. Per compiere questo tipo di azioni durante il loro Turno, i Giocatori dovranno innazitutto interagire con la <span class='tutorial-link' data-voce='Plancia di Gioco Digitale'>Plancia di Gioco Digitale</span> presente in quest'app, per verificare che tali azioni siano consentite."
+      },
+      {
+        "titolo": "Abilità",
+        "testo": "Ogni Personaggio possiede determinate <strong>Abilità</strong>. Queste possono essere utilizzate in qualsiasi momento durante il proprio <span class='tutorial-link' data-voce='Turno di Gioco'>Turno di Gioco</span>, e non c'è limite al numero di <strong>Abilità</strong> che è possibile utilizzare. È importante, però, tenere a mente che ogniqualvolta si utilizza un'<strong>Abilità</strong>, questa viene <span class='tutorial-link' data-voce='Esaurire una carta'>Esaurita</span> (girata a faccia in giù), e non sarà possibile riutilizzarla fin quando non sarà <span class='tutorial-link' data-voce='Rinnovare una carta'>Rinnovata</span> (girata a faccia in su)."
+      },
+      {
+        "titolo": "Vitalità",
+        "testo": "Si tratta della versione digitale della <span class='tutorial-link' data-voce='Plancia di Gioco'>Plancia di Gioco</span>, ovvero la sua riproduzione all'interno di questa applicazione. Attraverso di essa avrete modo di 'comunicare' all'applicazione i <span class='tutorial-link' data-voce='Movimento'>movimenti</span> del vostro Personaggio, potrete tentare di <span class='tutorial-link' data-voce='Esplorazione'>esplorare</span> luoghi, o <span class='tutorial-link' data-voce='Interazione'>interagire</span> con luoghi già eplorati."
+      },
+      {
+        "titolo": "Fuori Combattimento",
+        "testo": "Quando la <span class='tutorial-link' data-voce='Vitalità'>Vitalità</span> del Personaggio scende a <strong>0</strong>, finisce <strong>Fuori Combatimento</strong>, e la sua <span class='tutorial-link' data-voce='Carta Personaggio'>Carta Personaggio</span> va ruotata orizzontalmente sulla <span class='tutorial-link' data-voce='Carte Luogo'>Carta Luogo</span> in cui si trova. Egli non potrà svolegere il proprio <span class='tutorial-link' data-voce='Turno di Gioco'>Turno di Gioco</span> a meno che un suo compagno non riesca a restituirgli <span class='tutorial-link' data-voce='Vitalità'>Vitalità</span> in qualche modo. Le sue <span class='tutorial-link' data-voce='Carte Utilità'>Carte Utilità</span> e i suoi <span class='tutorial-link' data-voce='Oggetti'>Oggetti</span> sono considerai ancora in suo possesso, ma possono essere <strong>rubati</strong> da chiunque interagisca con lui. Nulla vieta agli altri giocatori di derubare il Personaggio fuori combattimento e poi curarlo in un secondo momento, qualora ne abbiano voglia."
+      }
+    ]
+  },
+  {
+    "categoria": "Meccaniche di Gioco",
+    "voci": [
+      {
+        "titolo": "Esaurire una carta",
+        "testo": "Ogniqualvolta utilizzate un'<span class='tutorial-link' data-voce='Abilità'>Abilità</span> del vostro Personaggio, una qualsiasi altra carta che abbia il simbolo <strong>Esaurimento</strong>, o ogniqualvolta il gioco vi indica di farlo, dovrete <strong>Esaurire</strong> la carta in questione, semplicemente <strong>girandola a faccia in giù</strong>. Fin tanto la carta non verrà <span class='tutorial-link' data-voce='Rinnovare una carta'>Rinnovata</span>, non potrà essere utilizzata."
+      },
+      {
+        "titolo": "Rinnovare una carta",
+        "testo": "<strong>Rinnovare</strong> una carta <span class='tutorial-link' data-voce='Esaurire una carta'>Esaurita</span>, significa semplicemente <strong>girarla a faccia in su</strong>, rendendola nuovamente utilizzabile. Generalmente ogni giocatore può Rinnovare fino a 2 carte in suo possesso all'inizio del proprio <span class='tutorial-link' data-voce='Turno di Gioco'>Turno di Gioco</span>, ma esistono anche altri modi in cui è possibile farlo, come ad esempio utilizzando determinate <span class='tutorial-link' data-voce='Carte Utilità'>Carte Utilità</span>."
+      }
+    ]
+  }
+]

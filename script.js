@@ -1196,24 +1196,63 @@ function abilitaScorrimentoMenu(scrollEl, frecciaSuEl, frecciaGiuEl) {
   aggiornaFrecce();
 }
 
+// I 3 pannelli che usano questo meccanismo di apertura/chiusura (Obiettivi,
+// Tutorial e Impostazioni). Il popup Personaggi è un concetto architetturale
+// diverso (mostraMenuPersonaggi/.popup) e non rientra nella mutua esclusione.
+const ID_MENU_LATERALI = ["menuObiettivi", "menuTutorial", "menuImpostazioni"];
+
+function _direzioneMenuLaterale(menuId) {
+  return menuId === "menuImpostazioni" ? "right" : "left";
+}
+
+function _haMenuLateraleAperto() {
+  return ID_MENU_LATERALI.some((id) =>
+    document.getElementById(id)?.classList.contains("open")
+  );
+}
+
 function toggleSideMenu(menuId, direction = "left", width = 300) {
   const menu = document.getElementById(menuId);
   const overlay = document.getElementById("overlaySfondo");
   const gameScreen = document.querySelector(".game-screen");
+  const cornerOverlay = document.getElementById("gameCornerOverlay");
+
+  // 🔹 Mutua esclusione: se sto per APRIRE questo menu e un altro pannello
+  // laterale è già aperto, chiudo prima quello, così non si sovrappongono.
+  if (!menu.classList.contains("open")) {
+    const altroMenuId = ID_MENU_LATERALI.find(
+      (id) => id !== menuId && document.getElementById(id)?.classList.contains("open")
+    );
+    if (altroMenuId) {
+      toggleSideMenu(altroMenuId, _direzioneMenuLaterale(altroMenuId), width);
+    }
+  }
 
   const isOpen = menu.classList.toggle("open");
 
+  // 🔹 Le 4 icone d'angolo si spostano in sincrono con la schermata di gioco,
+  // simulando che "si spostino assieme ad essa", per poi tornare al loro
+  // posto quando il menu si richiude.
+  const applicaSlideIcone = (traslazione) => {
+    if (cornerOverlay) {
+      cornerOverlay.style.transform = `translateX(${traslazione}px)`;
+    }
+  };
+
   if (isOpen) {
-    // Apertura menu → sposta schermo
+    // Apertura menu → sposta schermo (e le icone d'angolo assieme ad esso)
     if (direction === "left") {
       gameScreen.style.transform = `translateX(${width}px)`;
+      applicaSlideIcone(width);
     } else if (direction === "right") {
       gameScreen.style.transform = `translateX(-${width}px)`;
+      applicaSlideIcone(-width);
     }
     overlay.style.display = "block";
   } else {
     // Chiusura menu → reset immediato
     gameScreen.style.transform = "translateX(0)";
+    applicaSlideIcone(0);
     overlay.style.display = "none";
 
     const ghost = document.createElement("div");
@@ -1228,7 +1267,13 @@ function toggleSideMenu(menuId, direction = "left", width = 300) {
 
     // piccolo delay, poi rimuove e resetta
     setTimeout(() => {
-      gameScreen.style.transform = "translateX(0)";
+      // Se nel frattempo è stato aperto un altro pannello laterale (mutua
+      // esclusione), schermo e icone sono già stati riposizionati da quella
+      // apertura: questo reset ritardato non deve sovrascriverli.
+      if (!_haMenuLateraleAperto()) {
+        gameScreen.style.transform = "translateX(0)";
+        applicaSlideIcone(0);
+      }
 
       ghost.remove();
     }, 350);

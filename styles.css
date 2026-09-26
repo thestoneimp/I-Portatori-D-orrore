@@ -562,6 +562,12 @@ button.btn-primary:hover {
   inset: 0;
   z-index: 20000;
   pointer-events: none;
+  /* 🔹 Le icone si spostano in sincrono col game-screen quando un menu
+     laterale si apre/chiude (vedi toggleSideMenu in script.js), simulando
+     che si spostino assieme al resto della schermata. Stessa durata/easing
+     della transizione di .game-screen (0.4s ease) per restare visivamente
+     allineate durante lo scorrimento. */
+  transition: transform 0.4s ease;
 }
 
 .game-corner-overlay.nascosto {
@@ -1061,20 +1067,6 @@ button.casuale:hover {
   border-color: #4caf50;
 }
 
-/* 🔹 Le icone fisse d'angolo (#gameCornerOverlay) restano sempre sopra
-   questi pannelli (z-index più alto) e sono TUTTE E 4 sempre visibili
-   insieme, non solo quella del menu aperto: #menuObiettivi e #menuTutorial
-   condividono lo stesso bordo sinistro dello schermo, quindi entrambi
-   devono restare liberi sia dall'icona in alto a sinistra (Obiettivi) sia
-   da quella in basso a sinistra (Tutorial), qualunque dei due sia aperto —
-   altrimenti il titolo o la freccia di scorrimento finirebbero
-   parzialmente sotto un'icona non "sua". */
-#menuObiettivi,
-#menuTutorial {
-  padding-top: clamp(70px, 15vh, 96px);
-  padding-bottom: clamp(70px, 15vh, 96px);
-}
-
 .advance-turn-btn {
   position: fixed;
   bottom: 20px;
@@ -1237,12 +1229,6 @@ button.casuale:hover {
   background-color: #222;
   color: white;
   padding: clamp(10px, 3vh, 20px);
-  /* 🔹 Stessa ragione della regola su #menuObiettivi/#menuTutorial più
-     sopra: questo pannello condivide il bordo destro dello schermo con
-     l'icona Personaggi (in alto) e la propria icona 🗝️ (in basso),
-     entrambe sempre visibili — riserva spazio su entrambi i lati. */
-  padding-top: clamp(70px, 15vh, 96px);
-  padding-bottom: clamp(70px, 15vh, 96px);
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
   overflow-y: auto;
   /* 🔹 Stesso motivo del .side-menu qui sopra: transform relativo alla
