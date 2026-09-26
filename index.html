@@ -46,6 +46,19 @@
       <button id="navBtnAvanti" class="nav-icon-btn" type="button" aria-label="Avanti" title="Avanti" hidden>›</button>
     </div>
 
+    <!-- 🔹 Le 4 icone di menu della schermata di gioco (Obiettivi/Personaggi/
+         Tutorial/Impostazioni): stesso principio di navOverlay sopra, fuori
+         dal flusso e immuni allo scale-to-fit/zoom/pan di .game-screen, così
+         restano ferme nei 4 angoli veri dello schermo e non occupano spazio
+         nel tabellone. Spostate sotto <html> da script.js. Mostrate solo
+         durante la partita tramite mostraMenuGioco()/nascondiMenuGioco(). -->
+    <div id="gameCornerOverlay" class="game-corner-overlay nascosto">
+      <button id="gcBtnObiettivi" class="game-corner-btn corner-top-left" type="button" aria-label="Obiettivi" title="Obiettivi">🕯️</button>
+      <button id="gcBtnPersonaggi" class="game-corner-btn corner-top-right" type="button" aria-label="Personaggi" title="Personaggi">🎭</button>
+      <button id="gcBtnTutorial" class="game-corner-btn corner-bottom-left" type="button" aria-label="Tutorial" title="Tutorial">📖</button>
+      <button id="gcBtnImpostazioni" class="game-corner-btn corner-bottom-right" type="button" aria-label="Impostazioni" title="Impostazioni">🗝️</button>
+    </div>
+
     <div class="home-background" aria-hidden="true">
       <video class="home-background-video" autoplay muted loop playsinline preload="auto">
         <source src="assets/media/animazione-casa-sfondo.mp4" type="video/mp4" />

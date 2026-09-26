@@ -7,7 +7,7 @@
 // mai ricreato, sopravvivono a qualunque cambio schermata invece di
 // sparire dopo il primo utilizzo.
 (function rendiPersistentiElementiFuoriSchermo() {
-  ["siparioTransizione", "avvisoRuotaSchermo", "navOverlay"].forEach((id) => {
+  ["siparioTransizione", "avvisoRuotaSchermo", "navOverlay", "gameCornerOverlay"].forEach((id) => {
     const el = document.getElementById(id);
     if (el && el.parentElement !== document.documentElement) {
       document.documentElement.appendChild(el);
@@ -48,6 +48,35 @@ function mostraNavigazione({ indietro, home, avanti } = {}) {
 
 function nascondiNavigazione() {
   const overlay = document.getElementById("navOverlay");
+  if (overlay) overlay.classList.add("nascosto");
+}
+
+// ============================
+// 📌 0ter. MENU DI GIOCO A ICONE FISSE (Obiettivi/Personaggi/Tutorial/Impostazioni)
+// ============================
+// Stesso principio di mostraNavigazione()/nascondiNavigazione(): overlay
+// fisso fuori da .game-screen, quindi immune alla sua scala/zoom/pan e non
+// conteggiato nello spazio del tabellone. Le azioni sono sempre le stesse
+// (assegnazione diretta onclick, non addEventListener, per restare idempotente
+// anche se richiamata più volte). Mostrato solo durante la partita.
+function mostraMenuGioco() {
+  const overlay = document.getElementById("gameCornerOverlay");
+  if (!overlay) return;
+
+  document.getElementById("gcBtnObiettivi").onclick = () =>
+    toggleSideMenu("menuObiettivi", "left", 300);
+  document.getElementById("gcBtnPersonaggi").onclick = () =>
+    mostraMenuPersonaggi();
+  document.getElementById("gcBtnTutorial").onclick = () =>
+    toggleSideMenu("menuTutorial", "left", 300);
+  document.getElementById("gcBtnImpostazioni").onclick = () =>
+    toggleSideMenu("menuImpostazioni", "right", 300);
+
+  overlay.classList.remove("nascosto");
+}
+
+function nascondiMenuGioco() {
+  const overlay = document.getElementById("gameCornerOverlay");
   if (overlay) overlay.classList.add("nascosto");
 }
 
@@ -698,6 +727,7 @@ function getCarteIniziali(nomeEroe) {
 function goToMainMenu() {
   faseCorrente = "giocatori"; // Resetta la fase a inizio partita
   nascondiNavigazione(); // la Home ha i propri pulsanti, non serve l'overlay
+  nascondiMenuGioco(); // si esce dalla partita: nasconde le 4 icone d'angolo
   document.body.innerHTML = `
     <div class="home-background" aria-hidden="true">
       <video class="home-background-video" autoplay muted loop playsinline preload="auto">
@@ -1167,8 +1197,9 @@ function toggleSideMenu(menuId, direction = "left", width = 300) {
 // ============================
 
 function mostraSchermataPrincipale() {
-  // la schermata di gioco ha già i propri pulsanti d'angolo (📜📘📚⚙️)
+  // la schermata di gioco ha la propria navigazione a icone d'angolo
   nascondiNavigazione();
+  mostraMenuGioco();
 
   console.log(
     "DEBUG → posizioniPersonaggi all'inizio partita:",
@@ -1203,10 +1234,6 @@ function mostraSchermataPrincipale() {
           <div id="grigliaPersonaggi" class="griglia-personaggi"></div>
           <div class="turn-counter" id="turnCounter">Contatore Minacce: ${gameData.turniRimanenti}</div>
           <div id="phaseIndicator" class="phase-indicator"></div>
-          <button onclick="toggleSideMenu('menuObiettivi', 'left', 300)" class="corner-btn top-left">📜</button>
-          <button class="corner-btn top-right" onclick="mostraMenuPersonaggi()">📘</button>
-          <button class="corner-btn bottom-left" onclick="toggleSideMenu('menuTutorial', 'left', 300)">📚</button>
-          <button class="corner-btn bottom-right" onclick="toggleSideMenu('menuImpostazioni', 'right', 300)">⚙️</button>
           <button id="btnAvanzaTurno" class="advance-turn-btn">Termina Turno</button>
         </div>
       </div>
@@ -5074,13 +5101,13 @@ function gestisciFrecciaTutorial(mostra, posizione) {
       freccia.style.top = `${rect.bottom + 5}px`;
     } else if (posizione === "top-left") {
       freccia.innerHTML = "⬇️"; // verso il basso
-      const btn = document.querySelector(".corner-btn.top-left");
+      const btn = document.getElementById("gcBtnObiettivi");
       const rect = btn.getBoundingClientRect();
       freccia.style.left = `${rect.left + rect.width / 2 - 20}px`;
       freccia.style.top = `${rect.bottom + 5}px`;
     } else if (posizione === "bottom-left") {
       freccia.innerHTML = "⬆️"; // verso l'alto
-      const btn = document.querySelector(".corner-btn.bottom-left");
+      const btn = document.getElementById("gcBtnTutorial");
       const rect = btn.getBoundingClientRect();
       freccia.style.left = `${rect.left + rect.width / 2 - 20}px`;
       freccia.style.top = `${rect.top - 30}px`;
