@@ -851,15 +851,18 @@ function mostraScenario(scenario, isTutorial = false) {
   console.log(`🎯 Scenario corrente impostato: ${gameData.scenarioCorrente}`);
 
   const html = `
-    <h2>${isTutorial ? "Scenario Tutorial" : "Scenario Comune"}</h2>
-    <h3>${scenario.nome}</h3>
-    <p><em>${scenario.introduzione}</em></p>
-    <p><strong>Obiettivo:</strong> ${scenario.obiettivo}</p>
-    <p><strong>Turni disponibili:</strong> ${scenario.turni}</p>
-
-    <div>
-      <p><strong>Anteprima della disposizione delle carte:</strong></p>
-      <div id="previewTabellone"></div>
+    <div class="scenario-anteprima-layout">
+      <div class="scenario-anteprima-testo">
+        <h2>${isTutorial ? "Scenario Tutorial" : "Scenario Comune"}</h2>
+        <h3>${scenario.nome}</h3>
+        <p><em>${scenario.introduzione}</em></p>
+        <p><strong>Obiettivo:</strong> ${scenario.obiettivo}</p>
+        <p><strong>Turni disponibili:</strong> ${scenario.turni}</p>
+      </div>
+      <div class="scenario-anteprima-tabellone">
+        <p><strong>Anteprima della disposizione delle carte:</strong></p>
+        <div id="previewTabellone"></div>
+      </div>
     </div>
   `;
 
@@ -878,16 +881,14 @@ function mostraScenario(scenario, isTutorial = false) {
 
   setTimeout(() => {
     generaGrigliaTabelloneNascosto();
-    generaPreviewTabellone();
+    // 🔹 generaPreviewTabellone() viene richiamata automaticamente da
+    // adattaSchermataAllaFinestra() (osservatore delle modifiche al DOM,
+    // vedi più sotto), che ne calcola anche la scala corretta in base allo
+    // spazio disponibile: non serve chiamarla anche qui.
   }, 100);
 }
 
 function mostraSchermataScenario(titolo, testo, immagine) {
-  // 🔹 Schermata a tutto schermo: nasconde le icone di navigazione fisse,
-  // che qui non servono (l'unica azione è "Inizia") e coprirebbero un
-  // angolo dei contenuti.
-  nascondiNavigazione();
-
   // Se l'overlay non esiste, crealo
   let schermata = document.getElementById("schermataScenario");
   if (!schermata) {
@@ -910,7 +911,6 @@ function mostraSchermataScenario(titolo, testo, immagine) {
   const titoloEl = schermata.querySelector("#titoloScenario");
   const testoEl = schermata.querySelector("#testoScenario");
   const immagineEl = schermata.querySelector("#immagineScenario");
-  const btnStart = schermata.querySelector("#btnIniziaScenario");
 
   // Popola contenuti
   if (titoloEl) titoloEl.textContent = titolo || "";
@@ -928,14 +928,16 @@ function mostraSchermataScenario(titolo, testo, immagine) {
   // Mostra overlay
   schermata.style.display = "flex";
 
-  // (Ri)aggancia il click del bottone
-  if (btnStart) {
-    btnStart.onclick = () => {
+  // 🔹 Il vecchio pulsante "Inizia" in-flow è sostituito dall'icona verde
+  // "Avanti" dell'overlay di navigazione fisso, coerente con le altre
+  // schermate (il markup #btnIniziaScenario resta ma è nascosto via CSS).
+  mostraNavigazione({
+    avanti: () => {
       schermata.style.display = "none";
       // Avvio effettivo del gioco
       mostraSchermataPrincipale();
-    };
-  }
+    },
+  });
 }
 
 function animazioneTestoScenario(testo, elemento) {
@@ -1040,17 +1042,66 @@ function generaPreviewTabellone() {
 
   // Applica lo stile corretto per la preview
   clone.className = "griglia-preview-tabellone";
+  clone.style.transform = "none"; // misuriamo la dimensione naturale prima di scalare
 
-  container.innerHTML = "";
+  // 🔹 Il clone viene misurato FUORI dal flusso (position:absolute,
+  // invisibile) invece di sostituire subito il contenuto: se lo si
+  // inserisse a piena grandezza nel flusso normale, il container
+  // "ballerebbe" temporaneamente a un'altezza enorme, e siccome .container
+  // è centrato verticalmente (justify-content:center), questo sposterebbe
+  // anche la posizione (getBoundingClientRect().top) misurata subito dopo
+  // — falsando il calcolo dello spazio verticale disponibile. Lasciando
+  // invece il contenuto precedente (o vuoto) al suo posto durante la
+  // misurazione, la posizione resta stabile. Si sostituisce tutto solo
+  // alla fine, con la scala già corretta.
+  clone.style.position = "absolute";
+  clone.style.visibility = "hidden";
+  clone.style.pointerEvents = "none";
   container.appendChild(clone);
 
-  // 🔧 clone.className applica "transform: scale(...)" (solo visivo): lo
-  // spazio riservato nel flusso della pagina resta quello A PIENA
-  // GRANDEZZA, lasciando un grande vuoto sotto l'anteprima (e spingendo
-  // giù i pulsanti). Il container viene quindi ritagliato all'altezza
-  // realmente visibile (altezza reale * fattore di scala del CSS).
-  const SCALA_PREVIEW = 0.6; // deve combaciare con .griglia-preview-tabellone
-  container.style.height = `${clone.offsetHeight * SCALA_PREVIEW}px`;
+  // 🔹 La scala non è più un valore fisso (0.6): su schermi bassi in
+  // landscape lasciava uscire l'anteprima dal fondo dello schermo. Si
+  // misura invece lo spazio VERTICALE realmente rimasto sotto il punto in
+  // cui l'anteprima è posizionata (che dipende dal layout: sotto al testo
+  // se impilata, accanto se in due colonne) e la si scala di conseguenza,
+  // così l'anteprima non sfora mai, qualunque sia il layout.
+  const naturaleW = clone.scrollWidth;
+  const naturaleH = clone.scrollHeight;
+  if (!naturaleW || !naturaleH) {
+    clone.remove();
+    return;
+  }
+
+  const disponibileW = container.clientWidth || naturaleW;
+
+  // 🔹 L'icona verde "Avanti" è fissa in basso a destra, proprio sopra
+  // l'angolo dove finisce questa colonna: si riserva lo spazio che occupa
+  // (misurato dal vero elemento, non un valore fisso, così regge anche a
+  // future modifiche della sua dimensione) più un piccolo margine, invece
+  // di un margine fisso che su schermi molto larghi e bassi non bastava a
+  // evitare la sovrapposizione.
+  const iconAvanti = document.getElementById("navBtnAvanti");
+  const spazioIcona =
+    iconAvanti && !iconAvanti.hidden
+      ? window.innerHeight - iconAvanti.getBoundingClientRect().top + 10
+      : 16;
+  const MARGINE_INFERIORE = Math.max(16, spazioIcona);
+  const disponibileH = Math.max(
+    60,
+    window.innerHeight - container.getBoundingClientRect().top - MARGINE_INFERIORE
+  );
+
+  const scala = Math.min(1, disponibileW / naturaleW, disponibileH / naturaleH);
+
+  // Ora si applica il risultato finale: si sostituisce il contenuto del
+  // container con l'unico clone, in flusso normale, già alla scala giusta.
+  clone.style.position = "";
+  clone.style.visibility = "";
+  clone.style.pointerEvents = "";
+  clone.style.transform = `scale(${scala})`;
+  container.innerHTML = "";
+  container.appendChild(clone);
+  container.style.height = `${naturaleH * scala}px`;
   container.style.overflow = "hidden";
 }
 
@@ -7473,7 +7524,34 @@ function adattaSchermataAllaFinestra() {
   if (el.matches(".container") && !el.classList.contains("schermata-iniziale")) {
     document.body.style.transform = "";
     document.documentElement.style.overflow = "";
-    el.classList.remove("contenuto-eccede");
+
+    // 🔹 Il contenuto è centrato verticalmente (vedi CSS: .container:not
+    // (.schermata-iniziale) usa justify-content:center), per non lasciare
+    // vuoto in basso sulle schermate con poco contenuto. Ma se eccede
+    // l'altezza disponibile, la centratura lo farebbe sforare anche SOPRA
+    // il bordo superiore, dove lo scroll interno non può raggiungerlo
+    // (scrollTop non può essere negativo): si forza quindi prima
+    // l'allineamento in alto per misurare/adattare in modo deterministico,
+    // poi si decide se serve davvero tenerlo (eccesso confinato in basso,
+    // raggiungibile con lo scroll).
+    el.classList.add("contenuto-eccede");
+
+    // 🔹 La schermata "Anteprima Scenario" contiene un'anteprima del
+    // tabellone che si auto-ridimensiona in base allo spazio verticale
+    // rimasto SOTTO la propria posizione (vedi generaPreviewTabellone).
+    // Quella posizione deve restare stabile PRIMA e DOPO il calcolo:
+    // se in seguito si passasse alla centratura (perché il contenuto
+    // "sembra" entrare), l'intero blocco si sposterebbe più in basso,
+    // portando l'anteprima proprio sotto l'icona "Avanti" fissa in basso a
+    // destra — quindi qui l'allineamento in alto resta sempre attivo,
+    // invece di rivalutarlo come per le altre schermate.
+    if (document.getElementById("previewTabellone")) {
+      generaPreviewTabellone();
+      return;
+    }
+
+    const eccede = el.scrollHeight > el.clientHeight + 1;
+    el.classList.toggle("contenuto-eccede", eccede);
     return;
   }
 

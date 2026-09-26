@@ -215,13 +215,39 @@ h1, h2, h3 {
    (dispositivi molto piccoli), scorre SOLO al proprio interno grazie a
    max-height+overflow-y qui sotto, invece di rimpicciolire tutto. */
 .container:not(.schermata-iniziale) {
+  /* 🔹 Riempie tutto lo schermo (come .schermata-iniziale) e centra il
+     contenuto verticalmente al suo interno con flexbox, così le schermate
+     con poco contenuto non lasciano un vuoto in basso: prima .container
+     restava alto quanto il suo contenuto e si appoggiava in cima al body,
+     lasciando lo sfondo scuro a vista sotto. align-items resta "stretch"
+     (default) così titoli/paragrafi/griglie restano a piena larghezza per
+     l'a-capo del testo; solo i pulsanti diretti vengono ri-centrati sotto
+     (altrimenti la stretch li allargherebbe a piena larghezza). */
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   max-width: min(96vw, 1100px);
-  max-height: 100vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
   margin: 0 auto;
   padding: clamp(10px, 2.2vh, 20px) clamp(12px, 3vw, 20px);
+}
+
+/* 🔹 Se il contenuto naturale eccede l'altezza disponibile, la centratura
+   lo farebbe sforare anche SOPRA il bordo superiore, dove lo scroll interno
+   non può raggiungerlo (scrollTop non può essere negativo): si passa quindi
+   ad allineamento in alto, così l'eccesso resta solo in basso, raggiungibile
+   con lo scroll. Classe gestita in JS da adattaSchermataAllaFinestra(). */
+.container:not(.schermata-iniziale).contenuto-eccede {
+  justify-content: flex-start;
+}
+
+.container:not(.schermata-iniziale) > button,
+.container:not(.schermata-iniziale) form > button {
+  align-self: center;
 }
 
 .container:not(.schermata-iniziale) h2 {
@@ -315,8 +341,8 @@ h1, h2, h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: clamp(38px, 9vh, 54px);
-  height: clamp(38px, 9vh, 54px);
+  width: clamp(46px, 11vh, 66px);
+  height: clamp(46px, 11vh, 66px);
   margin: 0;
   padding: 0;
   border-radius: 50%;
@@ -340,7 +366,7 @@ h1, h2, h3 {
   background-color: rgba(26, 26, 36, 0.85);
   border: 1px solid #3d1418;
   color: #fff;
-  font-size: clamp(1.1rem, 3.2vh, 1.6rem);
+  font-size: clamp(1.3rem, 3.8vh, 1.9rem);
 }
 
 #navBtnIndietro:hover,
@@ -366,7 +392,7 @@ h1, h2, h3 {
   background-color: #2ecc71;
   border: 1px solid #27ae60;
   color: #06210f;
-  font-size: clamp(1.2rem, 3.4vh, 1.8rem);
+  font-size: clamp(1.4rem, 4vh, 2.1rem);
   font-weight: 700;
   box-shadow: 0 0 14px rgba(46, 204, 113, 0.55);
 }
@@ -1191,12 +1217,63 @@ button.casuale:hover {
   row-gap: 20px;
   column-gap: 15px;
   padding: 10px;
-  transform: scale(0.6);
-  transform-origin: top center; /* ✅ cambia qui */
+  /* 🔹 La scala non è più fissa (0.6): viene calcolata dinamicamente in
+     generaPreviewTabellone() in base allo spazio realmente disponibile,
+     così l'anteprima non sfora mai il fondo dello schermo. */
+  transform-origin: top center;
   pointer-events: none;
   background-color: rgba(255, 255, 255, 0.05);
   width: fit-content;
   margin: 0 auto;
+}
+
+/* 🔹 Schermata "Anteprima Scenario": riepilogo testuale + anteprima del
+   tabellone. Dato che l'app è pensata solo per l'uso in orizzontale, su
+   schermi sufficientemente larghi (aspect-ratio ≥ 4/3, il caso normale) le
+   due parti stanno affiancate invece che una sopra l'altra, sfruttando
+   meglio la larghezza; sotto quella soglia restano impilate. In entrambi i
+   casi l'anteprima del tabellone si auto-ridimensiona in JS
+   (generaPreviewTabellone) per stare nello spazio verticale rimasto,
+   invece di sforare il fondo dello schermo. */
+.scenario-anteprima-layout {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2vh, 20px);
+  width: 100%;
+  min-height: 0;
+  /* 🔹 Questa schermata resta sempre allineata in alto (vedi JS,
+     adattaSchermataAllaFinestra): senza questo margine il titolo
+     finirebbe proprio sotto l'icona "Indietro", fissa in alto a
+     sinistra. Il valore replica lo spazio che l'icona occupa
+     (posizione + dimensione, vedi #navBtnIndietro) più un piccolo margine. */
+  margin-top: clamp(66px, 16vh, 96px);
+}
+
+.scenario-anteprima-tabellone {
+  min-width: 0;
+}
+
+#previewTabellone {
+  overflow: hidden;
+}
+
+@media (min-aspect-ratio: 4/3) {
+  .scenario-anteprima-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    text-align: left;
+    gap: clamp(16px, 3vw, 40px);
+  }
+
+  .scenario-anteprima-testo,
+  .scenario-anteprima-tabellone {
+    flex: 1 1 50%;
+    min-width: 0;
+  }
+
+  .scenario-anteprima-tabellone {
+    text-align: center;
+  }
 }
 
 .carta-tabellone.esplorata {
@@ -1445,7 +1522,7 @@ button.casuale:hover {
   flex-direction: column;
   align-items: stretch; /* ⬅️ invece di flex-start */
   justify-content: flex-start;
-  padding: 40px 40px 96px; /* ⬅️ spazio extra per non coprire il contenuto col bottone fisso */
+  padding: 40px; /* il pulsante "Inizia" ora è l'icona di navigazione, non serve più spazio extra in basso */
   z-index: 9999;
   overflow-y: auto;
 }
@@ -1469,32 +1546,11 @@ button.casuale:hover {
   animation-delay: 1s;
 }
 
+/* 🔹 Il pulsante "Inizia" in-flow è stato sostituito dall'icona verde
+   "Avanti" dell'overlay di navigazione fisso (coerente con le altre
+   schermate): resta nel markup per compatibilità ma non viene mostrato. */
 #btnIniziaScenario {
-  position: fixed; /* ⬅️ ancorato alla finestra, non al contenitore scrollante */
-  left: 50%;
-  bottom: 24px;
-  transform: translateX(-50%);
-  padding: 14px 32px;
-  font-family: var(--font-title);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-size: 1.25rem;
-  font-weight: 700;
-  cursor: pointer;
-  background: var(--blood-red);
-  color: white;
-  border: 1px solid #ff333d;
-  border-radius: 4px;
-  box-shadow: 0 0 16px var(--blood-red-glow);
-  z-index: 10000; /* sopra al contenuto */
-  margin-top: 0;
-  transition: all 0.2s ease;
-}
-
-#btnIniziaScenario:hover {
-  background: #ff1a26;
-  box-shadow: 0 0 24px rgba(229, 9, 20, 0.8);
-  transform: translateX(-50%) translateY(-2px);
+  display: none;
 }
 
 #titoloScenario {
