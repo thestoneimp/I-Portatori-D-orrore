@@ -44,21 +44,6 @@ body {
   overflow: visible;
   transform-origin: top center;
   will-change: transform;
-  /* 🔹 Centra verticalmente l'unico figlio "nel flusso" (.container, per
-     le schermate secondarie): tutti gli altri elementi full-screen
-     (.home-background, .schermata-iniziale, #schermataScenario,
-     #gameViewport, i popup...) sono position:fixed e quindi già esclusi
-     dal flusso normale — restano fuori dal flex e non vengono toccati.
-     Così, quando il contenuto di .container è più corto dello schermo
-     (caso comune ora che il testo/i pulsanti occupano meno spazio), non
-     resta più "appeso" in alto con un vuoto sotto: si dispone al centro,
-     usando anche lo spazio verticale che avanza. La misura dell'altezza
-     "naturale" del contenuto (scrollHeight/offsetHeight, usata per
-     decidere se serve rimpicciolire) non cambia: riflette sempre la sola
-     dimensione intrinseca di .container, non quella di body. */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .home-background {
@@ -219,17 +204,22 @@ h1, h2, h3 {
    selezione scenario, ecc. Prima riempivano molto meno schermo di quanto
    sembrasse necessario: il motivo non era la larghezza di .container
    (che è già senza vincoli), ma il sistema di adattamento in JS, che
-   quando il contenuto è troppo ALTO per lo schermo lo restringe con UN
+   quando il contenuto è troppo ALTO per lo schermo lo restringeva con UN
    UNICO fattore applicato sia in verticale che in orizzontale (altrimenti
-   il testo si deformerebbe) — quindi ogni volta che l'altezza non basta,
-   anche la larghezza si restringe con lei, lasciando bande vuote ai lati
-   pur avendoci spazio. La cura reale è ridurre lo spazio verticale che
-   questi elementi occupano "di natura" (titoli, paragrafi, pulsanti),
-   così quasi mai serve restringere per farceli entrare, e allargare un
-   po' la colonna di testo così sfrutta meglio lo schermo panoramico dei
-   telefoni in orizzontale. */
+   il testo si deformerebbe) — quindi ogni volta che l'altezza non
+   bastava, anche la larghezza si restringeva con lei, lasciando bande
+   vuote ai lati pur avendoci spazio. Ora queste schermate NON passano
+   più da quel restringimento (vedi adattaSchermataAllaFinestra in
+   script.js): restano sempre a piena larghezza e a dimensione naturale
+   del testo. Se il contenuto è comunque troppo alto per lo schermo
+   (dispositivi molto piccoli), scorre SOLO al proprio interno grazie a
+   max-height+overflow-y qui sotto, invece di rimpicciolire tutto. */
 .container:not(.schermata-iniziale) {
   max-width: min(96vw, 1100px);
+  max-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
   margin: 0 auto;
   padding: clamp(10px, 2.2vh, 20px) clamp(12px, 3vw, 20px);
 }

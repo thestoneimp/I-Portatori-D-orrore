@@ -7421,6 +7421,26 @@ function adattaSchermataAllaFinestra() {
 
   adattaGrigliaSelezionePersonaggi();
 
+  // 🔹 Le schermate "secondarie" (.container semplice: selezione
+  // espansioni/personaggi, carte iniziali, obiettivi, selezione
+  // scenario...) NON passano più dal restringimento in blocco: quel
+  // sistema, per far entrare il contenuto in ALTEZZA, doveva applicare la
+  // STESSA scala anche in LARGHEZZA (un'unica trasformazione, altrimenti
+  // il testo si deforma) — lasciando bande vuote ai lati anche quando la
+  // larghezza aveva spazio a sufficienza. Restano quindi sempre a piena
+  // larghezza e a dimensione naturale del testo; se il contenuto è
+  // comunque troppo alto per lo schermo (schermi molto piccoli), scorre
+  // SOLO al proprio interno (vedi .container:not(.schermata-iniziale) in
+  // styles.css), senza restringere né spostare nient'altro. La home
+  // (.schermata-iniziale) e la schermata di scenario mantengono invece il
+  // vecchio comportamento, che qui non ha mai creato questo problema.
+  if (el.matches(".container") && !el.classList.contains("schermata-iniziale")) {
+    document.body.style.transform = "";
+    document.documentElement.style.overflow = "";
+    el.classList.remove("contenuto-eccede");
+    return;
+  }
+
   // 🔹 Misurazione a due passaggi: con "justify-content:center" (di
   // default) il contenuto che eccede l'altezza sfora per metà SOPRA il
   // bordo superiore, e quella parte non risulta in scrollHeight (che
