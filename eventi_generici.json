@@ -1,0 +1,68 @@
+[
+  {
+    "id": "ragno",
+    "tag": [
+      "ragno",
+      "insetto",
+      "piccolo",
+      "ricerca"
+    ],
+    "testo": "Frugando al suo interno non trovi nulla di importante, ma quando fai per ritrarre la mano, ti accorgi che su di essa vi è un enorme ragno peloso!",
+    "prova": {
+      "abilita": "tempra",
+      "difficolta": 3
+    },
+    "successo": {
+      "testo": "Riesci a mantenere il sangue freddo, e lentamente fai scivolare via il ragno dalla tua mano.",
+      "effetti": []
+    },
+    "fallimento": {
+      "testo": "Cominci a scuotere la mano con veemenza mentre dalla tua gola fuoriesce un urlo!",
+      "effetti": [
+        {
+          "tipo": "impostaStatoLuogo",
+          "stato": "rumore",
+          "valore": 3,
+          "descrizione": "Urlo (Ragno)",
+          "tipoRumore": "urlo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "chiave",
+    "tag": [
+      "ricerca",
+      "piccolo",
+      "chiave"
+    ],
+    "testo": "Frugando all'interno, riesci a scorgere qualcosa di piccolo e metallico. È una chiave!",
+    "seguito": {
+      "testo": "Prendi la Carta Oggetto \"Chiave\" dal Mazzo Oggetti e aggiungila alla tua mano.",
+      "effetti": []
+    }
+  },
+  {
+    "id": "serratura",
+    "tag": [
+      "ricerca",
+      "piccolo",
+      "chiuso"
+    ],
+    "ripetibile": true,
+    "testo": "Niente da fare. A quanto pare serve una chiave. La serratura è molto piccola."
+  },
+  {
+    "id": "chiave_piccola",
+    "tag": [
+      "ricerca",
+      "piccolo",
+      "chiave"
+    ],
+    "testo": "Tastando compulsamente, le tue dita incontrano qualcosa di piccolo e freddo. Sembra... Una chiave!",
+    "seguito": {
+      "testo": "Passa in rassegna il mazzo Oggetti per una Carta Oggetto \"Chiave Piccola\" e aggiungila alla tua mano.",
+      "effetti": []
+    }
+  }
+]

@@ -1,0 +1,181 @@
+[
+  {
+    "codice": "A01",
+    "nome": "Strada",
+    "tipo": "strada",
+    "piano": "strada",
+    "elementi": [],
+    "descrizione": [
+      "La luce giallastra di un lampione filtra attraverso la foschia, proiettando sagome allungate sull’asfalto lucido. Poco distante, una cassetta delle lettere arrugginita sembra attendere missive da tempo dimenticate.",
+      "Un tombino fumante rilascia un alito caldo che si dissolve nella notte gelida. Attorno, il silenzio è interrotto solo dallo scricchiolio sommesso di un cartello stradale che oscilla al vento.",
+      "L’aria umida impregna la strada, accentuando l’odore ferroso delle ringhiere e dell’asfalto bagnato. Un lampione tremolante rivela per un istante la bocca scura di un tombino spalancato."
+    ],
+    "tagAmbiente": [
+      "strada"
+    ]
+  },
+  {
+    "codice": "A02",
+    "nome": "Giardino Est",
+    "tipo": "giardino",
+    "piano": "giardino",
+    "elementi": [],
+    "tagAmbiente": [
+      "giardino"
+    ]
+  },
+  {
+    "codice": "A03",
+    "nome": "Giardino Ovest",
+    "tipo": "giardino",
+    "piano": "giardino",
+    "elementi": [],
+    "tagAmbiente": [
+      "giardino"
+    ]
+  },
+  {
+    "codice": "A04",
+    "nome": "Ingresso",
+    "tipo": "ingresso",
+    "piano": "casa",
+    "elementi": [],
+    "tagAmbiente": [
+      "ingresso"
+    ]
+  },
+  {
+    "codice": "A05",
+    "nome": "Salone",
+    "tipo": "salone",
+    "piano": "casa",
+    "elementi": [],
+    "tagAmbiente": [
+      "salone"
+    ]
+  },
+  {
+    "codice": "A06",
+    "nome": "Cucina",
+    "tipo": "cucina",
+    "piano": "casa",
+    "elementi": [],
+    "tagAmbiente": [
+      "cucina"
+    ],
+    "finestra": true
+  },
+  {
+    "codice": "A07",
+    "nome": "Camera da Letto",
+    "tipo": "camera",
+    "piano": "casa",
+    "elementi": [],
+    "tagAmbiente": [
+      "camera"
+    ],
+    "finestra": true
+  },
+  {
+    "codice": "A08",
+    "nome": "Bagno",
+    "tipo": "bagno",
+    "piano": "casa",
+    "elementi": [],
+    "tagAmbiente": [
+      "bagno"
+    ],
+    "finestra": true
+  },
+  {
+    "codice": "A09",
+    "nome": "Studio",
+    "tipo": "studio",
+    "piano": "casa",
+    "elementi": [],
+    "tagAmbiente": [
+      "studio"
+    ]
+  },
+  {
+    "codice": "A10",
+    "nome": "Camera dei Bimbi",
+    "tipo": "camera-bimbi",
+    "piano": "casa",
+    "elementi": [],
+    "tagAmbiente": [
+      "camera"
+    ],
+    "finestra": true
+  },
+  {
+    "codice": "A11",
+    "nome": "Ripostiglio",
+    "tipo": "ripostiglio",
+    "piano": "casa",
+    "elementi": [],
+    "tagAmbiente": [
+      "ripostiglio"
+    ]
+  },
+  {
+    "codice": "A12",
+    "nome": "Biblioteca",
+    "tipo": "biblioteca",
+    "piano": "casa",
+    "elementi": [],
+    "tagAmbiente": [
+      "biblioteca"
+    ]
+  },
+  {
+    "codice": "A13",
+    "nome": "Cantina Vini",
+    "tipo": "cantina_vini",
+    "piano": "cantina",
+    "elementi": [],
+    "tagAmbiente": [
+      "cantina"
+    ]
+  },
+  {
+    "codice": "A14",
+    "nome": "Dispensa",
+    "tipo": "dispensa",
+    "piano": "cantina",
+    "elementi": [],
+    "tagAmbiente": [
+      "dispensa"
+    ]
+  },
+  {
+    "codice": "A15",
+    "nome": "Locale Caldaia",
+    "tipo": "caldaia",
+    "piano": "cantina",
+    "elementi": [],
+    "tagAmbiente": [
+      "caldaia"
+    ]
+  },
+  {
+    "codice": "A16",
+    "nome": "Lavanderia",
+    "tipo": "lavanderia",
+    "piano": "cantina",
+    "elementi": [],
+    "tagAmbiente": [
+      "lavanderia"
+    ]
+  },
+  {
+    "codice": "A17",
+    "nome": "Soffitta",
+    "tipo": "soffitta",
+    "piano": "soffitta",
+    "elementi": [],
+    "tagAmbiente": [
+      "soffitta"
+    ]
+  }
+]

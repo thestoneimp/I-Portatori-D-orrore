@@ -1,0 +1,66 @@
+[
+  {
+    "id": "tutorial",
+    "codice": "SC01",
+    "nome": "La Notte di Halloween",
+    "introduzione": "La villa è silenziosa, ma l’aria è pregna di presagi oscuri. Stanotte qualcosa di antico è stato risvegliato... ed è affamato.",
+    "obiettivo": "Sopravvivere a 6 turni senza perdere alcun membro del gruppo.",
+    "turni": 6,
+    "tipo": "tutorial",
+    "descrizione": "La notte è fredda e umida. Un vento gelido soffia lungo la strada deserta, spegnendo l’occasionale lampione tremolante e costringendo gli arti a tremare leggermente. I passi risuonano sull’asfalto bagnato, un’eco sinistra che accompagna l'intero tragitto verso l’angolo più oscuro della città. Venire fin qui a piedi non è stata una grande idea per più di una ragione, ma oramai è troppo tardi per pentirsene. <strong>Eccola lì! La casa.</strong> Immobile, buia, silente… come se osservasse la strada dinanzi a sé, da dietro le sue finestre, nere come orbite vuote. Come fosse in attesa di qualcosa. O di <strong>qualcuno</strong>. Gli ululati del vento che spira attraverso le persiane distorte si confondono col fruscio delle foglie secche e lo scricchiolio dei rami a cui sono attaccate. Tutta colpa di <strong>Ray Stevenson</strong>, uno dei leader della confraternita Kappa Zeta Landa. È stato lui a ideare questo stupido rito di iniziazione,a quanto pare l'unico modo per poter entrare a far parte della cricca. Dice di aver nascosto <strong>qualcosa</strong> dentro quella casa, un oggetto che va recuperato <strong>stanotte</strong>, prima che l’alba sopraggiunga. Una prova, dice lui. Semplicemente una sfida; un  piccolo gioco… eppure ogni molecola in corpo urla disperata di fuggire da lì il più in fretta possibile.",
+    "setupStrutture": [
+      {
+        "tipoStep": "sbarramento",
+        "tipoA": "Tipo:strada",
+        "tipoB": "AdiacenteTipo:giardino",
+        "quantita": 1,
+        "nomeCarta": "Cancello Chiuso",
+        "titoloPopup": "Sbarramento!",
+        "messaggioPopup": "Piazza una carta <span class='tutorial-link' data-voce='Sbarramenti'>Sbarramento</span> <strong>Cancello</strong> come indicato."
+      },
+      {
+        "tipoStep": "sbarramento",
+        "tipoA": "Tipo:ingresso",
+        "tipoB": "AdiacenteTipo:giardino",
+        "quantita": 1,
+        "nomeCarta": "Porta Sbarrata",
+        "titoloPopup": "Sbarramento!",
+        "messaggioPopup": "Piazza una carta <span class='tutorial-link' data-voce='Sbarramenti'>Sbarramento</span> <strong>Porta</strong> tra l’<strong>Ingresso</strong> e il <strong>Giardino</strong> adiacente."
+      }
+    ],
+    "pngIniziali": [
+      {
+        "codicePng": "PNG02",
+        "criterio": {
+          "piano": "casa",
+          "escludiTipi": [
+            "giardino",
+            "strada"
+          ]
+        }
+      }
+    ],
+    "statoCasa": "abbandonata",
+    "momento": "notte"
+  },
+  {
+    "id": "messa_mezzanotte",
+    "codice": "SC02",
+    "nome": "La Messa di Mezzanotte",
+    "introduzione": "Nel villaggio si susseguono sparizioni misteriose. Tutti gli indizi puntano verso la vecchia chiesa, dove un culto dimenticato sta per celebrare il suo rito finale.",
+    "obiettivo": "Fermare il rituale prima del dodicesimo rintocco.",
+    "turni": 10,
+    "tipo": "comune",
+    "momento": "notte"
+  },
+  {
+    "id": "contagio",
+    "codice": "SC03",
+    "nome": "Contagio Inarrestabile",
+    "introduzione": "Una misteriosa epidemia ha trasformato alcuni abitanti in mostri rabbiosi. La fonte del contagio si nasconde tra le stanze della villa. Dovete trovarla... prima che sia troppo tardi.",
+    "obiettivo": "Isolare e bruciare la fonte del virus.",
+    "turni": 8,
+    "tipo": "comune",
+    "statoCasa": "abitata"
+  }
+]

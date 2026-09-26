@@ -1,0 +1,86 @@
+[
+  {
+    "id": "P01",
+    "nome": "Alice Richards",
+    "abilità": [
+      "Mira Letale",
+      "Tiro Rapido"
+    ],
+    "equipaggiamento": [
+      "Balestra",
+      "Mappa del Bosco"
+    ],
+    "movimento": 3,
+    "genere": "femmina"
+  },
+  {
+    "id": "P02",
+    "nome": "Scott Stockings",
+    "abilità": [
+      "Guarigione",
+      "Esorcismo"
+    ],
+    "equipaggiamento": [
+      "Croce Sacra",
+      "Bibbia"
+    ],
+    "movimento": 2,
+    "genere": "maschio"
+  },
+  {
+    "id": "P03",
+    "nome": "Kimberly Jones",
+    "abilità": [
+      "Evocazione",
+      "Sigillo Oscuro"
+    ],
+    "equipaggiamento": [
+      "Pugnale Rituale",
+      "Grimorio"
+    ],
+    "movimento": 3,
+    "genere": "femmina"
+  },
+  {
+    "id": "P04",
+    "nome": "Matt Stone",
+    "abilità": [
+      "Scatto",
+      "Sangue Freddo"
+    ],
+    "equipaggiamento": [
+      "Pistola",
+      "Radio Militare"
+    ],
+    "movimento": 4,
+    "genere": "maschio"
+  },
+  {
+    "id": "P05",
+    "nome": "Michael Richards",
+    "abilità": [
+      "Controllo",
+      "Sangue Freddo"
+    ],
+    "equipaggiamento": [
+      "Pistola",
+      "Radio Militare"
+    ],
+    "movimento": 3,
+    "genere": "maschio"
+  },
+  {
+    "id": "P06",
+    "nome": "Julia Constantin",
+    "abilità": [
+      "Ordine Tattico",
+      "Sangue Freddo"
+    ],
+    "equipaggiamento": [
+      "Pistola",
+      "Radio Militare"
+    ],
+    "movimento": 3,
+    "genere": "femmina"
+  }
+]

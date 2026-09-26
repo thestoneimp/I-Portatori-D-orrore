@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>I Portatori d'Orrore</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0f0a0a" />
+    <link rel="icon" href="icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="icons/icon-180.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Portatori d'Orrore" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&family=VT323&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="home-background" aria-hidden="true">
+      <video class="home-background-video" autoplay muted loop playsinline preload="auto">
+        <source src="assets/media/animazione-casa-sfondo.mp4" type="video/mp4" />
+      </video>
+      <div class="home-background-overlay"></div>
+    </div>
+
+    <div class="container schermata-iniziale">
+      <h1>I Portatori d'Orrore</h1>
+      <p class="sottotitolo-iniziale">La casa ricorda chi è entrato.</p>
+      <div class="azioni-iniziali">
+        <button onclick="startNewGame()">Nuova Partita<span>Inizia una nuova indagine</span></button>
+        <button onclick="continueGame()">Continua Partita<span>Riprendi la partita salvata</span></button>
+        <button onclick="mostraMenuCampagna()">Modalità Campagna<span>Gioca una storia a lungo termine</span></button>
+      </div>
+      <p id="status"></p>
+    </div>
+    <script src="script.js"></script>
+    <div id="tabelloneNascosto" style="display: none"></div>
+
+    <div
+      id="schermataScenario"
+      class="schermata-scenario"
+      style="display: none"
+    >
+      <h1 id="titoloScenario"></h1>
+
+      <div class="contenuto-scenario">
+        <div id="testoScenario" class="testo-scenario"></div>
+        <div class="immagine-scenario">
+          <img id="immagineScenario" src="" alt="Scenario" />
+        </div>
+      </div>
+
+      <div id="zoomWrapper">
+        <div id="tabelloneDinamico" class="griglia-tabellone"></div>
+      </div>
+
+      <button id="btnIniziaScenario">Inizia</button>
+    </div>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("service-worker.js").catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>

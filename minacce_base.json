@@ -1,0 +1,38 @@
+[
+  {
+    "codice": "M01",
+    "nome": "Uomo con impermeabile",
+    "movimento": 3,
+    "intelligenza": 2,
+    "tempra": 2,
+    "forza": 2,
+    "agilita": 3
+  },
+  {
+    "codice": "M02",
+    "nome": "Non Morto",
+    "movimento": 1,
+    "intelligenza": 0,
+    "tempra": 3,
+    "forza": 3,
+    "agilita": 1
+  },
+  {
+    "codice": "M03",
+    "nome": "Cane Rabbioso",
+    "movimento": 4,
+    "intelligenza": 1,
+    "tempra": 1,
+    "forza": 2,
+    "agilita": 4
+  },
+  {
+    "codice": "M04",
+    "nome": "Il Cacciatore",
+    "movimento": 3,
+    "intelligenza": 3,
+    "tempra": 2,
+    "forza": 3,
+    "agilita": 3
+  }
+]

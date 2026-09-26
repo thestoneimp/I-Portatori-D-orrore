@@ -1,0 +1,3712 @@
+[
+  {
+    "nome": "lampione",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Rivoli di pioggia scivolano lungo il palo corroso, sotto una luce grigia e uniforme."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "La pioggia batte sul palo piegato, mentre il buio inghiotte quasi del tutto la sua sagoma."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il metallo scrostato del lampione si staglia contro un cielo pallido e immobile."
+      },
+      {
+        "id": "R04",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella quiete notturna, il palo arrugginito sembra una sagoma scheletrica contro le stelle."
+      },
+      {
+        "id": "R05",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Gocce di pioggia scivolano sul metallo verniciato di fresco, senza intaccarne la lucentezza."
+      },
+      {
+        "id": "R06",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "La pioggia notturna disegna riflessi sul palo ben tenuto, immobile lungo il vialetto."
+      },
+      {
+        "id": "R07",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il lampione, verniciato di fresco, si staglia netto contro un cielo terso."
+      },
+      {
+        "id": "R08",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella notte serena, il palo curato proietta un'ombra netta e regolare sul selciato."
+      },
+      {
+        "id": "R09",
+        "scenario": "tutti",
+        "testo": "Il lampione si erge sottile sopra il marciapiede, il palo in metallo scuro."
+      }
+    ],
+    "tagPiazzamento": [
+      "strada",
+      "giardino"
+    ]
+  },
+  {
+    "nome": "tombino",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "L'acqua piovana ristagna intorno al coperchio corroso, formando una pozza scura."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nel buio, la pioggia scroscia sopra il tombino arrugginito con un rumore cupo e continuo."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il coperchio in ghisa, incrostato di ruggine, riflette appena la luce fredda del giorno."
+      },
+      {
+        "id": "R04",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Sotto le stelle, il tombino corroso sembra una macchia scura incisa nell'asfalto."
+      },
+      {
+        "id": "R05",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia scivola via ordinata dalle fessure del tombino, senza ristagnare."
+      },
+      {
+        "id": "R06",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Il rumore della pioggia sul metallo accompagna il silenzio della strada curata."
+      },
+      {
+        "id": "R07",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il coperchio in ghisa, pulito e integro, riflette la luce chiara del giorno."
+      },
+      {
+        "id": "R08",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella quiete della notte serena, il tombino appare come una forma scura e ordinata sull'asfalto."
+      },
+      {
+        "id": "R09",
+        "scenario": "tutti",
+        "testo": "Il tombino è un disco di ghisa incassato nell'asfalto, i bordi consumati dal tempo."
+      }
+    ],
+    "tagPiazzamento": [
+      "strada"
+    ]
+  },
+  {
+    "nome": "cassetta delle lettere",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia inzuppa i volantini che spuntano dalla fessura arrugginita."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nel buio bagnato dalla pioggia, la cassetta corrosa pende storta dal suo sostegno."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il metallo ossidato della cassetta riluce appena sotto la luce fredda del giorno."
+      },
+      {
+        "id": "R04",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella notte silenziosa, la cassetta arrugginita è appena visibile contro il muro scrostato."
+      },
+      {
+        "id": "R05",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Le gocce di pioggia scivolano sul metallo lucido della cassetta, ben salda al suo posto."
+      },
+      {
+        "id": "R06",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "La pioggia notturna tamburella sulla cassetta ordinata, accanto all'ingresso curato."
+      },
+      {
+        "id": "R07",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il metallo pulito della cassetta riflette la luce chiara di una giornata serena."
+      },
+      {
+        "id": "R08",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella notte quieta, la cassetta ben tenuta si intravede accanto al cancello."
+      },
+      {
+        "id": "R09",
+        "scenario": "tutti",
+        "testo": "La cassetta delle lettere è un piccolo scomparto metallico fissato accanto al cancello."
+      }
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ],
+    "tagPiazzamento": [
+      "strada"
+    ],
+    "tagOpzionali": [
+      "chiuso"
+    ]
+  },
+  {
+    "nome": "capanno degli attrezzi",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia scroscia sul tetto sconnesso del capanno, filtrando tra le assi marce."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nel buio battuto dalla pioggia, il capanno scolorito sembra sul punto di crollare."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Le assi scolorite del capanno assorbono la luce fredda di una giornata immobile."
+      },
+      {
+        "id": "R04",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Sotto le stelle, il capanno storto proietta un'ombra irregolare sul terreno incolto."
+      },
+      {
+        "id": "R05",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia scivola ordinata dal tetto ben tenuto del capanno."
+      },
+      {
+        "id": "R06",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Il ticchettio della pioggia sul tetto accompagna il silenzio del giardino curato."
+      },
+      {
+        "id": "R07",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Le assi verniciate del capanno risplendono sotto la luce chiara del giorno."
+      },
+      {
+        "id": "R08",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella notte serena, il capanno ordinato si staglia netto contro il prato curato."
+      },
+      {
+        "id": "R09",
+        "scenario": "tutti",
+        "testo": "Il capanno è una piccola struttura di legno, poco più grande di un ripostiglio."
+      }
+    ],
+    "tagPiazzamento": [
+      "giardino"
+    ]
+  },
+  {
+    "nome": "panchina",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia scivola sul legno marcio della panchina, incidendo solchi scuri."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nel buio bagnato, la panchina consumata sembra dissolversi tra le ombre."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il legno scolorito della panchina assorbe la luce fredda di un cielo immobile."
+      },
+      {
+        "id": "R04",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Sotto le stelle, la panchina spezzata è appena visibile tra le erbacce."
+      },
+      {
+        "id": "R05",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Le gocce di pioggia scivolano sul legno verniciato della panchina, ancora solida."
+      },
+      {
+        "id": "R06",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "La pioggia notturna tamburella sulla panchina ordinata del giardino curato."
+      },
+      {
+        "id": "R07",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il legno levigato della panchina risplende sotto la luce chiara del giorno."
+      },
+      {
+        "id": "R08",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella notte serena, la panchina ben tenuta si staglia netta contro il prato."
+      },
+      {
+        "id": "R09",
+        "scenario": "tutti",
+        "testo": "La panchina è fatta di assi di legno fissate a due sostegni in metallo."
+      }
+    ],
+    "tagPiazzamento": [
+      "giardino",
+      "strada"
+    ]
+  },
+  {
+    "nome": "fontana",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia si mescola all'acqua stagnante della fontana, increspandone la superficie torbida."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nel buio battuto dalla pioggia, la fontana in rovina gorgoglia appena, sommersa dal muschio."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "L'acqua verdastra della fontana riflette un cielo pallido e immobile."
+      },
+      {
+        "id": "R04",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Sotto le stelle, la fontana incrostata di muschio è avvolta da un silenzio innaturale."
+      },
+      {
+        "id": "R05",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia increspa l'acqua limpida della fontana, mantenuta pulita e funzionante."
+      },
+      {
+        "id": "R06",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Il suono della pioggia si mescola al lieve scroscio della fontana curata."
+      },
+      {
+        "id": "R07",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "L'acqua cristallina della fontana riflette la luce chiara di una giornata serena."
+      },
+      {
+        "id": "R08",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella notte quieta, la fontana ben tenuta luccica appena sotto le stelle."
+      },
+      {
+        "id": "R09",
+        "scenario": "tutti",
+        "testo": "La fontana è una vasca di pietra, al centro un piccolo zampillo ormai silenzioso."
+      }
+    ],
+    "tagPiazzamento": [
+      "giardino"
+    ]
+  },
+  {
+    "nome": "cuccia del cane",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La cuccia, ormai marcia e sfondata, trattiene ancora un odore acre di animale."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La cuccia, pulita e in buono stato, conserva una coperta ancora morbida."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La cuccia è una piccola struttura di legno, giusto lo spazio per un animale di taglia media."
+      }
+    ],
+    "tagPiazzamento": [
+      "giardino",
+      "ripostiglio"
+    ]
+  },
+  {
+    "nome": "triciclo",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il triciclo arrugginito giace inclinato, la vernice quasi del tutto scomparsa."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il triciclo, colorato e ben tenuto, sembra pronto per essere usato da un momento all'altro."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il triciclo ha tre ruote colorate e un manubrio basso, pensato per un bambino piccolo."
+      }
+    ],
+    "tagPiazzamento": [
+      "giardino",
+      "ingresso"
+    ]
+  },
+  {
+    "nome": "altalena",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia scivola sulle catene arrugginite dell'altalena, che ondeggia appena nel vento."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nel buio bagnato, l'altalena spezzata cigola sinistra a ogni raffica di vento."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il sedile scheggiato dell'altalena assorbe la luce fredda di un cielo immobile."
+      },
+      {
+        "id": "R04",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Sotto le stelle, le catene corrose dell'altalena sono appena visibili tra l'erba alta."
+      },
+      {
+        "id": "R05",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Le gocce di pioggia scivolano sulle catene lucide dell'altalena, ben mantenuta."
+      },
+      {
+        "id": "R06",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "La pioggia notturna tamburella sul sedile dell'altalena, immobile nel giardino curato."
+      },
+      {
+        "id": "R07",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Le catene lucide dell'altalena risplendono sotto la luce chiara del giorno."
+      },
+      {
+        "id": "R08",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella notte serena, l'altalena ferma proietta un'ombra regolare sul prato curato."
+      },
+      {
+        "id": "R09",
+        "scenario": "tutti",
+        "testo": "L'altalena pende da una struttura metallica, le catene che reggono un semplice sedile."
+      }
+    ],
+    "tagPiazzamento": [
+      "giardino"
+    ]
+  },
+  {
+    "nome": "appendiabiti",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Un impermeabile ammuffito pende storto da un gancio semi-staccato."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Giacche ordinate pendono in fila da ganci lucidi e ben fissati."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "L'appendiabiti è una struttura verticale con una fila di ganci in metallo."
+      }
+    ],
+    "tagPiazzamento": [
+      "ingresso",
+      "camera"
+    ]
+  },
+  {
+    "nome": "tappeto",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il tappeto, logoro e macchiato d'umidità, si sfalda quasi al minimo tocco."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il tappeto, pulito e dai colori ancora vivaci, è disposto con cura al centro della stanza."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il tappeto copre buona parte del pavimento, il disegno intessuto in trama fitta."
+      }
+    ],
+    "tagPiazzamento": [
+      "ingresso",
+      "salone",
+      "biblioteca"
+    ]
+  },
+  {
+    "nome": "specchio",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Macchie scure corrodono i bordi dello specchio, restituendo un riflesso incerto."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Lo specchio, terso e senza macchie, restituisce un riflesso nitido e limpido."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Lo specchio è incorniciato in legno, appeso a un chiodo sulla parete."
+      }
+    ],
+    "tagPiazzamento": [
+      "ingresso",
+      "camera",
+      "bagno"
+    ]
+  },
+  {
+    "nome": "divano",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il divano, sfondato e maleodorante, porta macchie scure ormai indelebili."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il divano, morbido e ben tenuto, conserva ancora l'odore di stoffa pulita."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il divano ha due posti, i braccioli imbottiti e i cuscini staccabili."
+      }
+    ],
+    "tagPiazzamento": [
+      "salone",
+      "biblioteca"
+    ]
+  },
+  {
+    "nome": "libreria",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Libri gonfi d'umidità marciscono silenziosi sui ripiani scrostati."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "I libri sono allineati con cura, i dorsi ancora leggibili e ben conservati."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La libreria occupa quasi un'intera parete, i ripiani colmi di volumi diversi."
+      }
+    ],
+    "tagPiazzamento": [
+      "salone",
+      "biblioteca",
+      "studio"
+    ]
+  },
+  {
+    "nome": "orologio a pendolo",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il legno tarlato dell'orologio si sta lentamente disgregando in un angolo della stanza."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il legno lucido dell'orologio è curato nei minimi dettagli, senza un graffio."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "L'orologio a pendolo è alto quasi quanto una persona, racchiuso in una cassa di legno scuro."
+      }
+    ],
+    "tagPiazzamento": [
+      "salone",
+      "ingresso"
+    ]
+  },
+  {
+    "nome": "quadro",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La tela del quadro è gonfia d'umidità, i colori ormai colati e irriconoscibili."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il quadro, pulito e ben illuminato, conserva colori ancora vividi."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il quadro raffigura un paesaggio, racchiuso in una cornice intagliata."
+      }
+    ],
+    "tagPiazzamento": [
+      "salone",
+      "biblioteca",
+      "camera"
+    ]
+  },
+  {
+    "nome": "pianoforte",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il legno del pianoforte è rigonfio e scrostato, i tasti ingialliti e sporchi."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il pianoforte, lucido e curato, sembra accordato di recente."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il pianoforte occupa un angolo della stanza, il coperchio chiuso sopra la tastiera."
+      }
+    ],
+    "tagPiazzamento": [
+      "salone",
+      "biblioteca",
+      "sala-hobby"
+    ]
+  },
+  {
+    "nome": "fornello",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Grasso indurito e ruggine incrostano i fuochi del fornello, ormai fatiscente."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il fornello, pulito e lucente, non mostra segni di trascuratezza."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il fornello ha quattro fuochi disposti in fila, i comandi allineati sul davanti."
+      }
+    ],
+    "tagPiazzamento": [
+      "cucina"
+    ]
+  },
+  {
+    "nome": "dispensa",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Scaffali marci custodiscono barattoli arrugginiti e etichette illeggibili."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Gli scaffali ordinati custodiscono provviste ben etichettate e in buono stato."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La dispensa è un mobile stretto e alto, diviso in più ripiani."
+      }
+    ],
+    "tagPiazzamento": [
+      "cucina",
+      "ripostiglio"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ]
+  },
+  {
+    "nome": "frigorifero",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La guarnizione screpolata del frigorifero lascia filtrare un odore acre e stantio."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il frigorifero, pulito e lucente, non emana alcun odore sgradevole."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il frigorifero è un grande blocco bianco, la maniglia lungo il bordo dell'anta."
+      }
+    ],
+    "tagPiazzamento": [
+      "cucina",
+      "dispensa"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ]
+  },
+  {
+    "nome": "pentole",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le pentole, annerite e ammaccate, sono impilate senza cura in un angolo."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le pentole, lucide e ben disposte, pendono ordinate sopra il fornello."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Le pentole sono di varie misure, impilate una dentro l'altra."
+      }
+    ],
+    "tagPiazzamento": [
+      "cucina",
+      "dispensa"
+    ]
+  },
+  {
+    "nome": "tavolo",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il legno del tavolo è gonfio e scheggiato, corroso dall'umidità accumulata."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il piano del tavolo, lucido e privo di graffi, è perfettamente in ordine."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il tavolo ha quattro gambe di legno e un piano abbastanza ampio da ospitare più persone."
+      }
+    ],
+    "tagPiazzamento": [
+      "cucina",
+      "salone"
+    ]
+  },
+  {
+    "nome": "lavello",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Ruggine e calcare incrostano il lavello, il cui scarico emana un lieve tanfo."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il lavello, pulito e lucente, non presenta traccia di ruggine o calcare."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il lavello è incassato nel piano cucina, il rubinetto curvo sopra la vasca."
+      }
+    ],
+    "tagPiazzamento": [
+      "cucina",
+      "bagno"
+    ]
+  },
+  {
+    "nome": "letto",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le lenzuola ammuffite del letto sono incollate al materasso dall'umidità."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le lenzuola del letto sono pulite e ben rimboccate, senza una piega fuori posto."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il letto occupa buona parte della stanza, la testiera addossata alla parete."
+      }
+    ],
+    "tagPiazzamento": [
+      "camera"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ]
+  },
+  {
+    "nome": "armadio",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "L'anta dell'armadio pende storta, il legno rigonfio e scrostato."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "L'armadio, lucido e ben tenuto, custodisce abiti ordinati e puliti."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "L'armadio è alto fino al soffitto, con due ante affiancate."
+      }
+    ],
+    "tagPiazzamento": [
+      "camera",
+      "soffitta"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ],
+    "tagOpzionali": [
+      "chiuso"
+    ]
+  },
+  {
+    "nome": "comodino",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il cassetto del comodino è incastrato dall'umidità, il legno rigonfio."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il comodino, lucido e privo di polvere, ha un cassetto che scorre senza sforzo."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il comodino è basso, con un solo cassetto sotto il piano superiore."
+      }
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ],
+    "tagPiazzamento": [
+      "camera",
+      "bagno"
+    ],
+    "tagOpzionali": [
+      "chiuso"
+    ]
+  },
+  {
+    "nome": "lavandino",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Crepe e macchie di calcare deturpano la ceramica scrostata del lavandino."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il lavandino, immacolato e senza crepe, riflette una cura costante."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il lavandino in ceramica è incassato in un piccolo mobile sotto lo specchio."
+      }
+    ],
+    "tagPiazzamento": [
+      "bagno",
+      "lavanderia"
+    ]
+  },
+  {
+    "nome": "vasca da bagno",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Lo smalto della vasca è scrostato e macchiato da anni di trascuratezza."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La vasca, smaltata di fresco, non presenta segni di usura."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La vasca da bagno è lunga e stretta, addossata a una delle pareti."
+      }
+    ],
+    "tagPiazzamento": [
+      "bagno"
+    ]
+  },
+  {
+    "nome": "scrivania",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il piano della scrivania è gonfio d'umidità, i cassetti bloccati dal legno deformato."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La scrivania, lucida e ordinata, ha cassetti che scorrono senza il minimo sforzo."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La scrivania ha un piano ampio e due cassetti laterali."
+      }
+    ],
+    "tagPiazzamento": [
+      "studio",
+      "camera"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ],
+    "tagOpzionali": [
+      "chiuso"
+    ]
+  },
+  {
+    "nome": "poltrona",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "L'imbottitura della poltrona fuoriesce da squarci nel tessuto marcio."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La poltrona, morbida e priva di strappi, conserva un tessuto ancora vivace."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La poltrona ha braccioli imbottiti e uno schienale alto."
+      }
+    ],
+    "tagPiazzamento": [
+      "studio",
+      "salone",
+      "biblioteca"
+    ]
+  },
+  {
+    "nome": "lampada",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il paralume della lampada è strappato e ingiallito, la base coperta di ruggine."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La lampada, pulita e integra, ha un paralume ancora perfettamente intatto."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La lampada ha una base pesante e un paralume conico."
+      }
+    ],
+    "tagPiazzamento": [
+      "studio",
+      "camera",
+      "salone"
+    ]
+  },
+  {
+    "nome": "radio",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La radio, coperta di ruggine, ha manopole quasi bloccate dall'incuria."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La radio, lucida e ben tenuta, ha manopole che girano ancora con fluidità."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La radio è un apparecchio compatto, con un'antenna che spunta dal retro."
+      }
+    ],
+    "tagPiazzamento": [
+      "studio",
+      "salone"
+    ]
+  },
+  {
+    "nome": "letto a castello",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le lenzuola ammuffite del letto a castello pendono a brandelli dalle assi marce."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le lenzuola del letto a castello sono pulite e ben rimboccate su entrambi i livelli."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il letto a castello ha due livelli, collegati da una piccola scaletta laterale."
+      }
+    ],
+    "tagPiazzamento": [
+      "camera"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ]
+  },
+  {
+    "nome": "peluche",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il peluche, macchiato e maleodorante, ha l'imbottitura fuoriuscita da uno squarcio."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il peluche, morbido e pulito, sembra accudito con cura fino a poco tempo fa."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il peluche ha la forma di un piccolo animale, le cuciture ben visibili."
+      }
+    ],
+    "tagPiazzamento": [
+      "camera",
+      "soffitta"
+    ]
+  },
+  {
+    "nome": "scatola dei giochi",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il cartone marcio della scatola dei giochi si sfalda al minimo tocco."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La scatola dei giochi, intatta e pulita, custodisce i pezzi in ordine."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La scatola dei giochi è di cartone robusto, con un coperchio removibile."
+      }
+    ],
+    "tagPiazzamento": [
+      "camera",
+      "soffitta"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ]
+  },
+  {
+    "nome": "armadietto",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le ante dell'armadietto sono corrose e scardinate, appese a un solo cardine."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "L'armadietto, pulito e senza ammaccature, si apre e chiude senza il minimo cigolio."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "L'armadietto è basso, con un'anta singola e una piccola maniglia."
+      }
+    ],
+    "tagPiazzamento": [
+      "camera",
+      "bagno",
+      "ripostiglio"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ],
+    "tagOpzionali": [
+      "chiuso"
+    ]
+  },
+  {
+    "nome": "scaffale",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Lo scaffale, marcio e inclinato, sembra sul punto di crollare sotto il proprio peso."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Lo scaffale, solido e ordinato, sostiene tutto senza il minimo cedimento."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Lo scaffale ha più ripiani sovrapposti, sorretti da montanti laterali."
+      }
+    ],
+    "tagPiazzamento": [
+      "ripostiglio",
+      "cantina",
+      "dispensa"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ]
+  },
+  {
+    "nome": "scatole",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le scatole, ammuffite e sfondate, lasciano intravedere contenuti ormai marciti."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le scatole, intatte e ben etichettate, sono impilate con ordine."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Le scatole sono impilate una sull'altra, di misure leggermente diverse."
+      }
+    ],
+    "tagPiazzamento": [
+      "ripostiglio",
+      "soffitta",
+      "dispensa"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ]
+  },
+  {
+    "nome": "aspirapolvere",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "L'aspirapolvere, coperto di ruggine, ha un cavo sfilacciato e inutilizzabile."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "L'aspirapolvere, pulito e integro, sembra pronto per essere usato."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "L'aspirapolvere è un apparecchio compatto, con un lungo cavo avvolto attorno al corpo."
+      }
+    ],
+    "tagPiazzamento": [
+      "ripostiglio",
+      "lavanderia"
+    ]
+  },
+  {
+    "nome": "secchio",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il secchio, corroso e incrinato, non potrebbe più contenere nulla senza perdite."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il secchio, pulito e senza crepe, è pronto all'uso in ogni momento."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il secchio è in metallo, con un manico ad arco sulla sommità."
+      }
+    ],
+    "tagPiazzamento": [
+      "ripostiglio",
+      "lavanderia"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ]
+  },
+  {
+    "nome": "botti",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le botti, screpolate e marce, si stanno lentamente sfaldando su se stesse."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le botti, ben tenute e stagne, non mostrano segni di cedimento."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Le botti sono cilindriche, tenute insieme da cerchi metallici."
+      }
+    ],
+    "tagPiazzamento": [
+      "cantina",
+      "dispensa"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ]
+  },
+  {
+    "nome": "lampadina penzolante",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il filo consumato della lampadina penzolante è avvolto da ragnatele spesse."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il filo della lampadina penzolante è pulito e privo di ragnatele."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La lampadina pende da un filo fissato al soffitto, senza alcun paralume."
+      }
+    ],
+    "tagPiazzamento": [
+      "cantina",
+      "soffitta"
+    ]
+  },
+  {
+    "nome": "caldaia",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La caldaia, corrosa e scrostata, è ricoperta da uno spesso strato di fuliggine."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La caldaia, pulita e priva di ruggine, sembra sottoposta a manutenzione regolare."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La caldaia è un blocco metallico addossato alla parete, collegata a una rete di tubi."
+      }
+    ],
+    "tagPiazzamento": [
+      "caldaia",
+      "cantina"
+    ]
+  },
+  {
+    "nome": "tubi",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "I tubi, corrosi e incrostati, mostrano vistose chiazze di ossidazione."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "I tubi, puliti e integri, non presentano alcun segno di corrosione."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "I tubi corrono lungo la parete, paralleli tra loro fino al soffitto."
+      }
+    ],
+    "tagPiazzamento": [
+      "caldaia",
+      "cantina"
+    ]
+  },
+  {
+    "nome": "interruttore generale",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il pannello dell'interruttore generale è coperto da una spessa crosta di polvere e ruggine."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il pannello dell'interruttore generale è pulito e privo di polvere accumulata."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "L'interruttore generale è racchiuso in un piccolo pannello con una leva centrale."
+      }
+    ],
+    "tagPiazzamento": [
+      "caldaia",
+      "cantina"
+    ]
+  },
+  {
+    "nome": "lavatrice",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "L'oblò scheggiato della lavatrice lascia intravedere un interno ammuffito."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "L'oblò della lavatrice è pulito e trasparente, senza traccia di muffa."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La lavatrice ha un oblò rotondo sul davanti e una manopola per i programmi."
+      }
+    ],
+    "tagPiazzamento": [
+      "lavanderia",
+      "bagno"
+    ]
+  },
+  {
+    "nome": "asse da stiro",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La copertura dell'asse da stiro è bruciacchiata e consumata fino alla trama."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La copertura dell'asse da stiro è pulita e priva di bruciature."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "L'asse da stiro è pieghevole, con gambe metalliche a incrocio."
+      }
+    ],
+    "tagPiazzamento": [
+      "lavanderia",
+      "ripostiglio"
+    ]
+  },
+  {
+    "nome": "cesto",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il vimini del cesto è marcio e sfaldato, incapace ormai di reggere alcun peso."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il vimini del cesto è intatto e ben intrecciato, ancora robusto."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il cesto è intrecciato in vimini, di forma ovale."
+      }
+    ],
+    "tagPiazzamento": [
+      "lavanderia",
+      "bagno"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ]
+  },
+  {
+    "nome": "Baule",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le fasce metalliche del baule sono corrose, il legno rigonfio d'umidità."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le fasce metalliche del baule sono lucide, il legno ben conservato."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il baule ha un coperchio bombato e due maniglie laterali in metallo."
+      }
+    ],
+    "tagPiazzamento": [
+      "soffitta",
+      "ripostiglio",
+      "cantina"
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ],
+    "tagOpzionali": [
+      "chiuso"
+    ]
+  },
+  {
+    "nome": "vecchio specchio",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La superficie del vecchio specchio è quasi del tutto annerita e illeggibile."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La superficie del vecchio specchio, pur datata, resta sorprendentemente limpida."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il vecchio specchio ha una cornice intagliata, appoggiato contro la parete."
+      }
+    ],
+    "tagPiazzamento": [
+      "soffitta",
+      "cantina"
+    ]
+  },
+  {
+    "nome": "scrivania rotta",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il legno tarlato della scrivania rotta si sgretola ulteriormente a ogni tocco."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Nonostante la gamba spezzata, il resto della scrivania appare ancora curato."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La scrivania ha un piano ampio, ma una delle gambe è visibilmente danneggiata."
+      }
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ],
+    "tagPiazzamento": [
+      "soffitta",
+      "cantina"
+    ],
+    "tagOpzionali": [
+      "chiuso"
+    ]
+  },
+  {
+    "nome": "sedia a dondolo",
+    "tagPiazzamento": [
+      "salone",
+      "soffitta"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il legno della sedia a dondolo è marcio e scricchiola pericolosamente."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il legno della sedia a dondolo è lucido e privo di cigolii sospetti."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La sedia a dondolo poggia su due archi di legno curvato."
+      }
+    ],
+    "tagDatazione": "vintage"
+  },
+  {
+    "nome": "camino",
+    "tagPiazzamento": [
+      "salone"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La canna fumaria del camino è ostruita da fuliggine accumulata negli anni."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il camino, pulito e privo di detriti, sembra manutenuto con regolarità."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il camino è incassato nella parete, la cappa che si restringe verso l'alto."
+      }
+    ]
+  },
+  {
+    "nome": "tenda pesante",
+    "tagPiazzamento": [
+      "salone",
+      "biblioteca"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il tessuto della tenda è marcio d'umidità e infestato da un odore di muffa."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il tessuto della tenda, pulito e pesante, cade in pieghe ordinate."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La tenda pesante scende dal soffitto fino al pavimento, coprendo l'intera finestra."
+      }
+    ]
+  },
+  {
+    "nome": "cassapanca",
+    "tagPiazzamento": [
+      "ingresso",
+      "camera"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il legno della cassapanca è rigonfio e scrostato, il coperchio a stento si chiude."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il legno della cassapanca è lucido, il coperchio scorre senza sforzo."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La cassapanca ha un coperchio piatto che si solleva su cerniere laterali."
+      }
+    ],
+    "tagDatazione": "vintage",
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ],
+    "tagOpzionali": [
+      "chiuso"
+    ]
+  },
+  {
+    "nome": "bicicletta",
+    "tagPiazzamento": [
+      "giardino",
+      "ripostiglio"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La bicicletta, arrugginita e con le gomme marce, non sembra più utilizzabile."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La bicicletta, pulita e ben tenuta, sembra pronta per essere usata."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La bicicletta ha due ruote di uguale misura e un manubrio dritto."
+      }
+    ]
+  },
+  {
+    "nome": "carriola",
+    "tagPiazzamento": [
+      "giardino"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia si accumula nel cassone arrugginito della carriola, tra foglie marce."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nel buio bagnato, la carriola rovesciata sembra una sagoma informe tra le erbacce."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il metallo ossidato della carriola assorbe la luce fredda di un cielo immobile."
+      },
+      {
+        "id": "R04",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Sotto le stelle, la carriola arrugginita è appena visibile, semisepolta dall'erba."
+      },
+      {
+        "id": "R05",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia scivola dal cassone pulito della carriola, riposta contro il muro."
+      },
+      {
+        "id": "R06",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Il ticchettio della pioggia sulla carriola accompagna il silenzio del giardino ordinato."
+      },
+      {
+        "id": "R07",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il metallo lucido della carriola riflette la luce chiara di una giornata serena."
+      },
+      {
+        "id": "R08",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella notte quieta, la carriola ben riposta si intravede accanto all'aiuola curata."
+      },
+      {
+        "id": "R09",
+        "scenario": "tutti",
+        "testo": "La carriola è un cassone metallico su una sola ruota, i manici in legno consumato."
+      }
+    ]
+  },
+  {
+    "nome": "valigia",
+    "tagPiazzamento": [
+      "soffitta",
+      "camera"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La stoffa della valigia è marcita e le cerniere corrose oltre ogni uso."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La stoffa della valigia è pulita, le cerniere scorrono ancora bene."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La valigia è rettangolare, chiusa da due fermagli laterali."
+      }
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ],
+    "tagOpzionali": [
+      "chiuso"
+    ]
+  },
+  {
+    "nome": "macchina da cucire",
+    "tagPiazzamento": [
+      "studio",
+      "soffitta"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il metallo della macchina da cucire è opaco di ruggine, il pedale bloccato."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il metallo della macchina da cucire è lucido, il pedale ancora scorrevole."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La macchina da cucire poggia su un piccolo tavolo con pedale a molla."
+      }
+    ],
+    "tagDatazione": "vintage"
+  },
+  {
+    "nome": "macchina da scrivere",
+    "tagPiazzamento": [
+      "studio",
+      "soffitta"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "I tasti della macchina da scrivere sono corrosi e incollati tra loro dalla ruggine."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "I tasti della macchina da scrivere sono puliti e si muovono ancora liberamente."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La macchina da scrivere ha una tastiera meccanica e un rullo centrale."
+      }
+    ],
+    "tagDatazione": "vintage"
+  },
+  {
+    "nome": "giradischi",
+    "tagPiazzamento": [
+      "salone",
+      "studio"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il piatto del giradischi è coperto di polvere spessa e ruggine superficiale."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il piatto del giradischi è pulito e lucido, privo di polvere accumulata."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il giradischi ha un piatto rotondo e un braccio snodato con la puntina."
+      }
+    ],
+    "tagDatazione": "vintage"
+  },
+  {
+    "nome": "macchina fotografica",
+    "tagPiazzamento": [
+      "studio",
+      "salone"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il corpo della macchina fotografica è corroso, la pelle scollata in più punti."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il corpo della macchina fotografica è pulito, la pelle ancora ben salda."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La macchina fotografica ha un corpo compatto e un obiettivo sporgente."
+      }
+    ]
+  },
+  {
+    "nome": "specchiera",
+    "tagPiazzamento": [
+      "camera"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il vetro della specchiera è annerito e i cassettini bloccati dall'umidità."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il vetro della specchiera è terso e i cassettini scorrono senza sforzo."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La specchiera ha un vetro centrale affiancato da due piccoli cassetti."
+      }
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ],
+    "tagOpzionali": [
+      "chiuso"
+    ]
+  },
+  {
+    "nome": "culla",
+    "tagPiazzamento": [
+      "camera",
+      "soffitta"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il legno della culla è marcio e scricchiola al minimo peso."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il legno della culla è liscio e ben conservato, privo di cedimenti."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La culla ha sponde basse e dondola leggermente su due archi curvi."
+      }
+    ]
+  },
+  {
+    "nome": "carrozzina",
+    "tagPiazzamento": [
+      "soffitta",
+      "camera"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le ruote della carrozzina sono bloccate dalla ruggine accumulata negli anni."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le ruote della carrozzina girano ancora liberamente, ben oliate."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La carrozzina ha quattro ruote sottili e una capote pieghevole."
+      }
+    ],
+    "tagDatazione": "vintage"
+  },
+  {
+    "nome": "cassetta degli attrezzi",
+    "tagPiazzamento": [
+      "ripostiglio",
+      "caldaia"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il metallo della cassetta degli attrezzi è corroso, il fermaglio quasi inutilizzabile."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il metallo della cassetta degli attrezzi è pulito, il fermaglio scatta senza sforzo."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La cassetta degli attrezzi è rettangolare, con un manico ad arco sopra il coperchio."
+      }
+    ],
+    "tagRichiesti": [
+      "ricerca",
+      "piccolo"
+    ],
+    "tagOpzionali": [
+      "chiuso"
+    ]
+  },
+  {
+    "nome": "bilancia",
+    "tagPiazzamento": [
+      "bagno",
+      "cucina"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il metallo della bilancia è ossidato, il quadrante appena leggibile."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il metallo della bilancia è lucido, il quadrante perfettamente leggibile."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La bilancia ha un piatto tondo sopra un quadrante graduato."
+      }
+    ]
+  },
+  {
+    "nome": "barattoli di conserva",
+    "tagPiazzamento": [
+      "dispensa",
+      "cucina"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "I coperchi dei barattoli sono arrugginiti, le etichette ormai illeggibili."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "I coperchi dei barattoli sono integri, le etichette ancora perfettamente leggibili."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "I barattoli di conserva sono allineati, ciascuno chiuso da un coperchio a vite."
+      }
+    ]
+  },
+  {
+    "nome": "tappeto elastico",
+    "tagPiazzamento": [
+      "giardino"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia scivola sulla tela lacera del tappeto elastico, ormai ceduta in più punti."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nel buio bagnato, le molle arrugginite del tappeto elastico cigolano appena nel vento."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La tela scolorita del tappeto elastico assorbe la luce fredda di un cielo immobile."
+      },
+      {
+        "id": "R04",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Sotto le stelle, il tappeto elastico sfondato è appena visibile tra l'erba incolta."
+      },
+      {
+        "id": "R05",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Le gocce di pioggia rimbalzano sulla tela tesa del tappeto elastico, ben tenuto."
+      },
+      {
+        "id": "R06",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "La pioggia notturna tamburella sul tappeto elastico, immobile nel giardino curato."
+      },
+      {
+        "id": "R07",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La tela tesa del tappeto elastico risplende sotto la luce chiara del giorno."
+      },
+      {
+        "id": "R08",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella notte serena, il tappeto elastico ben tenuto si staglia netto sul prato curato."
+      },
+      {
+        "id": "R09",
+        "scenario": "tutti",
+        "testo": "Il tappeto elastico è teso su una struttura circolare di metallo, circondato da una rete bassa."
+      }
+    ]
+  },
+  {
+    "nome": "lanterna a olio",
+    "tagPiazzamento": [
+      "soffitta",
+      "cantina"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il metallo della lanterna è ossidato, il vetro annerito da fumo antico."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il metallo della lanterna è lucido, il vetro pulito e trasparente."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La lanterna a olio ha un corpo in metallo e un piccolo vetro protettivo."
+      }
+    ],
+    "tagDatazione": "vintage"
+  },
+  {
+    "nome": "album fotografico",
+    "tagPiazzamento": [
+      "salone",
+      "soffitta"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le pagine dell'album sono incollate tra loro dall'umidità accumulata."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le pagine dell'album si sfogliano ancora agevolmente, ben conservate."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "L'album fotografico ha una copertina rigida e pagine spesse."
+      }
+    ]
+  },
+  {
+    "nome": "televisore a schermo piatto",
+    "tagPiazzamento": [
+      "salone"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Lo schermo del televisore è coperto da un velo spesso di polvere stantia."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Lo schermo del televisore è pulito e privo di polvere accumulata."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il televisore ha uno schermo sottile montato su un piccolo supporto."
+      }
+    ],
+    "tagDatazione": "moderno"
+  },
+  {
+    "nome": "laptop",
+    "tagPiazzamento": [
+      "studio",
+      "camera"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La tastiera del laptop è appiccicosa e coperta da uno spesso strato di polvere."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La tastiera del laptop è pulita e priva di polvere accumulata."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il laptop è chiuso, il coperchio liscio e sottile."
+      }
+    ],
+    "tagDatazione": "moderno"
+  },
+  {
+    "nome": "console videogiochi",
+    "tagPiazzamento": [
+      "salone",
+      "camera"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il corpo della console è ingrigito da uno strato uniforme di polvere."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il corpo della console è pulito e lucido, privo di polvere."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La console è un piccolo blocco rettangolare, con due prese sul retro."
+      }
+    ],
+    "tagDatazione": "moderno"
+  },
+  {
+    "nome": "router wifi",
+    "tagPiazzamento": [
+      "studio",
+      "salone"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le antenne del router sono coperte da una fitta ragnatela."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le antenne del router sono pulite e libere da ragnatele."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il router è un piccolo apparecchio con due antenne verticali."
+      }
+    ],
+    "tagDatazione": "moderno"
+  },
+  {
+    "nome": "cornice digitale",
+    "tagPiazzamento": [
+      "salone",
+      "camera"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il bordo della cornice digitale è opacizzato da uno strato di polvere."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il bordo della cornice digitale è lucido e privo di polvere."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La cornice digitale ha uno schermo rettangolare incassato in un bordo sottile."
+      }
+    ],
+    "tagDatazione": "moderno"
+  },
+  {
+    "nome": "cassa bluetooth",
+    "tagPiazzamento": [
+      "camera",
+      "salone"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il tessuto della cassa bluetooth è ingrigito e impregnato di umidità."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il tessuto della cassa bluetooth è pulito e privo di macchie."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La cassa bluetooth è cilindrica, rivestita in tessuto sulla superficie esterna."
+      }
+    ],
+    "tagDatazione": "moderno"
+  },
+  {
+    "nome": "termostato smart",
+    "tagPiazzamento": [
+      "ingresso",
+      "salone"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La cornice del termostato è ingiallita e coperta da un velo di polvere."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La cornice del termostato è bianca e priva di polvere accumulata."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il termostato è un piccolo pannello rotondo fissato alla parete."
+      }
+    ],
+    "tagDatazione": "moderno"
+  },
+  {
+    "nome": "forno a microonde",
+    "tagPiazzamento": [
+      "cucina"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il vetro dello sportello del microonde è macchiato e opacizzato dal tempo."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il vetro dello sportello del microonde è pulito e trasparente."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Il forno a microonde ha uno sportello con una piccola finestra al centro."
+      }
+    ],
+    "tagDatazione": "moderno"
+  },
+  {
+    "nome": "macchina del caffè",
+    "tagPiazzamento": [
+      "cucina"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il serbatoio della macchina del caffè è incrostato di depositi calcarei scuri."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il serbatoio della macchina del caffè è pulito e privo di incrostazioni."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "La macchina del caffè ha un serbatoio removibile e un beccuccio centrale."
+      }
+    ],
+    "tagDatazione": "moderno"
+  },
+  {
+    "nome": "asciugacapelli",
+    "tagPiazzamento": [
+      "bagno"
+    ],
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il filtro dell'asciugacapelli è intasato da uno spesso strato di polvere e capelli."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il filtro dell'asciugacapelli è pulito e privo di residui."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "L'asciugacapelli ha un'impugnatura stretta e una griglia sul retro del corpo."
+      }
+    ],
+    "tagDatazione": "moderno"
+  }
+]

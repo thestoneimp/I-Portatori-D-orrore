@@ -1,0 +1,394 @@
+[
+  {
+    "codice": "S01",
+    "nome": "Porta Chiusa",
+    "bloccante": "sì",
+    "tipo": "sbarramento",
+    "descrizione": "Blocca il passaggio tra due luoghi.",
+    "interazioni": [
+      {
+        "id": "apri",
+        "etichetta": "Apri",
+        "tipo": "descrittivo",
+        "testo": "Con un flebile scricchiolio sinistro, la porta si apre senza problemi.",
+        "azionedopotesto": "apertura"
+      },
+      {
+        "id": "abbatti",
+        "etichetta": "Abbatti",
+        "tipo": "prova",
+        "abilita": "forza",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "accumulo",
+        "testoCompletamento": "A forza di spallate e di calci ben assestati, la porta si spalanca.",
+        "azioneCompletamento": "abbattimento"
+      },
+      {
+        "id": "scavalca",
+        "etichetta": "Scavalca",
+        "tipo": "prova",
+        "abilita": "atletica",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "diretto",
+        "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
+        "azioneCompletamento": "scavalcamento"
+      }
+    ]
+  },
+  {
+    "codice": "S02",
+    "nome": "Porta Aperta",
+    "bloccante": "no",
+    "tipo": "sbarramento",
+    "descrizione": "Blocca il passaggio tra due luoghi.",
+    "interazioni": [
+      {
+        "id": "chiudi",
+        "etichetta": "Chiudi",
+        "tipo": "descrittivo",
+        "testo": "Chiudi la porta, facendo attenzione a fare meno rumore possibile.",
+        "azionedopotesto": "chiusura"
+      },
+      {
+        "id": "scavalca",
+        "etichetta": "Scavalca",
+        "tipo": "prova",
+        "abilita": "atletica",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "diretto",
+        "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
+        "azioneCompletamento": "scavalcamento"
+      }
+    ]
+  },
+  {
+    "codice": "S03",
+    "nome": "Porta Sbarrata",
+    "bloccante": "sì",
+    "tipo": "sbarramento",
+    "descrizione": "Blocca il passaggio tra due luoghi.",
+    "interazioni": [
+      {
+        "id": "abbatti",
+        "etichetta": "Abbatti",
+        "tipo": "prova",
+        "abilita": "forza",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "accumulo",
+        "testoCompletamento": "A forza di spallate e di calci ben assestati, la porta si spalanca.",
+        "azioneCompletamento": "abbattimento"
+      },
+      {
+        "id": "scavalca",
+        "etichetta": "Scavalca",
+        "tipo": "prova",
+        "abilita": "atletica",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "diretto",
+        "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
+        "azioneCompletamento": "scavalcamento"
+      }
+    ]
+  },
+  {
+    "codice": "S04",
+    "nome": "Porta chiusa a chiave",
+    "bloccante": "sì",
+    "tipo": "sbarramento",
+    "descrizione": "Blocca il passaggio tra due luoghi.",
+    "interazioni": [
+      {
+        "id": "abbatti",
+        "etichetta": "Abbatti",
+        "tipo": "prova",
+        "abilita": "forza",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "accumulo",
+        "testoCompletamento": "A forza di spallate e di calci ben assestati, la porta si spalanca.",
+        "azioneCompletamento": "abbattimento"
+      },
+      {
+        "id": "scavalca",
+        "etichetta": "Scavalca",
+        "tipo": "prova",
+        "abilita": "atletica",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "diretto",
+        "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
+        "azioneCompletamento": "scavalcamento"
+      }
+    ]
+  },
+  {
+    "codice": "S16",
+    "nome": "Porta divelta",
+    "bloccante": "no",
+    "tipo": "sbarramento",
+    "descrizione": "Indica l'assenza di una porta. Il luogo non può essere chiuso, solo sbarrato."
+  },
+  {
+    "codice": "S17",
+    "nome": "Macerie",
+    "bloccante": "sì",
+    "tipo": "sbarramento",
+    "descrizione": "Blocca il passaggio tra due stanze adiacenti. Non permette il movimento."
+  },
+  {
+    "codice": "S05",
+    "nome": "Sbarre",
+    "bloccante": "sì",
+    "tipo": "sbarramento",
+    "descrizione": "Blocca il passaggio ma permette di vedere attraverso, rivelando la stanza adiacente.",
+    "bloccaVista": false
+  },
+  {
+    "codice": "S06",
+    "nome": "Scale",
+    "tipo": "connessione",
+    "descrizione": "Collega due piani tra loro. Va posizionata tra due luoghi sovrapposti."
+  },
+  {
+    "codice": "S07",
+    "nome": "Passaggio segreto",
+    "tipo": "connessione",
+    "descrizione": "Collega due stanze non adiacenti. Si usa in coppia."
+  },
+  {
+    "codice": "S08",
+    "nome": "Botola",
+    "tipo": "connessione",
+    "descrizione": "Indica l'accesso segreto a un piano inferiore. Spesso va associata a una scala."
+  },
+  {
+    "codice": "S09",
+    "nome": "Cancello Chiuso",
+    "bloccante": "sì",
+    "tipo": "sbarramento",
+    "descrizione": "Blocca il passaggio ma permette di vedere attraverso, rivelando la stanza adiacente.",
+    "interazioni": [
+      {
+        "id": "apri",
+        "etichetta": "Apri",
+        "tipo": "descrittivo",
+        "testo": "Un pesante catenaccio in metallo avvolge le sbarre del cancello, tenuto in posizione da un massiccio e vistoso lucchetto."
+      },
+      {
+        "id": "abbatti",
+        "etichetta": "Abbatti",
+        "tipo": "descrittivo",
+        "testo": "Seppur vecchio e coperto di ruggine, abbattere un cancello del genere a mani nude sarebbe un'impresa semplicemente impossibile."
+      },
+      {
+        "id": "scavalca",
+        "etichetta": "Scavalca",
+        "tipo": "prova",
+        "abilita": "atletica",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "diretto",
+        "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
+        "azioneCompletamento": "scavalcamento"
+      }
+    ],
+    "bloccaVista": false
+  },
+  {
+    "codice": "S10",
+    "nome": "Porta",
+    "bloccante": "sì",
+    "tipo": "sbarramento",
+    "descrizione": "Blocca il passaggio tra due luoghi.",
+    "interazioni": [
+      {
+        "id": "abbatti",
+        "etichetta": "Abbatti",
+        "tipo": "prova",
+        "abilita": "forza",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "accumulo",
+        "testoCompletamento": "A forza di spallate e di calci ben assestati, la porta si spalanca.",
+        "azioneCompletamento": "abbattimento"
+      },
+      {
+        "id": "scavalca",
+        "etichetta": "Scavalca",
+        "tipo": "prova",
+        "abilita": "atletica",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "diretto",
+        "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
+        "azioneCompletamento": "scavalcamento"
+      }
+    ]
+  },
+  {
+    "codice": "S11",
+    "nome": "Finestra Rotta",
+    "tipo": "sbarramento",
+    "descrizione": "Del vetro che costituiva la finestra, sono rimasti solamente frammenti appuntiti ed affilati come rasoi, ancora attaccati alla sua cornice.",
+    "interazioni": [
+      {
+        "id": "attraversa",
+        "etichetta": "Attraversa",
+        "tipo": "descrittivo",
+        "testo": "Attraversi la finestra, ma nel farlo, non riesci ad evitare uno dei vetri sporgenti, che finisce per ferirti. Perdi 1 Punto Vitalità",
+        "azionedopotesto": "attraversa"
+      },
+      {
+        "id": "arrampicati",
+        "etichetta": "Arrampicati",
+        "tipo": "prova",
+        "abilita": "atletica",
+        "requisito": 5,
+        "giocatori": "gruppo",
+        "modo": "diretto",
+        "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
+        "azioneCompletamento": "scavalcamento"
+      }
+    ],
+    "bloccaVista": false
+  },
+  {
+    "codice": "S12",
+    "nome": "Finestra con Sbarre",
+    "tipo": "sbarramento",
+    "descrizione": "Delle sbarre sono a protezione della finestra.",
+    "interazioni": [
+      {
+        "id": "rompi",
+        "etichetta": "Rompi",
+        "tipo": "prova",
+        "abilita": "forza",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "accumulo",
+        "testoCompletamento": "A forza di spallate e di calci ben assestati, la porta si spalanca.",
+        "azioneCompletamento": "abbattimento"
+      },
+      {
+        "id": "arrampicati",
+        "etichetta": "Arrampicati",
+        "tipo": "prova",
+        "abilita": "atletica",
+        "requisito": 5,
+        "giocatori": "gruppo",
+        "modo": "diretto",
+        "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
+        "azioneCompletamento": "scavalcamento"
+      }
+    ],
+    "bloccaVista": false
+  },
+  {
+    "codice": "S13",
+    "nome": "Finestra Bloccata",
+    "tipo": "sbarramento",
+    "descrizione": "Il vetro della finestra è sudicio.",
+    "interazioni": [
+      {
+        "id": "rompi",
+        "etichetta": "Rompi",
+        "tipo": "prova",
+        "abilita": "forza",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "accumulo",
+        "testoCompletamento": "Il vetro della finestra cede di schianto, frantumandosi in centinaia di pezzi. Uno di questi frammenti lacera la tua pelle, ferendoti: perdi 1 Punto Vitalità.",
+        "azioneCompletamento": "rottura"
+      },
+      {
+        "id": "arrampicati",
+        "etichetta": "Arrampicati",
+        "tipo": "prova",
+        "abilita": "atletica",
+        "requisito": 5,
+        "giocatori": "gruppo",
+        "modo": "diretto",
+        "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
+        "azioneCompletamento": "scavalcamento"
+      }
+    ],
+    "bloccaVista": false
+  },
+  {
+    "codice": "S14",
+    "nome": "Finestra Aperta",
+    "tipo": "sbarramento",
+    "descrizione": "La finestra è aperta.",
+    "interazioni": [
+      {
+        "id": "chiudi",
+        "etichetta": "Chiudi",
+        "tipo": "descrittivo",
+        "testo": "Con un lieve cigolio, la finestra si chiude.",
+        "azionedopotesto": "chiusura"
+      },
+      {
+        "id": "attraversa",
+        "etichetta": "Attraversa",
+        "tipo": "descrittivo",
+        "testo": "Attraversi la finestra, ma nel farlo, non riesci ad evitare uno dei vetri sporgenti, che finisce per ferirti. Perdi 1 Punto Vitalità",
+        "azionedopotesto": "attraversa"
+      },
+      {
+        "id": "arrampicati",
+        "etichetta": "Arrampicati",
+        "tipo": "prova",
+        "abilita": "atletica",
+        "requisito": 5,
+        "giocatori": "gruppo",
+        "modo": "diretto",
+        "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
+        "azioneCompletamento": "scavalcamento"
+      }
+    ],
+    "bloccaVista": false
+  },
+  {
+    "codice": "S15",
+    "nome": "Finestra Chiusa",
+    "tipo": "sbarramento",
+    "descrizione": "La finestra è chiusa.",
+    "interazioni": [
+      {
+        "id": "apri",
+        "etichetta": "Apri",
+        "tipo": "descrittivo",
+        "testo": "La finestra si apre senza troppi problemi.",
+        "azionedopotesto": "apertura"
+      },
+      {
+        "id": "rompi",
+        "etichetta": "Rompi",
+        "tipo": "prova",
+        "abilita": "forza",
+        "requisito": 2,
+        "giocatori": "gruppo",
+        "modo": "accumulo",
+        "testoCompletamento": "Il vetro della finestra cede di schianto, frantumandosi in centinaia di pezzi. Uno di questi frammenti lacera la tua pelle, ferendoti: perdi 1 Punto Vitalità.",
+        "azioneCompletamento": "rottura"
+      },
+      {
+        "id": "arrampicati",
+        "etichetta": "Arrampicati",
+        "tipo": "prova",
+        "abilita": "atletica",
+        "requisito": 5,
+        "giocatori": "gruppo",
+        "modo": "diretto",
+        "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
+        "azioneCompletamento": "scavalcamento"
+      }
+    ],
+    "bloccaVista": false
+  }
+]

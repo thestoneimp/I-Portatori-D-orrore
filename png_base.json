@@ -1,0 +1,48 @@
+[
+  {
+    "codice": "PNG01",
+    "nome": "Superstite Sconosciuto",
+    "immagine": "",
+    "movimento": 3,
+    "comportamentoMovimento": "fermo",
+    "dialoghi": {
+      "default": "Non... non avvicinarti troppo. Non so più di chi potermi fidare."
+    },
+    "interazioniExtra": [
+      {
+        "id": "chiedi_aiuto",
+        "etichetta": "Chiedi cosa è successo",
+        "testo": "Il superstite ti guarda a lungo, poi inizia a raccontare, con voce tremante, cosa ha visto in questa casa."
+      }
+    ],
+    "genere": "maschio"
+  },
+  {
+    "codice": "PNG02",
+    "nome": "Senzatetto",
+    "immagine": "",
+    "movimento": 2,
+    "comportamentoMovimento": "fermo",
+    "messaggioApparizione": "La figura di un uomo sporco e claudicante fuoriesce dalla penombra. Sembra essere un senzatetto. Sul suo volto aleggia un misto di paura e frustrazione.",
+    "nodoDialogoIniziale": "inizio",
+    "dialoghi": {
+      "inizio": {
+        "testo": [
+          "E... E voi chi siete? Che ci fate qui?"
+        ],
+        "opzioni": [
+          {
+            "testo": "Chi siamo noi? Chi sei tu, piuttosto?!"
+          },
+          {
+            "testo": "Non si preoccupi, non abbiamo cattive intenzioni."
+          },
+          {
+            "testo": "Non sono affari tuoi, barbone!"
+          }
+        ]
+      }
+    },
+    "genere": "maschio"
+  }
+]
