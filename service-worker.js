@@ -1,4 +1,4 @@
-const CACHE_NAME = "portatori-orrore-v1";
+const CACHE_NAME = "portatori-orrore-v2";
 const PRECACHE_URLS = [
   "./",
   "./index.html",
@@ -35,22 +35,24 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// Network-first per i file dell'app: prende sempre l'ultima versione
+// quando c'è connessione, e usa la cache solo come riserva offline.
+// (Prima era cache-first: mostrava la versione vecchia finché non si
+// riapriva l'app una seconda volta.)
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
+  if (!req.url.startsWith(self.location.origin)) return;
 
   event.respondWith(
-    caches.match(req).then((cached) => {
-      const fetchPromise = fetch(req)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200 && req.url.startsWith(self.location.origin)) {
-            const clone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
-          }
-          return networkResponse;
-        })
-        .catch(() => cached);
-      return cached || fetchPromise;
-    })
+    fetch(req)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+        }
+        return networkResponse;
+      })
+      .catch(() => caches.match(req))
   );
 });
