@@ -17,6 +17,23 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- 🔹 Sipario: coperto di default finché lo script non ha calcolato e
+         applicato l'adattamento allo schermo, così non si vede mai il
+         contenuto "a grandezza naturale" per un istante prima che si
+         restringa. Viene spostato subito sotto <html> da script.js, per
+         sopravvivere ai cambi di schermata che sostituiscono <body>. -->
+    <div id="siparioTransizione" class="sipario-transizione attivo"></div>
+
+    <!-- 🔹 L'app è pensata SOLO per l'uso in orizzontale: in verticale
+         blocca tutto con questo messaggio, invece di mostrare una
+         schermata mal adattata. Anche questo viene spostato sotto <html>
+         da script.js, per restare visibile su OGNI schermata. -->
+    <div id="avvisoRuotaSchermo" class="avviso-ruota-schermo">
+      <div class="avviso-ruota-icona">📱↻</div>
+      <p>Ruota il dispositivo</p>
+      <p class="avviso-ruota-sottotitolo">L'app funziona solo in orizzontale</p>
+    </div>
+
     <div class="home-background" aria-hidden="true">
       <video class="home-background-video" autoplay muted loop playsinline preload="auto">
         <source src="assets/media/animazione-casa-sfondo.mp4" type="video/mp4" />
@@ -33,15 +50,6 @@
         <button onclick="mostraMenuCampagna()">Modalità Campagna<span>Gioca una storia a lungo termine</span></button>
       </div>
       <p id="status"></p>
-    </div>
-
-    <!-- 🔹 L'app è pensata SOLO per l'uso in orizzontale: in verticale
-         blocca tutto con questo messaggio, invece di mostrare una
-         schermata mal adattata. -->
-    <div id="avvisoRuotaSchermo" class="avviso-ruota-schermo">
-      <div class="avviso-ruota-icona">📱↻</div>
-      <p>Ruota il dispositivo</p>
-      <p class="avviso-ruota-sottotitolo">L'app funziona solo in orizzontale</p>
     </div>
 
     <script src="script.js"></script>

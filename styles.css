@@ -18,10 +18,21 @@ html,
 body {
   height: 100%;
   overflow: hidden;
+  overscroll-behavior: none; /* niente "rimbalzo"/trascinamento pagina su mobile */
   margin: 0;
 }
 
+/* 🔹 Ancora entrambi al viewport reale: su alcuni browser mobile (Safari
+   iOS in particolare) "overflow:hidden" da solo non basta a impedire il
+   trascinamento/scroll residuo del documento. */
+html {
+  position: fixed;
+  width: 100%;
+}
+
 body {
+  position: fixed;
+  width: 100%;
   background-color: var(--bg-dark);
   color: var(--text-main);
   font-family: var(--font-body);
@@ -234,6 +245,26 @@ h1, h2, h3 {
 @keyframes ruotaIcona {
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(-90deg); }
+}
+
+/* 🔹 Sipario: copre TUTTO (sopra anche all'avviso di rotazione, non
+   importa l'ordine in quel caso) durante i calcoli di adattamento, per
+   evitare che si veda per un istante il contenuto a grandezza naturale
+   prima che si restringa. Attivo di default nell'HTML: parte già coperto,
+   script.js lo scopre solo a calcolo completato. */
+.sipario-transizione {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  background: var(--bg-dark, #0a0a0e);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.sipario-transizione.attivo {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* 🔹 Applicata via JS (adattaSchermataAllaFinestra) solo quando il

@@ -1,4 +1,21 @@
 // ============================
+// 📌 0. ELEMENTI "PERSISTENTI" FUORI DA <body>
+// ============================
+// Il sipario di transizione e l'avviso "ruota il dispositivo" devono
+// restare visibili anche quando document.body.innerHTML viene sostituito
+// per intero (cambio schermata): spostandoli sotto <html>, che non viene
+// mai ricreato, sopravvivono a qualunque cambio schermata invece di
+// sparire dopo il primo utilizzo.
+(function rendiPersistentiElementiFuoriSchermo() {
+  ["siparioTransizione", "avvisoRuotaSchermo"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el && el.parentElement !== document.documentElement) {
+      document.documentElement.appendChild(el);
+    }
+  });
+})();
+
+// ============================
 // 📌 1. DATI INIZIALI E VARIABILI GLOBALI
 // ============================
 
@@ -7363,7 +7380,7 @@ function adattaGrigliaSelezionePersonaggi() {
     const n = grid.children.length;
     if (!n) return;
 
-    const MIN_CARD = 170;
+    const MIN_CARD = 125; // soglia minima di leggibilità: sotto, meglio andare a capo
     const GAP = 14;
     const disponibile = grid.clientWidth || window.innerWidth;
 
@@ -7425,6 +7442,20 @@ function adattaSchermataAllaFinestra() {
   el.classList.toggle("contenuto-eccede", scalaCalcolata < 1);
 }
 
+// 🔹 Sipario di transizione: coperto SUBITO (in modo sincrono, prima che il
+// browser disegni il fotogramma successivo) quando cambia schermata, e
+// scoperto solo a calcolo/scala completati — così non si vede mai il
+// "salto" dalla dimensione naturale a quella adattata.
+function elementoSipario() {
+  return document.getElementById("siparioTransizione");
+}
+function mostraSipario() {
+  elementoSipario()?.classList.add("attivo");
+}
+function nascondiSipario() {
+  elementoSipario()?.classList.remove("attivo");
+}
+
 // 🔹 Punto unico richiamato da resize/rotazione/cambio schermata: decide da
 // solo quale dei due adattamenti (gioco o resto dell'app) applicare.
 let _adattaTuttoTimeout = null;
@@ -7435,9 +7466,16 @@ function adattaTuttoAllaFinestra() {
     adattaSchermataAllaFinestra();
   }
 }
-function schedulaAdattamento(ritardo = 150) {
+function schedulaAdattamento(ritardo = 150, scopriSipario = false) {
   clearTimeout(_adattaTuttoTimeout);
-  _adattaTuttoTimeout = setTimeout(adattaTuttoAllaFinestra, ritardo);
+  _adattaTuttoTimeout = setTimeout(() => {
+    adattaTuttoAllaFinestra();
+    if (scopriSipario) {
+      // due rAF: aspetta che il browser disegni davvero il layout con la
+      // nuova scala prima di scoprire, non solo che lo script sia finito.
+      requestAnimationFrame(() => requestAnimationFrame(nascondiSipario));
+    }
+  }, ritardo);
 }
 
 window.addEventListener("resize", () => schedulaAdattamento(150));
@@ -7447,7 +7485,17 @@ window.addEventListener("orientationchange", () => schedulaAdattamento(300));
 // cambia (nuova schermata, popup, ecc.), così ogni schermata — comprese
 // quelle future — risulta adattata senza dover richiamare la funzione a
 // mano da ogni punto del codice che genera nuovo HTML.
-new MutationObserver(() => schedulaAdattamento(120)).observe(document.body, {
+//
+// Il sipario si accende SOLO per un vero cambio schermata (nodi rimossi:
+// una document.body.innerHTML= o un container.innerHTML= sostituisce
+// tutto), non per piccole aggiunte come l'animazione del testo dello
+// scenario (che aggiunge singoli span senza mai rimuovere nulla): altrimenti
+// lampeggerebbe ad ogni parola.
+new MutationObserver((mutazioni) => {
+  const cambioSchermata = mutazioni.some((m) => m.removedNodes.length > 0);
+  if (cambioSchermata) mostraSipario();
+  schedulaAdattamento(cambioSchermata ? 60 : 150, cambioSchermata);
+}).observe(document.body, {
   childList: true,
   subtree: true,
 });
@@ -7459,6 +7507,17 @@ new MutationObserver(() => schedulaAdattamento(120)).observe(document.body, {
 if (document.fonts && document.fonts.ready) {
   document.fonts.ready.then(() => schedulaAdattamento(50));
 }
+
+// 🔹 Primo caricamento della pagina: il sipario parte già acceso (impostato
+// direttamente nell'HTML), e viene tolto solo dopo il primo calcolo, una
+// volta che anche i font sono pronti.
+Promise.all([
+  new Promise((res) => {
+    if (document.readyState === "complete") res();
+    else window.addEventListener("load", res, { once: true });
+  }),
+  document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve(),
+]).then(() => schedulaAdattamento(0, true));
 
 //GESTIONE ZOOM
 
