@@ -285,6 +285,27 @@ button.btn-primary:hover {
   font-style: italic;
 }
 
+/* 🔹 Contenitore esterno fisso alla vera finestra del dispositivo: è
+   l'unico che "ritaglia" (overflow:hidden). Non viene mai toccato dal
+   sistema di zoom/pan esistente. */
+.game-viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* 🔹 Riceve SOLO la scala automatica "adatta allo schermo" (calcolata in
+   JS, vedi adattaGameScreenAllaFinestra). Separato da .game-screen così
+   non entra mai in conflitto con i transform che .game-screen già usa
+   per il menu laterale e per lo zoom-su-carta. */
+.game-fit {
+  width: 100vw;
+  height: 100vh;
+  transform-origin: top center;
+  will-change: transform;
+}
+
 .game-screen {
   transform-origin: top left; /* o 0 0 */
   will-change: transform; /* micro-ottimizzazione */
@@ -292,7 +313,7 @@ button.btn-primary:hover {
   transition: transform 0.4s ease;
   width: 100%;
   height: 100vh;
-  overflow: hidden;
+  overflow: visible; /* il ritaglio avviene solo su .game-viewport */
 }
 
 .game-background {

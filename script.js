@@ -1080,16 +1080,20 @@ function mostraSchermataPrincipale() {
 
   document.body.innerHTML = `
     <div class="overlay" id="overlaySfondo"></div>
-    <div class="game-screen">
-      <div id="tabelloneDinamico" class="griglia-tabellone"></div>
-      <div id="grigliaPersonaggi" class="griglia-personaggi"></div>
-      <div class="turn-counter" id="turnCounter">Contatore Minacce: ${gameData.turniRimanenti}</div>
-      <div id="phaseIndicator" class="phase-indicator"></div>
-      <button onclick="toggleSideMenu('menuObiettivi', 'left', 300)" class="corner-btn top-left">📜</button>
-      <button class="corner-btn top-right" onclick="mostraMenuPersonaggi()">📘</button>
-      <button class="corner-btn bottom-left" onclick="toggleSideMenu('menuTutorial', 'left', 300)">📚</button>
-      <button class="corner-btn bottom-right" onclick="toggleSideMenu('menuImpostazioni', 'right', 300)">⚙️</button>
-      <button id="btnAvanzaTurno" class="advance-turn-btn">Termina Turno</button>
+    <div id="gameViewport" class="game-viewport">
+      <div id="gameFit" class="game-fit">
+        <div class="game-screen">
+          <div id="tabelloneDinamico" class="griglia-tabellone"></div>
+          <div id="grigliaPersonaggi" class="griglia-personaggi"></div>
+          <div class="turn-counter" id="turnCounter">Contatore Minacce: ${gameData.turniRimanenti}</div>
+          <div id="phaseIndicator" class="phase-indicator"></div>
+          <button onclick="toggleSideMenu('menuObiettivi', 'left', 300)" class="corner-btn top-left">📜</button>
+          <button class="corner-btn top-right" onclick="mostraMenuPersonaggi()">📘</button>
+          <button class="corner-btn bottom-left" onclick="toggleSideMenu('menuTutorial', 'left', 300)">📚</button>
+          <button class="corner-btn bottom-right" onclick="toggleSideMenu('menuImpostazioni', 'right', 300)">⚙️</button>
+          <button id="btnAvanzaTurno" class="advance-turn-btn">Termina Turno</button>
+        </div>
+      </div>
     </div>
 
     <div id="menuObiettivi" class="side-menu">
@@ -1118,6 +1122,7 @@ function mostraSchermataPrincipale() {
   `;
 
   generaGrigliaTabellone();
+  adattaGameScreenAllaFinestra();
   aggiornaContatoreTurni();
   aggiornaTestoPulsanteConferma();
   aggiornaListaObiettivi();
@@ -7281,6 +7286,59 @@ function aggiungiSbarramentoSpecifico(...args) {
   }
   return risultato;
 }
+
+// 🔹 Adatta l'intera schermata di gioco (tabellone + personaggi + pulsanti)
+// a QUALSIASI dimensione di schermo, restringendo tutto in blocco quando
+// non ci sta (telefono, soprattutto in landscape), senza mai ingrandire
+// oltre le dimensioni originali (su PC, dove di solito c'è già spazio,
+// il fattore resta 1 e nulla cambia). Agisce solo su #gameFit, un
+// contenitore dedicato: non tocca il transform di .game-screen, che resta
+// libero per il menu laterale e per lo zoom-su-carta esistenti.
+const SCALA_MINIMA_ADATTAMENTO = 0.35; // sotto questa soglia, meglio scorrere che rimpicciolire oltre
+let _adattaGameScreenTimeout = null;
+
+function adattaGameScreenAllaFinestra() {
+  const gameFit = document.getElementById("gameFit");
+  const gameViewport = document.getElementById("gameViewport");
+  const tabellone = document.getElementById("tabelloneDinamico");
+  if (!gameFit || !gameViewport || !tabellone) return;
+
+  // offsetWidth/offsetHeight riflettono la dimensione NATURALE (di layout),
+  // non influenzata da un transform già applicato in precedenza.
+  const naturaleW = Math.max(tabellone.scrollWidth, tabellone.offsetWidth);
+  const naturaleH = Math.max(tabellone.scrollHeight, tabellone.offsetHeight);
+  if (!naturaleW || !naturaleH) return;
+
+  const MARGINE = 16;
+  const disponibileW = window.innerWidth - MARGINE;
+  const disponibileH = window.innerHeight - MARGINE;
+
+  const scalaCalcolata = Math.min(
+    1,
+    disponibileW / naturaleW,
+    disponibileH / naturaleH
+  );
+  const scala = Math.max(SCALA_MINIMA_ADATTAMENTO, scalaCalcolata);
+
+  gameFit.style.transform = `scale(${scala})`;
+
+  // Se anche la scala minima non basta a far entrare tutto, teniamo lo
+  // scroll come rete di sicurezza invece di rimpicciolire fino a rendere
+  // il tabellone illeggibile.
+  gameViewport.style.overflow = scalaCalcolata < SCALA_MINIMA_ADATTAMENTO ? "auto" : "hidden";
+}
+
+window.addEventListener("resize", () => {
+  clearTimeout(_adattaGameScreenTimeout);
+  _adattaGameScreenTimeout = setTimeout(adattaGameScreenAllaFinestra, 150);
+});
+
+window.addEventListener("orientationchange", () => {
+  clearTimeout(_adattaGameScreenTimeout);
+  // Su mobile, dopo la rotazione, innerWidth/innerHeight si aggiornano con
+  // un piccolo ritardo: ricalcoliamo un attimo dopo per essere sicuri.
+  _adattaGameScreenTimeout = setTimeout(adattaGameScreenAllaFinestra, 300);
+});
 
 //GESTIONE ZOOM
 
