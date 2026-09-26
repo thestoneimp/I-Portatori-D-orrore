@@ -860,7 +860,6 @@ function mostraScenario(scenario, isTutorial = false) {
         <p><strong>Turni disponibili:</strong> ${scenario.turni}</p>
       </div>
       <div class="scenario-anteprima-tabellone">
-        <p><strong>Anteprima della disposizione delle carte:</strong></p>
         <div id="previewTabellone"></div>
       </div>
     </div>
@@ -1093,12 +1092,26 @@ function generaPreviewTabellone() {
 
   const scala = Math.min(1, disponibileW / naturaleW, disponibileH / naturaleH);
 
+  // 🔹 Centratura orizzontale: la griglia naturale (prima di scalare) è
+  // quasi sempre più larga del container (che su schermi orizzontali è
+  // solo metà schermo), quindi "width:fit-content; margin:0 auto" (CSS)
+  // non la centra affatto — un margine "auto" non può essere negativo, si
+  // azzera, e la griglia resta ancorata a sinistra sforando a destra. Si
+  // calcola quindi qui lo scarto tra lo spazio disponibile e la larghezza
+  // GIÀ SCALATA, e lo si applica come traslazione esplicita (con
+  // transform-origin "top left", non più "top center", così scala e
+  // traslazione non interferiscono tra loro).
+  const larghezzaScalata = naturaleW * scala;
+  const offsetX = Math.max(0, (disponibileW - larghezzaScalata) / 2);
+
   // Ora si applica il risultato finale: si sostituisce il contenuto del
   // container con l'unico clone, in flusso normale, già alla scala giusta.
   clone.style.position = "";
   clone.style.visibility = "";
   clone.style.pointerEvents = "";
-  clone.style.transform = `scale(${scala})`;
+  clone.style.margin = "0";
+  clone.style.transformOrigin = "top left";
+  clone.style.transform = `translateX(${offsetX}px) scale(${scala})`;
   container.innerHTML = "";
   container.appendChild(clone);
   container.style.height = `${naturaleH * scala}px`;

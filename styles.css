@@ -1217,14 +1217,14 @@ button.casuale:hover {
   row-gap: 20px;
   column-gap: 15px;
   padding: 10px;
-  /* 🔹 La scala non è più fissa (0.6): viene calcolata dinamicamente in
-     generaPreviewTabellone() in base allo spazio realmente disponibile,
-     così l'anteprima non sfora mai il fondo dello schermo. */
-  transform-origin: top center;
+  /* 🔹 Scala e posizione (transform-origin, transform: translateX+scale)
+     sono impostate dinamicamente in generaPreviewTabellone(), in base
+     allo spazio realmente disponibile: non c'è più una scala fissa (0.6)
+     né un margin:auto per centrarla (che non funziona quando, come qui,
+     la griglia naturale è più larga del suo contenitore). */
   pointer-events: none;
   background-color: rgba(255, 255, 255, 0.05);
   width: fit-content;
-  margin: 0 auto;
 }
 
 /* 🔹 Schermata "Anteprima Scenario": riepilogo testuale + anteprima del
