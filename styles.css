@@ -292,6 +292,90 @@ h1, h2, h3 {
   50% { transform: rotate(-90deg); }
 }
 
+/* 🔹 Icone di navigazione fisse (Indietro/Home/Avanti): sovrapposte a
+   QUALSIASI schermata, fuori da .container e quindi immuni sia allo
+   scale-to-fit automatico sia al flusso normale del documento — così le
+   schermate hanno tutto lo spazio verticale/orizzontale per i propri
+   contenuti, invece di doverlo condividere con questi pulsanti. Nascoste
+   di default (classe "nascosto"): ogni schermata mostra solo le icone che
+   le servono tramite mostraNavigazione()/nascondiNavigazione() (script.js). */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  pointer-events: none;
+}
+
+.nav-overlay.nascosto {
+  display: none;
+}
+
+.nav-icon-btn {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(38px, 9vh, 54px);
+  height: clamp(38px, 9vh, 54px);
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  font-family: var(--font-title);
+  line-height: 1;
+  pointer-events: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nav-icon-btn:hover {
+  transform: scale(1.08);
+}
+
+.nav-icon-btn[hidden] {
+  display: none;
+}
+
+#navBtnIndietro,
+#navBtnHome {
+  background-color: rgba(26, 26, 36, 0.85);
+  border: 1px solid #3d1418;
+  color: #fff;
+  font-size: clamp(1.1rem, 3.2vh, 1.6rem);
+}
+
+#navBtnIndietro:hover,
+#navBtnHome:hover {
+  background-color: #272736;
+  border-color: var(--blood-red);
+  box-shadow: 0 0 12px var(--blood-red-glow);
+}
+
+#navBtnIndietro {
+  top: clamp(8px, 2vh, 16px);
+  left: clamp(8px, 2vh, 16px);
+}
+
+#navBtnHome {
+  bottom: clamp(8px, 2vh, 16px);
+  left: clamp(8px, 2vh, 16px);
+}
+
+#navBtnAvanti {
+  bottom: clamp(8px, 2vh, 16px);
+  right: clamp(8px, 2vh, 16px);
+  background-color: #2ecc71;
+  border: 1px solid #27ae60;
+  color: #06210f;
+  font-size: clamp(1.2rem, 3.4vh, 1.8rem);
+  font-weight: 700;
+  box-shadow: 0 0 14px rgba(46, 204, 113, 0.55);
+}
+
+#navBtnAvanti:hover {
+  background-color: #3ddb82;
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.75);
+}
+
 /* 🔹 Sipario: copre TUTTO (sopra anche all'avviso di rotazione, non
    importa l'ordine in quel caso) durante i calcoli di adattamento, per
    evitare che si veda per un istante il contenuto a grandezza naturale

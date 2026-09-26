@@ -34,6 +34,18 @@
       <p class="avviso-ruota-sottotitolo">L'app funziona solo in orizzontale</p>
     </div>
 
+    <!-- 🔹 Icone di navigazione fisse (Indietro / Home / Avanti): sovrapposte
+         a tutte le schermate secondarie, fuori dal flusso normale del
+         documento così le schermate hanno più spazio verticale a
+         disposizione. Spostate sotto <html> da script.js, per sopravvivere
+         ai cambi di schermata. Nascoste di default: ogni schermata sceglie
+         cosa mostrare tramite mostraNavigazione()/nascondiNavigazione(). -->
+    <div id="navOverlay" class="nav-overlay nascosto">
+      <button id="navBtnIndietro" class="nav-icon-btn" type="button" aria-label="Indietro" title="Indietro" hidden>‹</button>
+      <button id="navBtnHome" class="nav-icon-btn" type="button" aria-label="Menu principale" title="Menu principale" hidden>⌂</button>
+      <button id="navBtnAvanti" class="nav-icon-btn" type="button" aria-label="Avanti" title="Avanti" hidden>›</button>
+    </div>
+
     <div class="home-background" aria-hidden="true">
       <video class="home-background-video" autoplay muted loop playsinline preload="auto">
         <source src="assets/media/animazione-casa-sfondo.mp4" type="video/mp4" />

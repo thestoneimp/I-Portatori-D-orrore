@@ -7,13 +7,49 @@
 // mai ricreato, sopravvivono a qualunque cambio schermata invece di
 // sparire dopo il primo utilizzo.
 (function rendiPersistentiElementiFuoriSchermo() {
-  ["siparioTransizione", "avvisoRuotaSchermo"].forEach((id) => {
+  ["siparioTransizione", "avvisoRuotaSchermo", "navOverlay"].forEach((id) => {
     const el = document.getElementById(id);
     if (el && el.parentElement !== document.documentElement) {
       document.documentElement.appendChild(el);
     }
   });
 })();
+
+// ============================
+// 📌 0bis. NAVIGAZIONE A ICONE FISSE (Indietro / Home / Avanti)
+// ============================
+// Sostituisce i vecchi pulsanti in-flow "Indietro"/"Menu principale"/
+// "Avanti" con 3 icone fisse sovrapposte allo schermo (angoli in alto a
+// sinistra, in basso a sinistra, in basso a destra), slegate dal layout
+// delle singole schermate: queste ultime guadagnano così tutto lo spazio
+// verticale che prima serviva a quei pulsanti. Ogni schermata dichiara
+// quali icone mostrare e cosa devono fare chiamando mostraNavigazione();
+// le schermate che hanno una propria navigazione (Home, schermata di
+// gioco) chiamano invece nascondiNavigazione().
+function mostraNavigazione({ indietro, home, avanti } = {}) {
+  const overlay = document.getElementById("navOverlay");
+  const btnIndietro = document.getElementById("navBtnIndietro");
+  const btnHome = document.getElementById("navBtnHome");
+  const btnAvanti = document.getElementById("navBtnAvanti");
+  if (!overlay || !btnIndietro || !btnHome || !btnAvanti) return;
+
+  const configura = (btn, azione) => {
+    // Un solo handler alla volta (assegnazione diretta, non addEventListener):
+    // evita che i click si accumulino passando più volte per la stessa schermata.
+    btn.onclick = typeof azione === "function" ? azione : null;
+    btn.hidden = typeof azione !== "function";
+  };
+
+  configura(btnIndietro, indietro);
+  configura(btnHome, home);
+  configura(btnAvanti, avanti);
+  overlay.classList.remove("nascosto");
+}
+
+function nascondiNavigazione() {
+  const overlay = document.getElementById("navOverlay");
+  if (overlay) overlay.classList.add("nascosto");
+}
 
 // ============================
 // 📌 1. DATI INIZIALI E VARIABILI GLOBALI
@@ -448,11 +484,7 @@ function startNewGame() {
         <input type="checkbox" name="espansione" value="invasione_zombi" />
         Invasione Zombi
       </label><br/>
-      <button type="submit" class="btn-primary">Avanti</button>
     </form>
-    <div class="navigation-buttons">
-  <button onclick="goToMainMenu()">Torna al menu principale</button>
-</div>
     <p id="status"></p>
   `;
 
@@ -476,6 +508,11 @@ function startNewGame() {
 
       mostraSelezionePersonaggi();
     });
+
+  mostraNavigazione({
+    home: goToMainMenu,
+    avanti: () => document.getElementById("configForm").requestSubmit(),
+  });
 }
 
 function continueGame() {
@@ -522,16 +559,6 @@ function mostraSelezionePersonaggi() {
 
     <!-- 🔹 contatore giocatori -->
     <div id="playerCount" class="player-count">Numero Giocatori - 0</div>
-
-    <div class="navigation-buttons avanti">
-  <button type="button" id="btnSelezioneAvanti" class="btn-primary">Avanti</button>
-</div>
-
-<div class="navigation-buttons secondari">
-  <button type="button" onclick="goToMainMenu()" class="btn-secondary">Indietro</button>
-  <button type="button" onclick="goToMainMenu()" class="btn-secondary">Menu principale</button>
-</div>
-
   `;
 
   const grid = document.getElementById("gridSelezionePG");
@@ -551,9 +578,11 @@ function mostraSelezionePersonaggi() {
     grid.appendChild(card);
   });
 
-  document
-    .getElementById("btnSelezioneAvanti")
-    .addEventListener("click", confermaSelezionePG);
+  mostraNavigazione({
+    indietro: goToMainMenu,
+    home: goToMainMenu,
+    avanti: confermaSelezionePG,
+  });
 }
 
 function toggleSelezionePG(nome, cardEl) {
@@ -622,17 +651,13 @@ function mostraCarteInizialiDopoSelezione() {
     <div class="grid-selezione-wrapper">
       <div id="gridCarteIniziali" class="grid-selezione-pg"></div>
     </div>
-
-    <div class="navigation-buttons avanti">
-  <button type="button" onclick="mostraObiettiviPersonali()" class="btn-primary">Avanti</button>
-</div>
-
-<div class="navigation-buttons secondari">
-  <button type="button" onclick="mostraSelezionePersonaggi()" class="btn-secondary">Indietro</button>
-  <button type="button" onclick="goToMainMenu()" class="btn-secondary">Menu principale</button>
-</div>
-
   `;
+
+  mostraNavigazione({
+    indietro: mostraSelezionePersonaggi,
+    home: goToMainMenu,
+    avanti: mostraObiettiviPersonali,
+  });
 
   const grid = document.getElementById("gridCarteIniziali");
 
@@ -672,6 +697,7 @@ function getCarteIniziali(nomeEroe) {
 
 function goToMainMenu() {
   faseCorrente = "giocatori"; // Resetta la fase a inizio partita
+  nascondiNavigazione(); // la Home ha i propri pulsanti, non serve l'overlay
   document.body.innerHTML = `
     <div class="home-background" aria-hidden="true">
       <video class="home-background-video" autoplay muted loop playsinline preload="auto">
@@ -718,15 +744,16 @@ function mostraObiettiviPersonali() {
       <h2>Obiettivi Personali</h2>
       <p>Mescolate il mazzo degli Obiettivi Personali e distribuitene uno ad ogni giocatore.</p>
       <p><strong>Mi raccomando:</strong> non rivelate i vostri Obiettivi Personali agli altri giocatori, fino a quando l'Obiettivo stesso non vi indica di farlo.</p>
-      <p>Una volta fatto, premete il tasto "Continua".</p>
-      <button onclick="mostraSelezioneScenario()" class="btn-primary">Continua</button>
-      <div class="navigation-buttons">
-        <button onclick="mostraCarteInizialiDopoSelezione()">Indietro</button>
-        <button onclick="goToMainMenu()">Menu principale</button>
-      </div>
+      <p>Una volta fatto, premete l'icona verde "Avanti" in basso a destra.</p>
     `;
 
   document.querySelector(".container").innerHTML = html;
+
+  mostraNavigazione({
+    indietro: mostraCarteInizialiDopoSelezione,
+    home: goToMainMenu,
+    avanti: mostraSelezioneScenario,
+  });
 }
 
 function mostraSelezioneScenario() {
@@ -737,14 +764,14 @@ function mostraSelezioneScenario() {
 
     <button class="tutorial" onclick="selezionaScenarioTutorial()">Scenario Tutorial: La Notte di Halloween</button>
     <button class="casuale" onclick="selezionaScenarioCasuale()">Scenario Casuale</button>
-
-    <div class="navigation-buttons">
-      <button onclick="mostraObiettiviPersonali()">Indietro</button>
-      <button onclick="goToMainMenu()">Menu principale</button>
-    </div>
   `;
 
   document.querySelector(".container").innerHTML = html;
+
+  mostraNavigazione({
+    indietro: mostraObiettiviPersonali,
+    home: goToMainMenu,
+  });
 }
 
 function selezionaScenarioTutorial() {
@@ -834,20 +861,20 @@ function mostraScenario(scenario, isTutorial = false) {
       <p><strong>Anteprima della disposizione delle carte:</strong></p>
       <div id="previewTabellone"></div>
     </div>
-    <button onclick="mostraSchermataScenario(
-      gameData.scenario.nome,
-      gameData.scenario.descrizione || gameData.scenario.introduzione,
-      gameData.scenario.immagine
-    )" class="btn-primary">Avvia Scenario</button>
-    
-
-    <div class="navigation-buttons">
-      <button onclick="mostraSelezioneScenario()">Indietro</button>
-      <button onclick="goToMainMenu()">Menu principale</button>
-    </div>
   `;
 
   document.querySelector(".container").innerHTML = html;
+
+  mostraNavigazione({
+    indietro: mostraSelezioneScenario,
+    home: goToMainMenu,
+    avanti: () =>
+      mostraSchermataScenario(
+        gameData.scenario.nome,
+        gameData.scenario.descrizione || gameData.scenario.introduzione,
+        gameData.scenario.immagine
+      ),
+  });
 
   setTimeout(() => {
     generaGrigliaTabelloneNascosto();
@@ -856,6 +883,11 @@ function mostraScenario(scenario, isTutorial = false) {
 }
 
 function mostraSchermataScenario(titolo, testo, immagine) {
+  // 🔹 Schermata a tutto schermo: nasconde le icone di navigazione fisse,
+  // che qui non servono (l'unica azione è "Inizia") e coprirebbero un
+  // angolo dei contenuti.
+  nascondiNavigazione();
+
   // Se l'overlay non esiste, crealo
   let schermata = document.getElementById("schermataScenario");
   if (!schermata) {
@@ -1071,6 +1103,9 @@ function toggleSideMenu(menuId, direction = "left", width = 300) {
 // ============================
 
 function mostraSchermataPrincipale() {
+  // la schermata di gioco ha già i propri pulsanti d'angolo (📜📘📚⚙️)
+  nascondiNavigazione();
+
   console.log(
     "DEBUG → posizioniPersonaggi all'inizio partita:",
     gameData.posizioniPersonaggi
@@ -4597,12 +4632,13 @@ function mostraSelezioneScenarioCampagna() {
         } ${fatto ? "✅" : ""}</button>`;
       })
       .join("<br/>")}
-    <div class="navigation-buttons">
-      <button onclick="goToMainMenu()">Menu principale</button>
-    </div>
   `;
 
   document.querySelector(".container").innerHTML = html;
+
+  mostraNavigazione({
+    home: goToMainMenu,
+  });
 }
 
 function avviaScenarioCampagna(idScenario) {
