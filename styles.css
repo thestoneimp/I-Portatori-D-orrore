@@ -25,6 +25,14 @@ body {
   background-color: var(--bg-dark);
   color: var(--text-main);
   font-family: var(--font-body);
+  /* 🔹 Riceve l'adattamento automatico allo schermo per tutte le
+     schermate diverse dal tabellone di gioco (che ha il proprio, vedi
+     adattaSchermataAllaFinestra in script.js). overflow:visible perché il
+     "ritaglio" reale avviene su <html>, non qui: altrimenti il contenuto
+     verrebbe tagliato PRIMA che la scala possa farlo rientrare a schermo. */
+  overflow: visible;
+  transform-origin: top center;
+  will-change: transform;
 }
 
 .home-background {

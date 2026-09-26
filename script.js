@@ -7295,7 +7295,6 @@ function aggiungiSbarramentoSpecifico(...args) {
 // contenitore dedicato: non tocca il transform di .game-screen, che resta
 // libero per il menu laterale e per lo zoom-su-carta esistenti.
 const SCALA_MINIMA_ADATTAMENTO = 0.35; // sotto questa soglia, meglio scorrere che rimpicciolire oltre
-let _adattaGameScreenTimeout = null;
 
 function adattaGameScreenAllaFinestra() {
   const gameFit = document.getElementById("gameFit");
@@ -7328,16 +7327,83 @@ function adattaGameScreenAllaFinestra() {
   gameViewport.style.overflow = scalaCalcolata < SCALA_MINIMA_ADATTAMENTO ? "auto" : "hidden";
 }
 
-window.addEventListener("resize", () => {
-  clearTimeout(_adattaGameScreenTimeout);
-  _adattaGameScreenTimeout = setTimeout(adattaGameScreenAllaFinestra, 150);
-});
+// 🔹 Stesso principio del tabellone di gioco, ma per TUTTE LE ALTRE
+// schermate (menu iniziale, selezione personaggi, schermata scenario,
+// menu campagna, ecc.): individua la schermata attualmente visibile e la
+// restringe in blocco (transform su <body>) se il suo contenuto naturale
+// non entra nella finestra. Funziona automaticamente anche su schermate
+// future, senza dover richiamare questa funzione da ogni singolo punto
+// del codice che cambia schermata (vedi MutationObserver più sotto).
+function elementoSchermataAttiva() {
+  // Il tabellone di gioco ha già il proprio adattamento dedicato: qui non
+  // deve essere toccato (eviterebbe di sommare due scale diverse).
+  if (document.getElementById("gameViewport")) return null;
 
-window.addEventListener("orientationchange", () => {
-  clearTimeout(_adattaGameScreenTimeout);
-  // Su mobile, dopo la rotazione, innerWidth/innerHeight si aggiornano con
-  // un piccolo ritardo: ricalcoliamo un attimo dopo per essere sicuri.
-  _adattaGameScreenTimeout = setTimeout(adattaGameScreenAllaFinestra, 300);
+  const scenario = document.getElementById("schermataScenario");
+  if (scenario && getComputedStyle(scenario).display !== "none") {
+    return scenario;
+  }
+
+  return (
+    document.querySelector(".schermata-iniziale") ||
+    document.querySelector(".container") ||
+    null
+  );
+}
+
+function adattaSchermataAllaFinestra() {
+  const el = elementoSchermataAttiva();
+
+  if (!el) {
+    document.body.style.transform = "";
+    return;
+  }
+
+  const naturaleW = Math.max(el.scrollWidth, el.offsetWidth);
+  const naturaleH = Math.max(el.scrollHeight, el.offsetHeight);
+  if (!naturaleW || !naturaleH) return;
+
+  const MARGINE = 16;
+  const disponibileW = window.innerWidth - MARGINE;
+  const disponibileH = window.innerHeight - MARGINE;
+
+  const scalaCalcolata = Math.min(
+    1,
+    disponibileW / naturaleW,
+    disponibileH / naturaleH
+  );
+  const scala = Math.max(SCALA_MINIMA_ADATTAMENTO, scalaCalcolata);
+
+  document.body.style.transform = `scale(${scala})`;
+  document.documentElement.style.overflow =
+    scalaCalcolata < SCALA_MINIMA_ADATTAMENTO ? "auto" : "hidden";
+}
+
+// 🔹 Punto unico richiamato da resize/rotazione/cambio schermata: decide da
+// solo quale dei due adattamenti (gioco o resto dell'app) applicare.
+let _adattaTuttoTimeout = null;
+function adattaTuttoAllaFinestra() {
+  if (document.getElementById("gameViewport")) {
+    adattaGameScreenAllaFinestra();
+  } else {
+    adattaSchermataAllaFinestra();
+  }
+}
+function schedulaAdattamento(ritardo = 150) {
+  clearTimeout(_adattaTuttoTimeout);
+  _adattaTuttoTimeout = setTimeout(adattaTuttoAllaFinestra, ritardo);
+}
+
+window.addEventListener("resize", () => schedulaAdattamento(150));
+window.addEventListener("orientationchange", () => schedulaAdattamento(300));
+
+// 🔹 Ricalcola automaticamente ogni volta che il contenuto della pagina
+// cambia (nuova schermata, popup, ecc.), così ogni schermata — comprese
+// quelle future — risulta adattata senza dover richiamare la funzione a
+// mano da ogni punto del codice che genera nuovo HTML.
+new MutationObserver(() => schedulaAdattamento(120)).observe(document.body, {
+  childList: true,
+  subtree: true,
 });
 
 //GESTIONE ZOOM
