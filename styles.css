@@ -44,6 +44,21 @@ body {
   overflow: visible;
   transform-origin: top center;
   will-change: transform;
+  /* 🔹 Centra verticalmente l'unico figlio "nel flusso" (.container, per
+     le schermate secondarie): tutti gli altri elementi full-screen
+     (.home-background, .schermata-iniziale, #schermataScenario,
+     #gameViewport, i popup...) sono position:fixed e quindi già esclusi
+     dal flusso normale — restano fuori dal flex e non vengono toccati.
+     Così, quando il contenuto di .container è più corto dello schermo
+     (caso comune ora che il testo/i pulsanti occupano meno spazio), non
+     resta più "appeso" in alto con un vuoto sotto: si dispone al centro,
+     usando anche lo spazio verticale che avanza. La misura dell'altezza
+     "naturale" del contenuto (scrollHeight/offsetHeight, usata per
+     decidere se serve rimpicciolire) non cambia: riflette sempre la sola
+     dimensione intrinseca di .container, non quella di body. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .home-background {
@@ -197,6 +212,46 @@ h1, h2, h3 {
   .home-background-video {
     display: none;
   }
+}
+
+/* 🔹 Schermate "secondarie" (tutto ciò che riusa .container ma NON è la
+   home): selezione espansioni/personaggi, carte iniziali, obiettivi,
+   selezione scenario, ecc. Prima riempivano molto meno schermo di quanto
+   sembrasse necessario: il motivo non era la larghezza di .container
+   (che è già senza vincoli), ma il sistema di adattamento in JS, che
+   quando il contenuto è troppo ALTO per lo schermo lo restringe con UN
+   UNICO fattore applicato sia in verticale che in orizzontale (altrimenti
+   il testo si deformerebbe) — quindi ogni volta che l'altezza non basta,
+   anche la larghezza si restringe con lei, lasciando bande vuote ai lati
+   pur avendoci spazio. La cura reale è ridurre lo spazio verticale che
+   questi elementi occupano "di natura" (titoli, paragrafi, pulsanti),
+   così quasi mai serve restringere per farceli entrare, e allargare un
+   po' la colonna di testo così sfrutta meglio lo schermo panoramico dei
+   telefoni in orizzontale. */
+.container:not(.schermata-iniziale) {
+  max-width: min(96vw, 1100px);
+  margin: 0 auto;
+  padding: clamp(10px, 2.2vh, 20px) clamp(12px, 3vw, 20px);
+}
+
+.container:not(.schermata-iniziale) h2 {
+  margin: 0 0 clamp(8px, 2vh, 18px);
+  font-size: clamp(1.3rem, 5vh, 2.1rem);
+}
+
+.container:not(.schermata-iniziale) p {
+  margin: clamp(6px, 1.4vh, 14px) 0;
+  font-size: clamp(0.85rem, 2.4vh, 1.05rem);
+  line-height: 1.35;
+}
+
+.container:not(.schermata-iniziale) button {
+  margin: clamp(4px, 1vh, 10px);
+  padding: clamp(8px, 1.6vh, 12px) clamp(16px, 3vw, 28px);
+}
+
+.container:not(.schermata-iniziale) .navigation-buttons {
+  margin-top: clamp(10px, 2vh, 20px);
 }
 
 /* 🔹 Avviso "ruota il dispositivo": nascosto di default, coperto in
