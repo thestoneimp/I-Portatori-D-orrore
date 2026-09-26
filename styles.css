@@ -646,7 +646,7 @@ button.btn-primary:hover {
 .popup-content {
   background-color: var(--bg-panel);
   color: var(--text-main);
-  padding: 24px 32px;
+  padding: clamp(12px, 3vh, 24px) clamp(16px, 4vw, 32px);
   border-radius: 4px;
   border: 1px solid var(--bg-panel-border);
   border-top: 4px solid var(--blood-red);
@@ -959,31 +959,91 @@ button.casuale:hover {
   position: fixed;
   top: 0;
   left: 0;
-  width: 300px;
+  width: clamp(200px, 40vw, 320px);
   height: 100vh;
+  /* 🔹 Padding e bordo DENTRO l'altezza/larghezza dichiarate (non
+     sommati): senza, il padding riservato per le icone d'angolo (vedi
+     #menuObiettivi/#menuTutorial più sotto) farebbe sforare il pannello
+     oltre i 100vh, spingendo la freccia di scorrimento fuori schermo. */
+  box-sizing: border-box;
   background-color: var(--bg-panel);
   color: #fff;
-  padding: 20px;
+  padding: clamp(10px, 3vh, 20px);
   border-right: 2px solid #2e1418;
-  overflow-y: auto;
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.8);
-  /* 🔹 Nascosto tramite transform (invece di "left:-350px") apposta:
-     essendo ora dentro #gameFit, che scala tutto attorno al proprio
-     centro ("transform-origin: top center"), un offset assoluto in
-     pixel come "-350px" non resta più garantito fuori dallo schermo a
-     qualunque scala — più la scala si riduce, più quell'offset viene
-     "tirato" verso il centro, rivelando parzialmente il pannello anche
-     da chiuso. "translateX(-100%)" invece è relativo alla larghezza del
-     pannello stesso: resta sempre esattamente un pannello-intero fuori
-     dal proprio bordo sinistro, qualunque sia la scala applicata
-     dall'antenato. */
+  /* 🔹 Nascosto tramite transform (invece di "left:-350px") apposta: un
+     offset assoluto in pixel come "-350px" non resta garantito fuori
+     dallo schermo se in futuro un antenato applicasse una propria scala
+     (come già avviene per .game-fit) — "translateX(-100%)" invece è
+     relativo alla larghezza del pannello stesso: resta sempre esattamente
+     un pannello-intero fuori dal proprio bordo sinistro, qualunque sia la
+     sua larghezza (ora responsive, vedi sopra) o un'eventuale scala
+     applicata dall'antenato. */
   transform: translateX(-100%);
   transition: transform 0.3s ease;
   z-index: 1000;
+  /* 🔹 Layout a colonna: intestazione fissa, area scorrevole al centro
+     (vedi .side-menu-scroll) che occupa tutto lo spazio restante, frecce
+     di scorrimento fisse in fondo/cima quando servono. */
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.2vh, 10px);
 }
 
 .side-menu.open {
   transform: translateX(0);
+}
+
+.side-menu h3 {
+  margin: 0;
+  flex: 0 0 auto;
+  font-size: clamp(1rem, 3.4vh, 1.3rem);
+}
+
+/* 🔹 Area scorrevole interna: "overflow:hidden" (non "auto") apposta — le
+   voci in eccesso sono davvero nascoste, non solo raggiungibili con una
+   scrollbar/trascinamento. Si scorre SOLO tramite le frecce qui sotto
+   (script.js, abilitaScorrimentoMenu), che restano visibili solo quando
+   c'è davvero altro da rivelare in quella direzione. */
+.side-menu-scroll {
+  flex: 1 1 auto;
+  min-height: 0; /* un figlio flex scrollabile altrimenti non si comprime sotto il proprio contenuto */
+  overflow-y: hidden;
+}
+
+.side-menu-arrow {
+  flex: 0 0 auto;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: clamp(4px, 1vh, 8px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #3d1418;
+  border-radius: 4px;
+  color: var(--torch-amber);
+  font-size: clamp(0.9rem, 2.4vh, 1.1rem);
+  line-height: 1;
+  cursor: pointer;
+  text-align: center;
+}
+
+.side-menu-arrow:hover {
+  background: rgba(255, 170, 0, 0.12);
+  border-color: var(--torch-amber);
+}
+
+.side-menu-arrow[hidden] {
+  display: none;
+}
+
+.side-menu ul {
+  margin: 0;
+  padding-left: clamp(14px, 3vw, 20px);
+  font-size: clamp(0.8rem, 2.2vh, 1rem);
+}
+
+.side-menu li {
+  margin: clamp(4px, 1vh, 8px) 0;
 }
 
 .side-menu button {
@@ -991,13 +1051,28 @@ button.casuale:hover {
   background-color: #1a1a24;
   color: white;
   border: 1px solid #3d1418;
-  padding: 8px 14px;
+  padding: clamp(5px, 1.2vh, 8px) clamp(8px, 2vw, 14px);
+  font-size: clamp(0.75rem, 2.1vh, 0.95rem);
   cursor: pointer;
 }
 
 .side-menu button.completato {
   background-color: #1b5e20;
   border-color: #4caf50;
+}
+
+/* 🔹 Le icone fisse d'angolo (#gameCornerOverlay) restano sempre sopra
+   questi pannelli (z-index più alto) e sono TUTTE E 4 sempre visibili
+   insieme, non solo quella del menu aperto: #menuObiettivi e #menuTutorial
+   condividono lo stesso bordo sinistro dello schermo, quindi entrambi
+   devono restare liberi sia dall'icona in alto a sinistra (Obiettivi) sia
+   da quella in basso a sinistra (Tutorial), qualunque dei due sia aperto —
+   altrimenti il titolo o la freccia di scorrimento finirebbero
+   parzialmente sotto un'icona non "sua". */
+#menuObiettivi,
+#menuTutorial {
+  padding-top: clamp(70px, 15vh, 96px);
+  padding-bottom: clamp(70px, 15vh, 96px);
 }
 
 .advance-turn-btn {
@@ -1083,17 +1158,18 @@ button.casuale:hover {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
+  gap: clamp(10px, 2vw, 20px);
 }
 
 .personaggio-card {
-  width: 180px;
-  padding: 10px;
+  width: clamp(120px, 24vw, 180px);
+  padding: clamp(6px, 1.5vh, 10px);
   background-color: #222;
   color: white;
   border-radius: 6px;
   border: 1px solid #444;
   text-align: center;
+  font-size: clamp(0.8rem, 2.2vh, 1rem);
 }
 
 /* Avatar segnaposto */
@@ -1130,11 +1206,11 @@ button.casuale:hover {
   background-color: #222;
   color: white;
   border: 1px solid #444;
-  padding: 10px 16px;
-  margin: 8px;
+  padding: clamp(6px, 1.6vh, 10px) clamp(10px, 2.5vw, 16px);
+  margin: clamp(4px, 1vh, 8px);
   border-radius: 6px;
   cursor: pointer;
-  font-size: 1em;
+  font-size: clamp(0.8rem, 2.2vh, 1em);
   transition: background-color 0.2s ease;
 }
 
@@ -1155,11 +1231,18 @@ button.casuale:hover {
   position: fixed;
   top: 0;
   right: 0;
-  width: 300px;
+  width: clamp(200px, 40vw, 320px);
   height: 100vh;
+  box-sizing: border-box; /* vedi commento su .side-menu: padding dentro l'altezza dichiarata */
   background-color: #222;
   color: white;
-  padding: 20px;
+  padding: clamp(10px, 3vh, 20px);
+  /* 🔹 Stessa ragione della regola su #menuObiettivi/#menuTutorial più
+     sopra: questo pannello condivide il bordo destro dello schermo con
+     l'icona Personaggi (in alto) e la propria icona 🗝️ (in basso),
+     entrambe sempre visibili — riserva spazio su entrambi i lati. */
+  padding-top: clamp(70px, 15vh, 96px);
+  padding-bottom: clamp(70px, 15vh, 96px);
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
   overflow-y: auto;
   /* 🔹 Stesso motivo del .side-menu qui sopra: transform relativo alla
@@ -1176,17 +1259,23 @@ button.casuale:hover {
 
 #menuImpostazioni h3 {
   margin-top: 0;
+  font-size: clamp(1rem, 3.4vh, 1.3rem);
 }
 
 #menuImpostazioni label {
   display: block;
-  margin-top: 12px;
-  font-size: 0.9em;
+  margin-top: clamp(6px, 1.5vh, 12px);
+  font-size: clamp(0.8rem, 2.2vh, 0.9em);
 }
 
 #menuImpostazioni input[type="range"] {
   width: 100%;
   margin: 4px 0 16px;
+}
+
+#menuImpostazioni button {
+  font-size: clamp(0.75rem, 2.1vh, 0.95rem);
+  padding: clamp(5px, 1.2vh, 8px) clamp(8px, 2vw, 14px);
 }
 
 /* Slot salvataggio */
@@ -1518,14 +1607,15 @@ button.casuale:hover {
 }
 
 #listaCategorieTutorial h4 {
-  margin: 10px 0;
+  margin: clamp(6px, 1.2vh, 10px) 0;
   cursor: pointer;
   background-color: #1a1a24;
   color: #fff;
   border: 1px solid #3d1418;
   font-family: var(--font-title);
+  font-size: clamp(0.85rem, 2.3vh, 1rem);
   letter-spacing: 1px;
-  padding: 10px;
+  padding: clamp(6px, 1.4vh, 10px);
   border-radius: 4px;
   transition: all 0.2s ease;
 }

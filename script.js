@@ -1158,6 +1158,44 @@ function generaPreviewTabellone() {
   container.style.overflow = "hidden";
 }
 
+// 🔹 Frecce di scorrimento per i menu Obiettivi/Tutorial: su schermi bassi
+// il contenuto può eccedere l'altezza del pannello. Invece di uno scroll
+// libero (trascinamento/rotellina, poco affidabile sotto la scala globale
+// dell'app), il contenitore interno resta "overflow:hidden" — le voci in
+// eccesso sono quindi davvero nascoste, non solo fuori vista con una
+// scrollbar — e si scorre SOLO tramite le due frecce, che restano
+// visibili solo quando c'è davvero altro da rivelare in quella direzione
+// (scrollTop/scrollHeight, ricalcolati automaticamente ad ogni scroll e
+// ad ogni cambio di dimensione del contenuto, es. apertura di una
+// categoria del Tutorial o nuovi obiettivi aggiunti).
+function abilitaScorrimentoMenu(scrollEl, frecciaSuEl, frecciaGiuEl) {
+  if (!scrollEl || !frecciaSuEl || !frecciaGiuEl) return;
+
+  const aggiornaFrecce = () => {
+    const puoSalire = scrollEl.scrollTop > 1;
+    const puoScendere =
+      scrollEl.scrollTop + scrollEl.clientHeight < scrollEl.scrollHeight - 1;
+    frecciaSuEl.hidden = !puoSalire;
+    frecciaGiuEl.hidden = !puoScendere;
+  };
+
+  const passo = () => scrollEl.clientHeight * 0.85;
+  frecciaSuEl.onclick = () =>
+    scrollEl.scrollBy({ top: -passo(), behavior: "smooth" });
+  frecciaGiuEl.onclick = () =>
+    scrollEl.scrollBy({ top: passo(), behavior: "smooth" });
+  scrollEl.onscroll = aggiornaFrecce;
+
+  // Il contenuto (lista obiettivi, categorie tutorial) viene rigenerato o
+  // espanso/compresso da altre funzioni senza passare da qui: un
+  // ResizeObserver sul primo figlio ricalcola le frecce da solo ad ogni
+  // variazione di altezza, senza doverlo richiamare a mano ovunque.
+  const contenuto = scrollEl.firstElementChild;
+  if (contenuto) new ResizeObserver(aggiornaFrecce).observe(contenuto);
+
+  aggiornaFrecce();
+}
+
 function toggleSideMenu(menuId, direction = "left", width = 300) {
   const menu = document.getElementById(menuId);
   const overlay = document.getElementById("overlaySfondo");
@@ -1251,12 +1289,20 @@ function mostraSchermataPrincipale() {
 
     <div id="menuObiettivi" class="side-menu">
       <h3>Obiettivi Comuni</h3>
-      <ul id="listaObiettivi"></ul>
+      <button class="side-menu-arrow side-menu-arrow-su" type="button" aria-label="Scorri su" hidden>▲</button>
+      <div class="side-menu-scroll" id="scrollObiettivi">
+        <ul id="listaObiettivi"></ul>
+      </div>
+      <button class="side-menu-arrow side-menu-arrow-giu" type="button" aria-label="Scorri giù" hidden>▼</button>
     </div>
 
     <div id="menuTutorial" class="side-menu">
       <h3>Tutorial</h3>
-      <div id="listaCategorieTutorial"></div>
+      <button class="side-menu-arrow side-menu-arrow-su" type="button" aria-label="Scorri su" hidden>▲</button>
+      <div class="side-menu-scroll" id="scrollTutorial">
+        <div id="listaCategorieTutorial"></div>
+      </div>
+      <button class="side-menu-arrow side-menu-arrow-giu" type="button" aria-label="Scorri giù" hidden>▼</button>
     </div>
 
     <div id="menuImpostazioni">
@@ -1280,6 +1326,17 @@ function mostraSchermataPrincipale() {
   aggiornaTestoPulsanteConferma();
   aggiornaListaObiettivi();
   caricaTutorial();
+
+  abilitaScorrimentoMenu(
+    document.getElementById("scrollObiettivi"),
+    document.querySelector("#menuObiettivi .side-menu-arrow-su"),
+    document.querySelector("#menuObiettivi .side-menu-arrow-giu")
+  );
+  abilitaScorrimentoMenu(
+    document.getElementById("scrollTutorial"),
+    document.querySelector("#menuTutorial .side-menu-arrow-su"),
+    document.querySelector("#menuTutorial .side-menu-arrow-giu")
+  );
 
   document.getElementById("btnAvanzaTurno").addEventListener("click", () => {
     console.log("Pulsante Termina Turno cliccato");
