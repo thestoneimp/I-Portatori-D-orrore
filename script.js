@@ -65,7 +65,7 @@ function mostraMenuGioco() {
   document.getElementById("gcBtnObiettivi").onclick = () =>
     toggleSideMenu("menuObiettivi", "left", 300);
   document.getElementById("gcBtnPersonaggi").onclick = () =>
-    mostraMenuPersonaggi();
+    toggleSideMenu("menuPersonaggi", "right", 300);
   document.getElementById("gcBtnTutorial").onclick = () =>
     toggleSideMenu("menuTutorial", "left", 300);
   document.getElementById("gcBtnImpostazioni").onclick = () =>
@@ -1196,13 +1196,22 @@ function abilitaScorrimentoMenu(scrollEl, frecciaSuEl, frecciaGiuEl) {
   aggiornaFrecce();
 }
 
-// I 3 pannelli che usano questo meccanismo di apertura/chiusura (Obiettivi,
-// Tutorial e Impostazioni). Il popup Personaggi è un concetto architetturale
-// diverso (mostraMenuPersonaggi/.popup) e non rientra nella mutua esclusione.
-const ID_MENU_LATERALI = ["menuObiettivi", "menuTutorial", "menuImpostazioni"];
+// I 4 pannelli che usano questo meccanismo di apertura/chiusura (Obiettivi,
+// Tutorial, Personaggi e Impostazioni). I popup di dettaglio aperti sopra
+// questi pannelli (mostraDettagliPersonaggio, mostraDettaglioVoce, ecc.,
+// tutti con classe .popup) restano un concetto architetturale diverso e non
+// rientrano in questa mutua esclusione.
+const ID_MENU_LATERALI = [
+  "menuObiettivi",
+  "menuTutorial",
+  "menuPersonaggi",
+  "menuImpostazioni",
+];
 
 function _direzioneMenuLaterale(menuId) {
-  return menuId === "menuImpostazioni" ? "right" : "left";
+  return menuId === "menuImpostazioni" || menuId === "menuPersonaggi"
+    ? "right"
+    : "left";
 }
 
 function _haMenuLateraleAperto() {
@@ -1350,6 +1359,15 @@ function mostraSchermataPrincipale() {
       <button class="side-menu-arrow side-menu-arrow-giu" type="button" aria-label="Scorri giù" hidden>▼</button>
     </div>
 
+    <div id="menuPersonaggi" class="side-menu side-menu-right">
+      <h3>Personaggi in gioco</h3>
+      <button class="side-menu-arrow side-menu-arrow-su" type="button" aria-label="Scorri su" hidden>▲</button>
+      <div class="side-menu-scroll" id="scrollPersonaggi">
+        <div class="lista-personaggi-side" id="listaPersonaggiSide"></div>
+      </div>
+      <button class="side-menu-arrow side-menu-arrow-giu" type="button" aria-label="Scorri giù" hidden>▼</button>
+    </div>
+
     <div id="menuImpostazioni">
       <h3>Impostazioni Audio</h3>
       <label>Volume Generale</label>
@@ -1371,6 +1389,7 @@ function mostraSchermataPrincipale() {
   aggiornaTestoPulsanteConferma();
   aggiornaListaObiettivi();
   caricaTutorial();
+  aggiornaListaPersonaggiMenu();
 
   abilitaScorrimentoMenu(
     document.getElementById("scrollObiettivi"),
@@ -1381,6 +1400,11 @@ function mostraSchermataPrincipale() {
     document.getElementById("scrollTutorial"),
     document.querySelector("#menuTutorial .side-menu-arrow-su"),
     document.querySelector("#menuTutorial .side-menu-arrow-giu")
+  );
+  abilitaScorrimentoMenu(
+    document.getElementById("scrollPersonaggi"),
+    document.querySelector("#menuPersonaggi .side-menu-arrow-su"),
+    document.querySelector("#menuPersonaggi .side-menu-arrow-giu")
   );
 
   document.getElementById("btnAvanzaTurno").addEventListener("click", () => {
@@ -1398,6 +1422,11 @@ function mostraSchermataPrincipale() {
     if (popup) return;
     if (document.getElementById("menuObiettivi")?.classList.contains("open")) {
       toggleSideMenu("menuObiettivi", "left", 300);
+    }
+    if (
+      document.getElementById("menuPersonaggi")?.classList.contains("open")
+    ) {
+      toggleSideMenu("menuPersonaggi", "right", 300);
     }
     if (
       document.getElementById("menuImpostazioni")?.classList.contains("open")
@@ -4497,28 +4526,26 @@ function mostraMessaggioVittoriaGruppo() {
 // 📌 9. MENU PERSONAGGI E DETTAGLI
 // ============================
 
-function mostraMenuPersonaggi() {
-  const popup = document.createElement("div");
-  popup.classList.add("popup");
-  popup.id = "popupMenuPersonaggi";
+// Popola il pannello laterale Personaggi (#menuPersonaggi), sullo stesso
+// principio di aggiornaListaObiettivi()/caricaTutorial(): il contenuto viene
+// scritto una volta all'avvio della schermata di gioco (i personaggi sono
+// fissi per tutta la partita, vedi gameData.personaggi), toggleSideMenu si
+// occupa solo di apertura/chiusura del pannello.
+function aggiornaListaPersonaggiMenu() {
+  const lista = document.getElementById("listaPersonaggiSide");
+  if (!lista) return;
 
-  let html = `<div class="popup-content"><h2>Personaggi in gioco</h2>
-  <div class="lista-personaggi">`;
-
-  gameData.personaggi.forEach((pg, index) => {
-    html += `
+  lista.innerHTML = gameData.personaggi
+    .map(
+      (pg, index) => `
       <div class="personaggio-card">
         <div class="avatar-placeholder">[Avatar]</div>
         <p><strong>${pg}</strong></p>
         <button onclick="mostraDettagliPersonaggio(${index})">Dettagli Personaggio</button>
       </div>
-    `;
-  });
-
-  html += `</div><button onclick="chiudiPopup()">Chiudi</button></div>`;
-
-  popup.innerHTML = html;
-  document.body.appendChild(popup);
+    `
+    )
+    .join("");
 }
 
 function mostraMenuTurniGiocatori(personaggiDisponibili) {
@@ -4602,7 +4629,7 @@ function mostraDettagliPersonaggio(index) {
 
   popup.innerHTML = html;
 
-  chiudiPopup(); // Chiude popup precedente (lista personaggi)
+  chiudiPopup(); // Chiude un eventuale popup di dettaglio già aperto
   document.body.appendChild(popup);
 }
 
@@ -4625,8 +4652,10 @@ function mostraDettaglioVoce(titolo, descrizione) {
 }
 
 function tornaAlMenuPersonaggi() {
+  // Il pannello Personaggi è un side-menu, non un popup: è rimasto aperto
+  // dietro il dettaglio per tutto il tempo. Basta chiudere il popup di
+  // dettaglio per tornare a vederlo, senza doverlo ricreare.
   chiudiPopup();
-  mostraMenuPersonaggi();
 }
 
 function tornaAiDettagliPersonaggio() {

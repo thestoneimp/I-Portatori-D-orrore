@@ -1000,6 +1000,25 @@ button.casuale:hover {
   transform: translateX(0);
 }
 
+/* 🔹 Modificatore per i pannelli che scorrono da destra (Personaggi), sullo
+   stesso principio di #menuImpostazioni: specchia lato/bordo/ombra e parte
+   da fuori schermo sul lato destro invece che sinistro. Lo stato chiuso è
+   scoping con ":not(.open)" (non un semplice ordine nel foglio di stile)
+   apposta: così la regola ".side-menu.open" qui sopra vince sempre per la
+   proprietà transform quando il pannello è aperto, a prescindere da come
+   viene riordinato in futuro questo file. */
+.side-menu.side-menu-right {
+  left: auto;
+  right: 0;
+  border-right: none;
+  border-left: 2px solid #2e1418;
+  box-shadow: -2px 0 15px rgba(0, 0, 0, 0.8);
+}
+
+.side-menu.side-menu-right:not(.open) {
+  transform: translateX(100%);
+}
+
 .side-menu h3 {
   margin: 0;
   flex: 0 0 auto;
@@ -1162,6 +1181,33 @@ button.casuale:hover {
   border: 1px solid #444;
   text-align: center;
   font-size: clamp(0.8rem, 2.2vh, 1rem);
+}
+
+/* 🔹 Schede personaggio dentro il pannello laterale #menuPersonaggi: stesse
+   classi .personaggio-card/.avatar-placeholder del popup "Chi agisce ora?"
+   (mostraMenuTurniGiocatori), ma impilate in colonna e ridimensionate per lo
+   spazio più stretto del pannello — testo e avatar resi più piccoli, ma
+   sempre proporzionali (clamp) per restare leggibili a qualunque altezza
+   schermo. Le frecce di scorrimento (abilitaScorrimentoMenu) compaiono da
+   sole se le schede eccedono l'altezza disponibile, come per Obiettivi e
+   Tutorial. */
+.lista-personaggi-side {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.5vh, 14px);
+}
+
+.lista-personaggi-side .personaggio-card {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: clamp(0.72rem, 1.9vh, 0.9rem);
+  padding: clamp(6px, 1.2vh, 10px);
+}
+
+.lista-personaggi-side .avatar-placeholder {
+  height: clamp(36px, 9vh, 90px);
+  font-size: clamp(0.6rem, 1.6vh, 0.8rem);
+  margin-bottom: clamp(4px, 1vh, 8px);
 }
 
 /* Avatar segnaposto */
