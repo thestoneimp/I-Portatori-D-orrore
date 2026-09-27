@@ -984,7 +984,7 @@ button.casuale:hover {
   position: fixed;
   top: 0;
   left: 0;
-  width: clamp(200px, 40vw, 320px);
+  width: clamp(200px, 25vw, 320px);
   height: 100vh;
   /* 🔹 Padding e bordo DENTRO l'altezza/larghezza dichiarate (non
      sommati): senza, il padding riservato per le icone d'angolo (vedi
@@ -1288,7 +1288,7 @@ button.casuale:hover {
   position: fixed;
   top: 0;
   right: 0;
-  width: clamp(200px, 40vw, 320px);
+  width: clamp(200px, 25vw, 320px);
   height: 100vh;
   box-sizing: border-box; /* vedi commento su .side-menu: padding dentro l'altezza dichiarata */
   background-color: #222;

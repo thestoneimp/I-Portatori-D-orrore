@@ -1227,6 +1227,47 @@ function abilitaScorrimentoMenu(scrollEl, frecciaSuEl, frecciaGiuEl) {
   const contenuto = scrollEl.firstElementChild;
   if (contenuto) new ResizeObserver(aggiornaFrecce).observe(contenuto);
 
+  // 🔹 Scorrimento anche con rotella del mouse (desktop) e trascinamento
+  // del dito (mobile/touch), oltre alle frecce: "overflow-y:hidden" (CSS)
+  // impedisce lo scroll nativo, quindi lo replichiamo a mano scrivendo
+  // direttamente su scrollTop — stesso risultato di scrollBy() ma pilotato
+  // dal gesto invece che dal click sulla freccia.
+  scrollEl.addEventListener(
+    "wheel",
+    (e) => {
+      e.preventDefault();
+      scrollEl.scrollTop += e.deltaY;
+    },
+    { passive: false }
+  );
+
+  let touchYPrecedente = null;
+  scrollEl.addEventListener(
+    "touchstart",
+    (e) => {
+      touchYPrecedente = e.touches[0].clientY;
+    },
+    { passive: true }
+  );
+  scrollEl.addEventListener(
+    "touchmove",
+    (e) => {
+      if (touchYPrecedente === null) return;
+      const touchY = e.touches[0].clientY;
+      scrollEl.scrollTop += touchYPrecedente - touchY;
+      touchYPrecedente = touchY;
+      e.preventDefault();
+    },
+    { passive: false }
+  );
+  scrollEl.addEventListener(
+    "touchend",
+    () => {
+      touchYPrecedente = null;
+    },
+    { passive: true }
+  );
+
   aggiornaFrecce();
 }
 
