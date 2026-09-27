@@ -115,6 +115,13 @@ function mostraMenuGioco() {
   // ogni volta che si (ri)apre la schermata di gioco.
   overlay.style.transform = "";
 
+  // 🔹 Stesso motivo: turnCounter e phaseIndicator sono ora dentro questo
+  // overlay persistente (vedi index.html), quindi anche un display:none
+  // lasciato da una partita precedente (nascosto alla vittoria di gruppo,
+  // vedi mostraMessaggioVittoriaGruppo) resterebbe altrimenti attivo.
+  const turnCounter = document.getElementById("turnCounter");
+  if (turnCounter) turnCounter.style.display = "";
+
   overlay.classList.remove("nascosto");
 }
 
@@ -1426,8 +1433,6 @@ function mostraSchermataPrincipale() {
           <div class="game-background"></div>
           <div id="tabelloneDinamico" class="griglia-tabellone"></div>
           <div id="grigliaPersonaggi" class="griglia-personaggi"></div>
-          <div class="turn-counter" id="turnCounter">Contatore Minacce: ${gameData.turniRimanenti}</div>
-          <div id="phaseIndicator" class="phase-indicator"></div>
           <button id="btnAvanzaTurno" class="advance-turn-btn">Termina Turno</button>
         </div>
       </div>

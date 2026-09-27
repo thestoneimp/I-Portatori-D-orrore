@@ -40,16 +40,22 @@
     </div>
 
     <!-- 🔹 Le 4 icone di menu della schermata di gioco (Obiettivi/Personaggi/
-         Tutorial/Impostazioni): stesso principio di navOverlay sopra, fuori
-         dal flusso e immuni allo scale-to-fit/zoom/pan di .game-screen, così
-         restano ferme nei 4 angoli veri dello schermo e non occupano spazio
-         nel tabellone. Spostate sotto <html> da script.js. Mostrate solo
-         durante la partita tramite mostraMenuGioco()/nascondiMenuGioco(). -->
+         Tutorial/Impostazioni), più i due indicatori di fase/contatore
+         minacce: stesso principio di navOverlay sopra, fuori dal flusso e
+         immuni allo scale-to-fit/zoom/pan di .game-screen, così restano
+         fermi rispetto allo schermo reale e non occupano spazio nel
+         tabellone. Spostate sotto <html> da script.js. Mostrati solo
+         durante la partita tramite mostraMenuGioco()/nascondiMenuGioco().
+         Essendo dentro questo overlay, ereditano anche lo stesso
+         spostamento sincronizzato all'apertura/chiusura di un menu
+         laterale (vedi toggleSideMenu in script.js). -->
     <div id="gameCornerOverlay" class="game-corner-overlay nascosto">
       <button id="gcBtnObiettivi" class="game-corner-btn corner-top-left" type="button" aria-label="Obiettivi" title="Obiettivi">🕯️</button>
       <button id="gcBtnPersonaggi" class="game-corner-btn corner-top-right" type="button" aria-label="Personaggi" title="Personaggi">🎭</button>
       <button id="gcBtnTutorial" class="game-corner-btn corner-bottom-left" type="button" aria-label="Tutorial" title="Tutorial">📖</button>
       <button id="gcBtnImpostazioni" class="game-corner-btn corner-bottom-right" type="button" aria-label="Impostazioni" title="Impostazioni">🗝️</button>
+      <div id="phaseIndicator" class="phase-indicator"></div>
+      <div id="turnCounter" class="turn-counter"></div>
     </div>
 
     <div class="home-background" aria-hidden="true">
