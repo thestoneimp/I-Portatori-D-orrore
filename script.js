@@ -1419,6 +1419,7 @@ function mostraSchermataPrincipale() {
   `;
 
   generaGrigliaTabellone();
+  aggiornaSfondoAmbientale();
   adattaGameScreenAllaFinestra();
   aggiornaContatoreTurni();
   aggiornaTestoPulsanteConferma();
@@ -1611,6 +1612,37 @@ function risolviContestoAmbientale(scenario) {
     }
   }
   return risolto;
+}
+
+// 🔹 Sfondo dinamico della schermata di gioco: ogni immagine copre un
+// "bucket" di statoCasa (abbandonata/in_rovina condividono lo sfondo
+// dell'edizione "abbandonata"; abitata/curata condividono l'edizione
+// "abitata") e un bucket di meteo (pioggia e tempesta condividono la
+// stessa immagine "pioggia", non essendocene una dedicata alla tempesta).
+const BUCKET_STATOCASA_SFONDO = {
+  abbandonata: "abbandonata",
+  in_rovina: "abbandonata",
+  abitata: "abitata",
+  curata: "abitata",
+};
+const BUCKET_METEO_SFONDO = {
+  sereno: "sereno",
+  nebbia: "nebbia",
+  pioggia: "pioggia",
+  tempesta: "pioggia",
+  neve: "neve",
+};
+
+function aggiornaSfondoAmbientale() {
+  const sfondo = document.querySelector(".game-background");
+  if (!sfondo) return;
+
+  const ctx = gameData.contestoAmbientale || {};
+  const stato = BUCKET_STATOCASA_SFONDO[ctx.statoCasa] || "abbandonata";
+  const meteo = BUCKET_METEO_SFONDO[ctx.meteo] || "sereno";
+  const momento = ctx.momento === "giorno" ? "giorno" : "notte";
+
+  sfondo.style.backgroundImage = `url("assets/media/sfondi/sfondo-${stato}-${meteo}-${momento}.jpg")`;
 }
 
 const FRAMMENTI_CONTESTO = {
