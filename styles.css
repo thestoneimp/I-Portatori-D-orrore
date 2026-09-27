@@ -538,6 +538,15 @@ button.btn-primary:hover {
   overflow: visible; /* il ritaglio avviene solo su .game-viewport */
 }
 
+/* 🔹 Figlio diretto di #gameViewport (non di .game-screen): il tabellone può
+   essere più grande di una schermata, quindi #gameFit/.game-screen vengono
+   rimpiccioliti con un transform:scale calcolato in JS
+   (adattaGameScreenAllaFinestra) per farceli entrare. Uno sfondo dentro
+   quella catena sarebbe stato rimpicciolito insieme al tabellone, lasciando
+   grandi zone nere ai lati e in basso (stesso bug già risolto per il video
+   di sfondo della schermata home, vedi commento su .game-viewport). Stando
+   fuori da quella catena (dentro #gameViewport, che è fixed/inset:0 e non
+   viene mai scalato), copre sempre l'intera finestra reale. */
 .game-background {
   position: absolute;
   top: 0;
@@ -547,10 +556,8 @@ button.btn-primary:hover {
   background-image: url("assets/media/sfondo-schermata-gioco.jpg");
   background-size: cover;
   background-position: center;
-  /* 🔹 z-index negativo (non solo "primo nel DOM"): resta sotto qualunque
-     altro figlio di .game-screen anche se in futuro venisse aggiunto prima
-     di lui nel markup, dato che gli altri figli hanno tutti z-index
-     auto/positivo. */
+  /* 🔹 z-index negativo: resta sotto #gameFit (e quindi sotto tabellone,
+     personaggi, contatore turni, ecc.), che ha z-index auto. */
   z-index: -1;
 }
 

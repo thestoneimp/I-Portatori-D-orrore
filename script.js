@@ -1330,9 +1330,9 @@ function mostraSchermataPrincipale() {
   document.body.innerHTML = `
     <div class="overlay" id="overlaySfondo"></div>
     <div id="gameViewport" class="game-viewport">
+      <div class="game-background"></div>
       <div id="gameFit" class="game-fit">
         <div class="game-screen">
-          <div class="game-background"></div>
           <div id="tabelloneDinamico" class="griglia-tabellone"></div>
           <div id="grigliaPersonaggi" class="griglia-personaggi"></div>
           <div class="turn-counter" id="turnCounter">Contatore Minacce: ${gameData.turniRimanenti}</div>
