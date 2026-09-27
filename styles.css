@@ -538,16 +538,21 @@ button.btn-primary:hover {
   overflow: visible; /* il ritaglio avviene solo su .game-viewport */
 }
 
-/* 🔹 Figlio di .griglia-tabellone (creato in generaGrigliaTabellone(), non
-   nel markup statico: quel contenitore viene svuotato e ridisegnato ad ogni
-   aggiornamento del tabellone). Ancorato al VERO ingombro delle carte
-   (.griglia-tabellone si restringe a "fit-content" e si centra da sola),
-   non a .game-screen, che è sempre grande quanto l'intera finestra a
-   prescindere da quanto le carte occupino davvero — usarlo come riferimento
-   lasciava spazio vuoto intorno all'immagine quando il tabellone (più
-   piccolo di .game-screen) veniva rimpicciolito per intero. Stando dentro
-   il tabellone vero e proprio, lo sfondo eredita anche scale-to-fit,
-   zoom-su-carta e slide dei menu laterali esattamente come le carte. */
+/* 🔹 Figlio di .game-screen (di nuovo, come la primissima versione), MA con
+   dimensione/posizione ricalcolate in JS (adattaGameScreenAllaFinestra,
+   vedi lì il commento con la spiegazione geometrica) invece dei fissi
+   width/height:100% qui sotto (che restano solo come valore di partenza,
+   sovrascritti in px non appena la funzione gira la prima volta). Il motivo:
+   .game-screen è sempre grande quanto l'intera finestra (100vw×100vh) A
+   PRESCINDERE da quanto le carte occupino davvero — un semplice 100%/100%
+   veniva quindi rimpicciolito insieme a tutto il resto da #gameFit quando
+   il tabellone non riempie la finestra, lasciando spazio vuoto ai lati. La
+   dimensione calcolata in JS compensa esattamente quel rimpicciolimento, in
+   modo che a riposo copra sempre l'intera finestra, pur restando figlio di
+   .game-screen: eredita quindi normalmente ogni ULTERIORE transform (zoom-
+   su-carta, slide dei menu laterali) esattamente come le carte, perché da
+   quel punto in poi si muove/scala insieme a loro nello stesso sistema di
+   coordinate. */
 .game-background {
   position: absolute;
   top: 0;
@@ -557,8 +562,8 @@ button.btn-primary:hover {
   background-image: url("assets/media/sfondo-schermata-gioco.jpg");
   background-size: cover;
   background-position: center;
-  /* 🔹 z-index negativo: resta sotto le carte, altri figli di
-     .griglia-tabellone (z-index auto). */
+  /* 🔹 z-index negativo: resta sotto tabellone, personaggi, contatore
+     turni e pulsante turno, gli altri figli di .game-screen (z-index auto). */
   z-index: -1;
 }
 
@@ -1344,11 +1349,6 @@ button.casuale:hover {
   padding-top: 120px; /* ↑ margine visivo dalla cima */
   row-gap: 70px;
   column-gap: 50px;
-  /* 🔹 Ancora di posizionamento per .game-background (vedi sotto): questo
-     è il VERO ingombro del tabellone (si restringe a "fit-content" e si
-     centra da solo), a differenza di .game-screen che è sempre grande
-     quanto l'intera finestra. */
-  position: relative;
 }
 
 .carta-tabellone {

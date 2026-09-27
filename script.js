@@ -1366,6 +1366,7 @@ function mostraSchermataPrincipale() {
     <div id="gameViewport" class="game-viewport">
       <div id="gameFit" class="game-fit">
         <div class="game-screen">
+          <div class="game-background"></div>
           <div id="tabelloneDinamico" class="griglia-tabellone"></div>
           <div id="grigliaPersonaggi" class="griglia-personaggi"></div>
           <div class="turn-counter" id="turnCounter">Contatore Minacce: ${gameData.turniRimanenti}</div>
@@ -3871,16 +3872,6 @@ function generaGrigliaTabellone() {
   const container = document.getElementById("tabelloneDinamico");
   container.innerHTML = "";
   container.classList.add("griglia-tabellone");
-
-  // 🔹 Sfondo ancorato al VERO ingombro del tabellone (questo contenitore,
-  // width:fit-content + margin:auto), non a .game-screen (che è sempre
-  // grande quanto l'intera finestra, 100vw×100vh, a prescindere da quanto
-  // le carte occupino davvero): altrimenti a tabellone rimpicciolito
-  // restava spazio vuoto intorno all'immagine. Ricreato ad ogni ridisegno
-  // del tabellone perché container.innerHTML="" qui sopra lo cancella.
-  const sfondo = document.createElement("div");
-  sfondo.className = "game-background";
-  container.appendChild(sfondo);
 
   // --- Disegno CARTE ---
   for (const carta of gameData.tabelloneAttivo) {
@@ -7671,6 +7662,40 @@ function adattaGameScreenAllaFinestra() {
   // scroll come rete di sicurezza invece di rimpicciolire fino a rendere
   // il tabellone illeggibile.
   gameViewport.style.overflow = scalaCalcolata < SCALA_MINIMA_ADATTAMENTO ? "auto" : "hidden";
+
+  // 🔹 Compensa lo sfondo (.game-background, figlio di .game-screen) per lo
+  // "letterboxing" introdotto proprio dallo scale qui sopra: #gameFit è
+  // sempre grande quanto un'intera finestra (100vw×100vh) nel suo sistema
+  // di coordinate LOCALE (prima di essere rimpicciolito), ma quando il
+  // tabellone non riempie la finestra e scala<1, il rendering finale di
+  // quella finestra-intera diventa più piccolo della finestra vera — да qui
+  // le bande vuote ai lati/in basso quando lo sfondo è dimensionato al
+  // 100%/100% di .game-screen (che condivide lo stesso sistema locale).
+  //
+  // Anziché portare lo sfondo FUORI da questo sistema di coordinate (come
+  // in una versione precedente: restava sempre a piena finestra, ma non
+  // seguiva più zoom-su-carta/slide dei menu), lo ingrandiamo qui in modo
+  // che, moltiplicato per la STESSA scala, torni a coprire esattamente la
+  // finestra reale — restando così un figlio di .game-screen a tutti gli
+  // effetti, e quindi soggetto a qualunque transform ulteriore venga
+  // applicato a .game-screen dopo questo punto (zoom-su-carta, slide dei
+  // menu laterali) esattamente come le carte.
+  //
+  // Geometria (transform-origin di #gameFit è "top center", vedi CSS):
+  // - larghezza/altezza locali = finestra/scala, così *scala tornano ad
+  //   essere esattamente la finestra reale;
+  // - top resta 0 (l'origine verticale è già in alto);
+  // - left si centra rispetto al centro orizzontale locale di #gameFit
+  //   (50vw), in modo che lo scale-verso-il-centro lo riporti a sinistra=0.
+  const sfondo = document.querySelector(".game-background");
+  if (sfondo) {
+    const bgW = window.innerWidth / scala;
+    const bgH = window.innerHeight / scala;
+    sfondo.style.width = `${bgW}px`;
+    sfondo.style.height = `${bgH}px`;
+    sfondo.style.left = `${window.innerWidth / 2 - bgW / 2}px`;
+    sfondo.style.top = "0px";
+  }
 }
 
 // 🔹 Stesso principio del tabellone di gioco, ma per TUTTE LE ALTRE
