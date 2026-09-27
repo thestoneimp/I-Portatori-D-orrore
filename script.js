@@ -97,13 +97,23 @@ function mostraMenuGioco() {
   if (!overlay) return;
 
   document.getElementById("gcBtnObiettivi").onclick = () =>
-    toggleSideMenu("menuObiettivi", "left", 300);
+    toggleSideMenu("menuObiettivi", "left");
   document.getElementById("gcBtnPersonaggi").onclick = () =>
-    toggleSideMenu("menuPersonaggi", "right", 300);
+    toggleSideMenu("menuPersonaggi", "right");
   document.getElementById("gcBtnTutorial").onclick = () =>
-    toggleSideMenu("menuTutorial", "left", 300);
+    toggleSideMenu("menuTutorial", "left");
   document.getElementById("gcBtnImpostazioni").onclick = () =>
-    toggleSideMenu("menuImpostazioni", "right", 300);
+    toggleSideMenu("menuImpostazioni", "right");
+
+  // 🔹 A differenza dei pannelli laterali (rigenerati ogni volta dentro
+  // document.body.innerHTML in mostraSchermataPrincipale), questo overlay
+  // vive fuori da <body> ed è quindi lo STESSO elemento DOM per tutta la
+  // sessione: se si abbandona la schermata di gioco (es. torna al menu
+  // principale) mentre un menu laterale era aperto, il transform applicato
+  // da toggleSideMenu() resterebbe scritto qui e riapparirebbe già
+  // "spostato" alla partita successiva. Va quindi azzerato esplicitamente
+  // ogni volta che si (ri)apre la schermata di gioco.
+  overlay.style.transform = "";
 
   overlay.classList.remove("nascosto");
 }
@@ -1295,11 +1305,17 @@ function _haMenuLateraleAperto() {
   );
 }
 
-function toggleSideMenu(menuId, direction = "left", width = 300) {
+function toggleSideMenu(menuId, direction = "left") {
   const menu = document.getElementById(menuId);
   const overlay = document.getElementById("overlaySfondo");
   const gameScreen = document.querySelector(".game-screen");
   const cornerOverlay = document.getElementById("gameCornerOverlay");
+
+  // 🔹 Larghezza reale del pannello (CSS clamp(200px, 25vw, 320px)), letta
+  // dal DOM invece di un valore fisso: così lo spostamento di schermo e
+  // icone d'angolo combacia sempre con la larghezza effettiva del pannello,
+  // qualunque essa sia sull'attuale dimensione di schermo.
+  const width = menu.getBoundingClientRect().width;
 
   // 🔹 Mutua esclusione: se sto per APRIRE questo menu e un altro pannello
   // laterale è già aperto, chiudo prima quello, così non si sovrappongono.
@@ -1308,7 +1324,7 @@ function toggleSideMenu(menuId, direction = "left", width = 300) {
       (id) => id !== menuId && document.getElementById(id)?.classList.contains("open")
     );
     if (altroMenuId) {
-      toggleSideMenu(altroMenuId, _direzioneMenuLaterale(altroMenuId), width);
+      toggleSideMenu(altroMenuId, _direzioneMenuLaterale(altroMenuId));
     }
   }
 
@@ -1365,7 +1381,7 @@ function toggleSideMenu(menuId, direction = "left", width = 300) {
 
   // Chiudi se clic fuori
   overlay.onclick = () => {
-    if (isOpen) toggleSideMenu(menuId, direction, width);
+    if (isOpen) toggleSideMenu(menuId, direction);
   };
 }
 
@@ -1390,7 +1406,7 @@ function mostraSchermataPrincipale() {
   window.onpopstate = function () {
     const menu = document.getElementById("menuObiettivi");
     if (menu?.classList.contains("open")) {
-      toggleSideMenu("menuObiettivi", "left", 300);
+      toggleSideMenu("menuObiettivi", "left");
       history.pushState(null, null);
     } else {
       goToMainMenu();
@@ -1498,17 +1514,17 @@ function mostraSchermataPrincipale() {
     const popup = document.querySelector(".popup");
     if (popup) return;
     if (document.getElementById("menuObiettivi")?.classList.contains("open")) {
-      toggleSideMenu("menuObiettivi", "left", 300);
+      toggleSideMenu("menuObiettivi", "left");
     }
     if (
       document.getElementById("menuPersonaggi")?.classList.contains("open")
     ) {
-      toggleSideMenu("menuPersonaggi", "right", 300);
+      toggleSideMenu("menuPersonaggi", "right");
     }
     if (
       document.getElementById("menuImpostazioni")?.classList.contains("open")
     ) {
-      toggleSideMenu("menuImpostazioni", "right", 300);
+      toggleSideMenu("menuImpostazioni", "right");
     }
   });
 
@@ -5199,8 +5215,8 @@ const passiTutorial = {
     postAzione: () => avviaTutorialFase(3),
   },
   3: {
-    preAzione: () => toggleSideMenu("menuTutorial", "left", 300),
-    suChiusura: () => toggleSideMenu("menuTutorial", "left", 300),
+    preAzione: () => toggleSideMenu("menuTutorial", "left"),
+    suChiusura: () => toggleSideMenu("menuTutorial", "left"),
     popup: {
       titolo: "Menu Tutorial",
       messaggio:
