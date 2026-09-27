@@ -538,15 +538,16 @@ button.btn-primary:hover {
   overflow: visible; /* il ritaglio avviene solo su .game-viewport */
 }
 
-/* 🔹 Figlio diretto di #gameViewport (non di .game-screen): il tabellone può
-   essere più grande di una schermata, quindi #gameFit/.game-screen vengono
-   rimpiccioliti con un transform:scale calcolato in JS
-   (adattaGameScreenAllaFinestra) per farceli entrare. Uno sfondo dentro
-   quella catena sarebbe stato rimpicciolito insieme al tabellone, lasciando
-   grandi zone nere ai lati e in basso (stesso bug già risolto per il video
-   di sfondo della schermata home, vedi commento su .game-viewport). Stando
-   fuori da quella catena (dentro #gameViewport, che è fixed/inset:0 e non
-   viene mai scalato), copre sempre l'intera finestra reale. */
+/* 🔹 Figlio di .game-screen apposta (non di #gameViewport): deve restare
+   "ancorata" al tabellone, non alla finestra — su richiesta esplicita
+   dell'utente, che la vuole parte della schermata di gioco stessa: se lo
+   zoom-su-carta o lo scale-to-fit rimpiccioliscono/spostano .game-screen
+   (vedi adattaGameScreenAllaFinestra, e i transform di zoom/pan più sotto
+   nel file), lo sfondo si rimpicciolisce/sposta insieme a tabellone e
+   carte, invece di restare fisso a piena finestra. Effetto collaterale
+   accettato: con un tabellone molto più grande di una schermata (scale-to-
+   fit molto ridotto) può quindi risultare più piccolo della finestra reale,
+   proprio perché segue il tabellone anziché restarne indipendente. */
 .game-background {
   position: absolute;
   top: 0;
@@ -556,8 +557,8 @@ button.btn-primary:hover {
   background-image: url("assets/media/sfondo-schermata-gioco.jpg");
   background-size: cover;
   background-position: center;
-  /* 🔹 z-index negativo: resta sotto #gameFit (e quindi sotto tabellone,
-     personaggi, contatore turni, ecc.), che ha z-index auto. */
+  /* 🔹 z-index negativo: resta sotto tabellone, personaggi, contatore
+     turni e pulsante turno, gli altri figli di .game-screen (z-index auto). */
   z-index: -1;
 }
 
