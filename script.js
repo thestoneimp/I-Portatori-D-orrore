@@ -15,6 +15,40 @@
 })();
 
 // ============================
+// 📌 0quater. SCHERMO INTERO (nasconde barra di stato/notifiche del telefono)
+// ============================
+// Le API Fullscreen del browser richiedono un gesto utente esplicito: non
+// si possono attivare da sole al caricamento della pagina. Al primo
+// tocco/click sulla pagina proviamo quindi a richiedere lo schermo intero;
+// la guardia su document.fullscreenElement evita richieste ripetute inutili
+// una volta ottenuto (l'ascoltatore resta attivo, senza "once", perché lo
+// schermo intero può uscire da solo, es. gesture di sistema, e in tal caso
+// il tocco successivo lo richiede di nuovo). Copre sia chi usa l'app in una
+// scheda del browser sia chi l'ha aggiunta alla schermata Home ma non l'ha
+// ancora reinstallata dopo l'aggiornamento del manifest (vedi manifest.json,
+// "display":"fullscreen", che da solo nasconde la barra di stato SOLO per le
+// icone aggiunte alla Home dopo questa modifica).
+function richiediSchermoIntero() {
+  const el = document.documentElement;
+  const richiedi =
+    el.requestFullscreen ||
+    el.webkitRequestFullscreen ||
+    el.msRequestFullscreen;
+  if (!richiedi || document.fullscreenElement) return;
+  try {
+    const risultato = richiedi.call(el);
+    if (risultato && typeof risultato.catch === "function") {
+      risultato.catch(() => {}); // negato dal browser: nessun problema, si riprova al prossimo tocco
+    }
+  } catch (e) {
+    // Alcuni browser (vecchie versioni Safari/iOS) non supportano l'API: ignora.
+  }
+}
+["click", "touchend"].forEach((evento) =>
+  document.addEventListener(evento, richiediSchermoIntero)
+);
+
+// ============================
 // 📌 0bis. NAVIGAZIONE A ICONE FISSE (Indietro / Home / Avanti)
 // ============================
 // Sostituisce i vecchi pulsanti in-flow "Indietro"/"Menu principale"/
