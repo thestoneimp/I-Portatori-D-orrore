@@ -1366,7 +1366,6 @@ function mostraSchermataPrincipale() {
     <div id="gameViewport" class="game-viewport">
       <div id="gameFit" class="game-fit">
         <div class="game-screen">
-          <div class="game-background"></div>
           <div id="tabelloneDinamico" class="griglia-tabellone"></div>
           <div id="grigliaPersonaggi" class="griglia-personaggi"></div>
           <div class="turn-counter" id="turnCounter">Contatore Minacce: ${gameData.turniRimanenti}</div>
@@ -3872,6 +3871,16 @@ function generaGrigliaTabellone() {
   const container = document.getElementById("tabelloneDinamico");
   container.innerHTML = "";
   container.classList.add("griglia-tabellone");
+
+  // 🔹 Sfondo ancorato al VERO ingombro del tabellone (questo contenitore,
+  // width:fit-content + margin:auto), non a .game-screen (che è sempre
+  // grande quanto l'intera finestra, 100vw×100vh, a prescindere da quanto
+  // le carte occupino davvero): altrimenti a tabellone rimpicciolito
+  // restava spazio vuoto intorno all'immagine. Ricreato ad ogni ridisegno
+  // del tabellone perché container.innerHTML="" qui sopra lo cancella.
+  const sfondo = document.createElement("div");
+  sfondo.className = "game-background";
+  container.appendChild(sfondo);
 
   // --- Disegno CARTE ---
   for (const carta of gameData.tabelloneAttivo) {
