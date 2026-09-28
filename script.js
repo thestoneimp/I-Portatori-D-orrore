@@ -4199,15 +4199,10 @@ function completaEsplorazione(carta, onClose = null) {
   });
 
   // Mostra popup con descrizione o messaggio standard
+  // 🎥 Nessuno zoom qui: l'unico zoom del gioco resta l'inquadratura
+  // dinamica sul personaggio attivo (impostaInquadraturaPersonaggio),
+  // che segue già il tabellone dove il personaggio si trova.
   setTimeout(() => {
-    const elCarta = document.querySelector(
-      `.carta-tabellone[data-codice="${carta.codice}"]`
-    );
-    if (elCarta) {
-      zoomSuElemento(elCarta, 1200, 2);
-    } else {
-      zoomSuCoordinate(carta.posizione.x, carta.posizione.y, 1200, 2);
-    }
     mostraPopupGenerico({
       titolo: `${carta.nome}`,
       messaggio: descrizione
@@ -5952,17 +5947,23 @@ function muoviPersonaggioConAnimazione(
     // fine percorso. Solo per il personaggio ATTIVO di turno — muovere una
     // minaccia o un PNG non deve spostare la telecamera. Uso la stessa
     // durata di questo singolo step (stepSec), così le due animazioni
-    // (carta + inquadratura) restano sincronizzate. Non tocco il ramo di
-    // "arrivo" qui sotto: quello resta l'unico punto che può innescare un
-    // altro zoom (esplorazione/rivelazione strutture) — lasciarlo senza una
-    // chiamata concorrente evita di reintrodurre il conflitto fra due
-    // inquadrature in rapida successione già corretto in precedenza.
+    // (carta + inquadratura) restano sincronizzate, e un'easing "linear"
+    // (invece di "ease") per non introdurre un rallentamento/accelerazione
+    // ad ogni cambio di cella: con "ease" ogni segmento parte e finisce
+    // lento, producendo un "respiro" percettibile a ciascun passo anche
+    // quando la posizione di partenza è corretta (vedi commento dentro
+    // impostaInquadraturaPersonaggio per il fix del punto di partenza).
+    // Non tocco il ramo di "arrivo" qui sotto: quello resta l'unico punto
+    // che può innescare un altro zoom — lasciarlo senza una chiamata
+    // concorrente evita di reintrodurre il conflitto fra due inquadrature
+    // in rapida successione già corretto in precedenza.
     if (
       nomePersonaggio === gameData.pgAttivo &&
       typeof impostaInquadraturaPersonaggio === "function"
     ) {
       impostaInquadraturaPersonaggio(nomePersonaggio, {
         durata: durataStepMs,
+        easing: "linear",
       });
     }
 
@@ -7715,21 +7716,11 @@ function aggiungiSbarramentoSpecificoBase(
       `🪟 [Bordo esterno] "${struttura.nome}" (${codiceCartaStruttura}) piazzato su ${direzione} di ${cartaA.codice} @ (${posX},${posY})`
     );
 
-    // Solo se richiesto, trigger grafica e zoom (default: visual = true)
+    // Solo se richiesto, trigger grafica (default: visual = true).
+    // 🎥 Nessuno zoom qui: rimane solo l'inquadratura dinamica sul
+    // personaggio attivo.
     if (opts.visual !== false) {
       generaGrigliaTabellone();
-      if (opts.zoom !== false) {
-        setTimeout(() => {
-          const elStruttura = document.querySelector(
-            `.struttura-grid-item[data-instance-id="${instanceId}"]`
-          );
-          if (elStruttura) {
-            zoomSuElemento(elStruttura, 1200, 2);
-          } else {
-            zoomSuCoordinate(posX, posY, 1200, 2);
-          }
-        }, 300);
-      }
     }
     return;
   }
@@ -7808,21 +7799,11 @@ function aggiungiSbarramentoSpecificoBase(
     `✅ Sbarramento "${struttura.nome}" (${codiceCartaStruttura}) piazzato tra ${cartaA.codice} e ${cartaB.codice} in posizione intermedia (${posX},${posY})`
   );
 
-  // Solo se richiesto, trigger grafica e zoom (default: visual = true)
+  // Solo se richiesto, trigger grafica (default: visual = true).
+  // 🎥 Nessuno zoom qui: rimane solo l'inquadratura dinamica sul
+  // personaggio attivo.
   if (opts.visual !== false) {
     generaGrigliaTabellone();
-    if (opts.zoom !== false) {
-      setTimeout(() => {
-        const elStruttura = document.querySelector(
-          `.struttura-grid-item[data-instance-id="${instanceId}"]`
-        );
-        if (elStruttura) {
-          zoomSuElemento(elStruttura, 1200, 2);
-        } else {
-          zoomSuCoordinate(posX, posY, 1200, 2);
-        }
-      }, 300);
-    }
   }
 }
 
@@ -8308,11 +8289,20 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
 
   const durata = Number.isFinite(opts.durata) ? opts.durata : 900;
   const s = Number.isFinite(opts.zoom) ? opts.zoom : 1.7;
+  const easing = opts.easing || "ease";
   const viewport = opts.viewportEl || gameScreen;
 
-  // Misura "piatta": stesso principio di zoomSuElemento/zoomSuCoordinate —
-  // azzero temporaneamente il transform di .game-screen per leggere le
-  // posizioni reali, poi le confronto rispetto a game-screen stesso.
+  // 🔹 Salvo il transform REALMENTE attivo in questo istante (anche se la
+  // telecamera è a metà di una transizione precedente), PRIMA di azzerarlo
+  // per la misura "piatta" qui sotto. Senza questo, ogni chiamata
+  // (soprattutto quelle ravvicinate fatte ad ogni passo di un movimento)
+  // farebbe ripartire l'animazione da zero/centro invece che dal punto
+  // vero in cui si trova la telecamera — il bug che produceva uno "scatto"
+  // visibile ad ogni passo invece di un inseguimento fluido.
+  const transformAttuale = getComputedStyle(gameScreen).transform;
+
+  // Misura "piatta": azzero temporaneamente il transform per leggere le
+  // posizioni reali (pre-zoom) di carta/griglia/sfondo.
   gameScreen.style.transition = "none";
   gameScreen.style.transform = "none";
   void gameScreen.offsetHeight;
@@ -8370,7 +8360,14 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
   const tx = (vpRect.width / 2 - s * cx) / scalaGameFit;
   const ty = (window.innerHeight / 2 - s * cy) / scalaGameFit;
 
-  gameScreen.style.transition = `transform ${durata}ms ease`;
+  // Ripristino (ancora SENZA transizione) il transform reale rilevato ad
+  // inizio funzione, così la transizione che sto per attivare parte dal
+  // punto vero in cui la telecamera si trova ora, non da "none".
+  gameScreen.style.transform =
+    transformAttuale && transformAttuale !== "none" ? transformAttuale : "none";
+  void gameScreen.offsetHeight;
+
+  gameScreen.style.transition = `transform ${durata}ms ${easing}`;
   gameScreen.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
 }
 
@@ -9313,19 +9310,8 @@ document.addEventListener("click", (e) => {
       { once: true }
     );
 
-    const cartaLuogo = gameData.tabelloneAttivo.find(
-      (c) => c.codice === codiceCella
-    );
-    if (cartaLuogo?.posizione) {
-      const elCartaLuogo = document.querySelector(
-        `.carta-tabellone[data-codice="${codiceCella}"]`
-      );
-      if (elCartaLuogo) {
-        zoomSuElemento(elCartaLuogo, 600, 2);
-      } else {
-        zoomSuCoordinate(cartaLuogo.posizione.x, cartaLuogo.posizione.y, 600, 2);
-      }
-    }
+    // 🎥 Nessuno zoom qui: rimane solo l'inquadratura dinamica sul
+    // personaggio attivo.
 
     // porta sopra solo le carte della cella (schema z-index “selettivo” che hai già)
     document.querySelectorAll(".carta-personaggio").forEach((pg) => {
@@ -9663,22 +9649,10 @@ function rivelaStruttureBatch(instanceIds = [], opts = {}) {
       generaGrigliaTabellone();
     }
 
-    // 3) opzionale: zoom sul singolo rivelato
-    if (opts.zoom && s.posizione && typeof s.posizione.x === "number") {
-      const elStruttura = document.querySelector(
-        `.struttura-grid-item[data-instance-id="${s.codice}"]`
-      );
-      if (elStruttura) {
-        zoomSuElemento(elStruttura, opts.durata ?? 900, opts.zoomFactor ?? 2);
-      } else {
-        zoomSuCoordinate(
-          s.posizione.x,
-          s.posizione.y,
-          opts.durata ?? 900,
-          opts.zoomFactor ?? 2
-        );
-      }
-    }
+    // 3) 🎥 Nessuno zoom qui: rimane solo l'inquadratura dinamica sul
+    // personaggio attivo (opts.zoom, se passato dal chiamante, non ha più
+    // alcun effetto — lasciato nella firma solo per non rompere le
+    // chiamate esistenti).
 
     // 4) popup informativo per questa rivelazione; alla chiusura proseguiamo
     const nomeBreve = (s.nome || s.codice || "")
