@@ -4505,7 +4505,12 @@ function mostraMessaggioFase() {
 
 function aggiornaIndicatoreFase() {
   const el = document.getElementById("phaseIndicator");
-  if (!el) return;
+  // 🔹 Il testo ora vive in uno span figlio dedicato (non più direttamente
+  // su #phaseIndicator via textContent), perché il contenitore ospita anche
+  // il pulsante "Termina Turno" (vedi index.html) — sovrascrivere
+  // textContent lo cancellerebbe ad ogni aggiornamento.
+  const testoEl = document.getElementById("phaseIndicatorText");
+  if (!el || !testoEl) return;
 
   const isGiocatori = faseCorrente === "giocatori";
   const pg = isGiocatori ? gameData.pgAttivo : null;
@@ -4517,9 +4522,13 @@ function aggiornaIndicatoreFase() {
       : "Fase Giocatori"
     : "Fase Minacce";
 
-  el.textContent = label; // niente spazi extra → funziona :empty
+  testoEl.textContent = label;
   el.classList.toggle("giocatori", isGiocatori);
   el.classList.toggle("minacce", !isGiocatori);
+  // 🔹 Sostituisce il vecchio trucco CSS ":empty" (non più applicabile: il
+  // contenitore ha sempre almeno il pulsante come figlio, quindi non è mai
+  // realmente vuoto nel DOM anche quando il testo lo è).
+  el.classList.toggle("vuoto", !label);
 }
 
 function mostraSconfitta() {

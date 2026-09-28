@@ -638,6 +638,12 @@ button.btn-primary:hover {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
+.advance-turn-btn:disabled:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: none;
+}
+
 .corner-top-left {
   top: clamp(8px, 2vh, 16px);
   left: clamp(8px, 2vh, 16px);
@@ -985,12 +991,15 @@ button.casuale:hover {
    .game-corner-btn — l'overlay riceve il transform di sincronizzazione
    coi menu laterali (toggleSideMenu) e, essendo transform un elemento
    diventa containing block per i figli fixed, il badge si sposta insieme
-   all'overlay senza bisogno di altro codice. Posizionato in alto, a metà
-   strada fra il pulsante Personaggi (in alto a destra) e il centro
-   schermo. */
+   all'overlay senza bisogno di altro codice. Orizzontalmente a metà strada
+   fra il pulsante Personaggi (in alto a destra) e il centro schermo, ma su
+   una seconda riga più in basso: da quando #phaseIndicator si è allargato
+   per ospitare anche il pulsante "Termina Turno" ed è stato centrato, sulla
+   stessa riga i due badge finivano per sovrapporsi sugli schermi stretti
+   (mobile landscape) quando il nome del personaggio attivo è lungo. */
 .turn-counter {
   position: fixed;
-  top: clamp(8px, 2vh, 16px);
+  top: clamp(50px, 10vh, 78px);
   left: 75%;
   transform: translateX(-50%);
   font-family: var(--font-vhs);
@@ -1131,37 +1140,38 @@ button.casuale:hover {
   border-color: #4caf50;
 }
 
-/* 🔹 Dentro #gameCornerOverlay (fuori da .game-screen, vedi index.html):
-   stesso principio di .game-corner-btn/.turn-counter più sopra — immune a
-   scala/zoom/pan del tabellone e sincronizzato con l'apertura/chiusura dei
-   menu laterali. "pointer-events:auto" necessario perché l'overlay padre
-   ha pointer-events:none (lascia passare i click sul tabellone sottostante
-   ovunque tranne che sui suoi elementi interattivi). */
+/* 🔹 Ora figlio di #phaseIndicator (vedi index.html), non più un pulsante
+   fisso a sé stante in fondo allo schermo: "amalgamato" nel badge di fase
+   come un chip interno, stesso schema colore/font del testo che lo
+   circonda invece di un riquadro scuro a contrasto. "pointer-events:auto"
+   resta necessario: sia l'overlay #gameCornerOverlay sia .phase-indicator
+   stesso hanno pointer-events:none, quindi solo il pulsante deve
+   riabilitare i click. */
 .advance-turn-btn {
-  position: fixed;
-  bottom: clamp(10px, 2.5vh, 20px);
-  left: 50%;
-  transform: translateX(-50%);
   pointer-events: auto;
-  padding: 12px 26px;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 5px 16px;
   font-family: var(--font-title);
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  background-color: #1a1a24;
-  color: white;
-  border: 1px solid #3d1418;
-  border-radius: 4px;
-  font-size: 16px;
+  background-color: rgba(255, 255, 255, 0.14);
+  color: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-size: clamp(0.65rem, 1.9vh, 0.95rem);
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.15s ease;
+  box-shadow: none;
 }
 
 .advance-turn-btn:hover {
-  background-color: #272736;
-  border-color: var(--blood-red);
-  box-shadow: 0 0 14px var(--blood-red-glow);
-  transform: translateX(-50%) translateY(-1px);
+  background-color: rgba(255, 255, 255, 0.26);
+  border-color: var(--torch-amber);
+  box-shadow: 0 0 10px var(--torch-amber-glow);
+  transform: translateY(-1px);
 }
 
 .overlay {
@@ -1815,14 +1825,19 @@ button.casuale:hover {
 
 /* 🔹 Stesso principio di .turn-counter qui sopra: dentro #gameCornerOverlay,
    "position:fixed" per seguirne il transform di sincronizzazione coi menu
-   laterali. Posizionato in alto, a metà strada fra il pulsante Obiettivi
-   (in alto a sinistra) e il centro schermo. */
+   laterali. Centrato al centro schermo (a differenza di .turn-counter, che
+   resta a destra): ora ospita anche il pulsante "Termina Turno" come figlio
+   (vedi index.html/.advance-turn-btn più sotto), quindi è diventato un
+   contenitore flex invece di un semplice blocco di testo. */
 .phase-indicator {
   position: fixed;
   top: clamp(8px, 2vh, 16px);
-  left: 25%;
+  left: 50%;
   transform: translateX(-50%);
-  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1.6vh, 14px);
+  padding: 6px 6px 6px 16px;
   border-radius: 999px;
   font-weight: 600;
   font-size: clamp(1rem, 3vh, 1.7rem);
@@ -1830,6 +1845,14 @@ button.casuale:hover {
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.15);
   white-space: nowrap;
+  /* 🔹 Il badge in sé resta "attraversabile" dai click come prima (l'overlay
+     padre ha pointer-events:none); solo il pulsante al suo interno riceve
+     pointer-events:auto esplicito (vedi .advance-turn-btn). */
+  pointer-events: none;
+}
+
+.phase-indicator-text {
+  pointer-events: none;
 }
 
 .phase-indicator.giocatori {
@@ -1839,8 +1862,11 @@ button.casuale:hover {
   background-color: #b71c1c;
 }
 
-/* Nascondi il badge quando è vuoto */
-.phase-indicator:empty {
+/* 🔹 Nascondi il badge quando il testo è vuoto: sostituisce il vecchio
+   ":empty" (non più applicabile ora che il pulsante è un figlio permanente,
+   quindi il contenitore non è mai realmente vuoto nel DOM). Classe gestita
+   da aggiornaIndicatoreFase() in script.js. */
+.phase-indicator.vuoto {
   display: none;
 }
 
