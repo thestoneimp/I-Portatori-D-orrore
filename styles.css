@@ -986,33 +986,83 @@ button.casuale:hover {
   background-color: #666;
 }
 
-/* 🔹 Dentro #game-corner-overlay (fuori da .game-screen, vedi index.html):
-   "position:fixed" invece di "absolute" per lo stesso motivo di
-   .game-corner-btn — l'overlay riceve il transform di sincronizzazione
-   coi menu laterali (toggleSideMenu) e, essendo transform un elemento
-   diventa containing block per i figli fixed, il badge si sposta insieme
-   all'overlay senza bisogno di altro codice. Orizzontalmente a metà strada
-   fra il pulsante Personaggi (in alto a destra) e il centro schermo, ma su
-   una seconda riga più in basso: da quando #phaseIndicator si è allargato
-   per ospitare anche il pulsante "Termina Turno" ed è stato centrato, sulla
-   stessa riga i due badge finivano per sovrapporsi sugli schermi stretti
-   (mobile landscape) quando il nome del personaggio attivo è lungo. */
+/* 🔹 Contatore minacce: non più un badge ambra a sé stante (nota storica:
+   prima era "position:fixed" a "left:75%", spostato su una seconda riga
+   quando il badge fase si è allargato) — ora è un figlio in-flow di
+   #phaseIndicator, allo stesso modo del pulsante "Termina Turno", reso in
+   forma di pagina di calendario "strappata" per amalgonarsi al mood horror
+   dell'app invece del riquadro ambra generico. Dimensioni in clamp() sulla
+   stessa scala (vh) delle icone d'angolo (.game-corner-btn), per restare
+   proporzionato al resto dell'overlay a qualunque risoluzione. */
 .turn-counter {
-  position: fixed;
-  top: clamp(50px, 10vh, 78px);
-  left: 75%;
-  transform: translateX(-50%);
-  font-family: var(--font-vhs);
-  font-size: clamp(1rem, 3vh, 1.75rem);
-  letter-spacing: 2px;
-  color: var(--torch-amber);
-  text-shadow: 0 0 10px var(--torch-amber-glow);
-  background-color: rgba(10, 10, 14, 0.85);
-  border: 1px solid #3d240a;
-  padding: 6px 18px;
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(46px, 10.5vh, 72px);
+  height: clamp(54px, 12vh, 82px);
+  pointer-events: none; /* puramente decorativo, nessuna interazione */
+}
+
+/* 🔹 Seconda "pagina" intravista dietro quella in primo piano, leggermente
+   ruotata: suggerisce lo strappo del calendario senza altro markup. */
+.turn-counter-page-back {
+  position: absolute;
+  top: 4%;
+  left: 6%;
+  width: 92%;
+  height: 91%;
+  background: #d8d3c4;
   border-radius: 4px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
-  white-space: nowrap;
+  transform: rotate(-5deg);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+}
+
+.turn-counter-page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.turn-counter-header {
+  background: var(--blood-red);
+  color: #fff;
+  font-family: var(--font-title);
+  font-size: clamp(6.5px, 1.5vh, 9px);
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.6px;
+  line-height: 1.3;
+  border-radius: 5px 5px 0 0;
+  padding: 4px 0 3px;
+}
+
+/* 🔹 Bordo inferiore "strappato" via clip-path (poligono a zig-zag) invece
+   di un rettangolo netto — l'effetto "pagina di calendario" richiesto. */
+.turn-counter-valore {
+  background: #f3f4f6;
+  color: #17181f;
+  height: 63%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title);
+  font-size: clamp(20px, 4.5vh, 36px);
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 82%,
+    90% 90%,
+    80% 82%,
+    70% 92%,
+    60% 83%,
+    50% 93%,
+    40% 82%,
+    30% 90%,
+    20% 81%,
+    10% 91%,
+    0 83%
+  );
 }
 
 .side-menu {
@@ -1823,12 +1873,11 @@ button.casuale:hover {
   animation: jumpY 400ms ease-in-out;
 }
 
-/* 🔹 Stesso principio di .turn-counter qui sopra: dentro #gameCornerOverlay,
-   "position:fixed" per seguirne il transform di sincronizzazione coi menu
-   laterali. Centrato al centro schermo (a differenza di .turn-counter, che
-   resta a destra): ora ospita anche il pulsante "Termina Turno" come figlio
-   (vedi index.html/.advance-turn-btn più sotto), quindi è diventato un
-   contenitore flex invece di un semplice blocco di testo. */
+/* 🔹 Dentro #gameCornerOverlay, "position:fixed" per seguirne il transform
+   di sincronizzazione coi menu laterali. Centrato al centro schermo. Ospita
+   come figli sia il pulsante "Termina Turno" sia il contatore minacce (vedi
+   index.html/.advance-turn-btn/.turn-counter), quindi è un contenitore
+   flex invece di un semplice blocco di testo. */
 .phase-indicator {
   position: fixed;
   top: clamp(8px, 2vh, 16px);
@@ -1852,6 +1901,19 @@ button.casuale:hover {
 }
 
 .phase-indicator-text {
+  pointer-events: none;
+}
+
+/* 🔹 Separatore fra il pulsante "Termina Turno" e il contatore minacce
+   integrato (vedi .turn-counter più sotto): una sottile linea verticale
+   della stessa altezza del badge, sullo stesso principio della divisione
+   visiva già usata altrove nell'app. */
+.phase-indicator-divider {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 1px;
+  margin: 4px 0;
+  background: rgba(255, 255, 255, 0.25);
   pointer-events: none;
 }
 

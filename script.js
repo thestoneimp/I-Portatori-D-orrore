@@ -4456,9 +4456,13 @@ function troncaPercorsoAiSbarramenti(percorso) {
 // ============================
 
 function aggiornaContatoreTurni() {
-  const counter = document.getElementById("turnCounter");
-  if (counter) {
-    counter.innerText = `Contatore Minacce: ${gameData.turniRimanenti}`;
+  // 🔹 L'etichetta "CONTATORE MINACCE" è ora markup statico dentro
+  // #turnCounter (index.html, stile "pagina di calendario strappata") — qui
+  // si aggiorna solo il numero, in un elemento figlio dedicato, sullo
+  // stesso principio di #phaseIndicatorText per #phaseIndicator.
+  const valoreEl = document.getElementById("turnCounterValore");
+  if (valoreEl) {
+    valoreEl.textContent = gameData.turniRimanenti;
   }
 }
 
