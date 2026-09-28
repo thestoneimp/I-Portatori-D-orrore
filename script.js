@@ -4767,6 +4767,12 @@ function avviaTurnoPer(nomePG) {
     // Ridisegna SOLO la cella del PG attivo
     aggiornaPersonaggiNelleCelle([cellaAttiva]);
   }
+  // 🎥 Ad ogni nuovo turno la "telecamera" fa uno zoom sulla carta del
+  // personaggio attivo: da qui in poi resta il punto di riferimento
+  // dell'inquadratura finché non inizia il turno successivo.
+  if (typeof impostaInquadraturaPersonaggio === "function") {
+    impostaInquadraturaPersonaggio(nomePG);
+  }
 }
 
 function mostraDettagliPersonaggio(index) {
@@ -5860,6 +5866,16 @@ function muoviPersonaggioConAnimazione(
       );
       if (autoEsploraEffettivo && cartaArrivo && !cartaArrivo.esplorata) {
         completaEsplorazione(cartaArrivo);
+      }
+
+      // 🎥 Se a muoversi è il personaggio attivo di turno (non un PNG o una
+      // minaccia, che possono passare da qui tramite muoviPngVerso/gli altri
+      // punti d'innesto), la "telecamera" lo segue sulla nuova cella.
+      if (
+        nomePersonaggio === gameData.pgAttivo &&
+        typeof impostaInquadraturaPersonaggio === "function"
+      ) {
+        impostaInquadraturaPersonaggio(nomePersonaggio, { durata: 700 });
       }
 
       if (typeof onComplete === "function") onComplete(cellaArrivo);
@@ -8214,9 +8230,115 @@ function zoomSuCoordinate(x, y, durata = 1000, zoom = 2, opts = {}) {
   // gameScreen.style.transformOrigin = prevOrigin;
 }
 
+// 🎥 Inquadratura "dinamica" centrata sulla carta del personaggio attivo di
+// turno (richiesta: all'inizio del turno e ad ogni suo spostamento, il
+// tabellone si inquadra intorno alla sua carta finché non inizia il turno
+// del giocatore successivo). Zoom fisso — abbastanza ravvicinato da
+// leggere i testi delle carte anche su schermi piccoli, ma abbastanza
+// ampio da vedere le carte-luogo vicine — con "clamp" del centro
+// inquadratura per due esigenze diverse:
+//  - in verticale, non deve mai mostrare oltre i bordi dello sfondo (oltre
+//    quel bordo l'immagine finisce e comincia il nero);
+//  - in orizzontale, viene invece "tirata" verso i bordi della GRIGLIA
+//    (più stretta dello sfondo) invece che dello sfondo stesso: così,
+//    quando il personaggio è su una colonna laterale (es. Strada,
+//    Giardino), l'inquadratura resta decentrata verso il centro del
+//    tabellone invece di mostrare tanto spazio vuoto di sfondo ai lati.
+function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
+  const gameScreen = document.querySelector(".game-screen");
+  const griglia = document.getElementById("tabelloneDinamico");
+  const sfondo = document.querySelector(".game-background");
+  if (!gameScreen || !griglia || !nomePG) return;
+
+  const cellaCodice = gameData.posizioniPersonaggi?.[nomePG];
+  if (!cellaCodice) return;
+
+  const cartaCella = griglia.querySelector(
+    `.carta-tabellone[data-codice="${cellaCodice}"]`
+  );
+  if (!cartaCella) return;
+
+  const durata = Number.isFinite(opts.durata) ? opts.durata : 900;
+  const s = Number.isFinite(opts.zoom) ? opts.zoom : 1.7;
+  const viewport = opts.viewportEl || gameScreen;
+
+  // Misura "piatta": stesso principio di zoomSuElemento/zoomSuCoordinate —
+  // azzero temporaneamente il transform di .game-screen per leggere le
+  // posizioni reali, poi le confronto rispetto a game-screen stesso.
+  gameScreen.style.transition = "none";
+  gameScreen.style.transform = "none";
+  void gameScreen.offsetHeight;
+
+  const vpRect = viewport.getBoundingClientRect();
+  const gsRect = gameScreen.getBoundingClientRect();
+  const elRect = cartaCella.getBoundingClientRect();
+
+  let cx = elRect.left - gsRect.left + elRect.width / 2;
+  let cy = elRect.top - gsRect.top + elRect.height / 2;
+
+  // Semi-larghezza/altezza (pixel "piatti") della finestra REALMENTE
+  // visibile alla zoom scelta. 🔹 Uso window.innerWidth/innerHeight (la
+  // finestra vera) e non vpRect (il rettangolo "piatto" di .game-screen)
+  // perché quando #gameFit adatta il tabellone scalandolo <1
+  // (letterboxing, tipico su mobile con proporzioni diverse), il proprio
+  // riquadro "piatto" è più PICCOLO della finestra reale — usarlo qui
+  // sottostimerebbe il margine di sicurezza e permetterebbe all'inquadratura
+  // di sconfinare oltre i bordi reali dello sfondo (bug osservato in test:
+  // bordo inferiore dello sfondo che non arrivava in fondo allo schermo).
+  const halfW = window.innerWidth / (2 * s);
+  const halfH = window.innerHeight / (2 * s);
+
+  function clampCentro(valore, origine, dimensione, meta) {
+    if (!Number.isFinite(origine) || !Number.isFinite(dimensione)) {
+      return valore;
+    }
+    // Riquadro più piccolo della finestra visibile: meglio centrarsi su di
+    // esso piuttosto che imporre un clamp min>max.
+    if (dimensione <= meta * 2) return origine + dimensione / 2;
+    return Math.min(
+      Math.max(valore, origine + meta),
+      origine + dimensione - meta
+    );
+  }
+
+  if (sfondo) {
+    const bgRect = sfondo.getBoundingClientRect();
+    const bgTop = bgRect.top - gsRect.top;
+    cy = clampCentro(cy, bgTop, bgRect.height, halfH);
+  }
+
+  const gridRect = griglia.getBoundingClientRect();
+  const gridLeft = gridRect.left - gsRect.left;
+  cx = clampCentro(cx, gridLeft, gridRect.width, halfW);
+
+  const scalaGameFit = ottieniScalaGameFit();
+  // 🔹 X: il centro orizzontale "piatto" di .game-screen coincide già con
+  // quello reale dello schermo, perché #gameFit scala con transform-origin
+  // "top CENTER" (si restringe simmetricamente ai lati). Y invece no:
+  // l'origine è "top", quindi lo schermo reale si estende oltre il basso
+  // del riquadro "piatto" di .game-screen quando è più piccolo della
+  // finestra — il bersaglio verticale va calcolato sulla finestra vera
+  // (window.innerHeight/2), non su vpRect.height/2.
+  const tx = (vpRect.width / 2 - s * cx) / scalaGameFit;
+  const ty = (window.innerHeight / 2 - s * cy) / scalaGameFit;
+
+  gameScreen.style.transition = `transform ${durata}ms ease`;
+  gameScreen.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+}
+
 function resetZoom() {
   const gameScreen = document.querySelector(".game-screen");
   if (!gameScreen) return;
+
+  // 🎥 Durante un turno attivo, "azzerare" lo zoom non deve più riportare
+  // tutto a scala 1: la carta del personaggio di turno resta il punto di
+  // riferimento dell'inquadratura finché non inizia il turno successivo
+  // (vedi impostaInquadraturaPersonaggio). Il reset "piatto" resta il
+  // comportamento di fallback per quando non c'è un personaggio attivo.
+  if (gameData.pgAttivo && typeof impostaInquadraturaPersonaggio === "function") {
+    impostaInquadraturaPersonaggio(gameData.pgAttivo);
+    return;
+  }
 
   gameScreen.style.transition = `transform 0.4s ease`;
   gameScreen.style.transform = `scale(1) translate(0, 0)`;
