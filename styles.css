@@ -620,6 +620,24 @@ button.btn-primary:hover {
   box-shadow: 0 0 12px var(--torch-amber-glow);
 }
 
+/* 🔹 Stato disabilitato (mostraMenuTurniGiocatori/avviaTurnoPer, script.js):
+   stessa griglia già "disabilitata" logicamente mentre non è ancora stato
+   scelto il personaggio che agisce — qui solo il feedback visivo, dato che
+   ":disabled" blocca già i click da solo. Condiviso con .advance-turn-btn
+   qui sotto, stesso principio. */
+.game-corner-btn:disabled,
+.advance-turn-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(60%);
+}
+
+.game-corner-btn:disabled:hover {
+  transform: none;
+  border-color: #3d1418;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
 .corner-top-left {
   top: clamp(8px, 2vh, 16px);
   left: clamp(8px, 2vh, 16px);

@@ -92,6 +92,28 @@ function nascondiNavigazione() {
 // conteggiato nello spazio del tabellone. Le azioni sono sempre le stesse
 // (assegnazione diretta onclick, non addEventListener, per restare idempotente
 // anche se richiamata più volte). Mostrato solo durante la partita.
+// 🔹 I 5 pulsanti dell'overlay fisso di gioco (4 icone d'angolo + "Termina
+// Turno") da disabilitare insieme alla griglia del tabellone mentre è
+// aperto il popup "Chi agisce ora?" (mostraMenuTurniGiocatori): prima che
+// un personaggio venga scelto la griglia è già "disabilitata" (nessun
+// gameData.pgAttivo impostato → gestisciClickCartaLuogo esce subito), quindi
+// non avrebbe senso poter comunque aprire i menu laterali o terminare un
+// turno non ancora iniziato.
+const ID_PULSANTI_OVERLAY_GIOCO = [
+  "gcBtnObiettivi",
+  "gcBtnPersonaggi",
+  "gcBtnTutorial",
+  "gcBtnImpostazioni",
+  "btnAvanzaTurno",
+];
+
+function impostaBloccoPulsantiOverlayGioco(bloccato) {
+  ID_PULSANTI_OVERLAY_GIOCO.forEach((id) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = bloccato;
+  });
+}
+
 function mostraMenuGioco() {
   const overlay = document.getElementById("gameCornerOverlay");
   if (!overlay) return;
@@ -137,10 +159,12 @@ function mostraMenuGioco() {
   if (turnCounter) turnCounter.style.display = "";
 
   const btnAvanzaTurno = document.getElementById("btnAvanzaTurno");
-  if (btnAvanzaTurno) {
-    btnAvanzaTurno.style.display = "";
-    btnAvanzaTurno.disabled = false;
-  }
+  if (btnAvanzaTurno) btnAvanzaTurno.style.display = "";
+
+  // 🔹 Stesso motivo: se si abbandona la partita mentre il popup "Chi agisce
+  // ora?" è aperto, i pulsanti resterebbero disabilitati (vedi
+  // mostraMenuTurniGiocatori/avviaTurnoPer più sotto) alla partita successiva.
+  impostaBloccoPulsantiOverlayGioco(false);
 
   overlay.classList.remove("nascosto");
 }
@@ -4706,10 +4730,16 @@ function mostraMenuTurniGiocatori(personaggiDisponibili) {
 
   popup.innerHTML = html;
   document.body.appendChild(popup);
+
+  // 🔹 Nessun personaggio ancora scelto: la griglia è già "disabilitata"
+  // logicamente (gestisciClickCartaLuogo esce subito senza gameData.pgAttivo),
+  // blocchiamo allo stesso modo i pulsanti dell'overlay fisso di gioco.
+  impostaBloccoPulsantiOverlayGioco(true);
 }
 
 function avviaTurnoPer(nomePG) {
   chiudiPopup(); // Chiude il menu turni
+  impostaBloccoPulsantiOverlayGioco(false);
   gameData.pgAttivo = nomePG;
   gameData.movimentoUsato[nomePG] = false; // Nuovo turno: movimento di nuovo disponibile
 
@@ -8053,8 +8083,18 @@ function zoomSuElemento(el, durata = 1000, zoom = 2, opts = {}) {
   const cy = elRect.top - gsRect.top + elRect.height / 2;
 
   const s = zoom;
-  const tx = vpRect.width / 2 - s * cx;
-  const ty = vpRect.height / 2 - s * cy;
+  // 🔹 cx/cy sono pixel VISIVI (misurati con getBoundingClientRect, quindi
+  // già scalati dall'adattamento automatico di #gameFit — vedi
+  // adattaGameScreenAllaFinestra/ottieniScalaGameFit). Il transform che
+  // stiamo per assegnare, però, è quello di .game-screen stesso: coordinate
+  // LOCALI (pre-scala), che il browser scala di nuovo in fase di rendering
+  // finale insieme a tutto il resto. Senza dividere qui per la scala
+  // corrente, lo zoom centrerebbe un punto sbagliato ogni volta che
+  // #gameFit non è a scala 1 — invisibile su PC, ma evidente su smartphone
+  // (stesso bug già corretto per le carte personaggio in getCoordinateCarta).
+  const scalaGameFit = ottieniScalaGameFit();
+  const tx = (vpRect.width / 2 - s * cx) / scalaGameFit;
+  const ty = (vpRect.height / 2 - s * cy) / scalaGameFit;
 
   gameScreen.style.transition = `transform ${durata}ms ease`;
   gameScreen.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
@@ -8126,9 +8166,13 @@ function zoomSuCoordinate(x, y, durata = 1000, zoom = 2, opts = {}) {
   }
 
   // 6) Trasformazione: centro il punto (cx,cy) nel viewport
+  // 🔹 Stesso motivo di zoomSuElemento() qui sopra: cx/cy sono pixel VISIVI
+  // (derivati da getBoundingClientRect), da dividere per la scala corrente
+  // di #gameFit prima di assegnarli al transform LOCALE di .game-screen.
   const s = zoom;
-  const tx = vpRect.width / 2 - s * cx;
-  const ty = vpRect.height / 2 - s * cy;
+  const scalaGameFit = ottieniScalaGameFit();
+  const tx = (vpRect.width / 2 - s * cx) / scalaGameFit;
+  const ty = (vpRect.height / 2 - s * cy) / scalaGameFit;
 
   // (log sintetico)
   console.log("GRID DOM", { domMinCol, domMinRow, nudgeRightPx });
