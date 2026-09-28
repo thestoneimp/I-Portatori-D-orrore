@@ -7257,6 +7257,21 @@ function aggiornaPersonaggiNelleCelle(
   }
 }
 
+// 🔹 Scala attualmente applicata a #gameFit da adattaGameScreenAllaFinestra()
+// (1 se il tabellone entra a piena dimensione, <1 quando viene rimpicciolito
+// per stare nello schermo — tipicamente su smartphone). Letta dal transform
+// calcolato invece che da una variabile globale: resta corretta anche se in
+// futuro cambia il modo in cui viene applicata.
+function ottieniScalaGameFit() {
+  const gameFit = document.getElementById("gameFit");
+  if (!gameFit) return 1;
+  const transform = getComputedStyle(gameFit).transform;
+  if (!transform || transform === "none") return 1;
+  const match = transform.match(/^matrix\(([^,]+),/);
+  const scala = match ? parseFloat(match[1]) : 1;
+  return scala && !Number.isNaN(scala) ? scala : 1;
+}
+
 function getCoordinateCarta(codiceCarta) {
   const tabellone = document.getElementById("tabelloneDinamico");
   const containerPG = document.getElementById("grigliaPersonaggi");
@@ -7272,13 +7287,21 @@ function getCoordinateCarta(codiceCarta) {
     return null;
   }
 
-  // Calcola coordinate relative al contenitore dei personaggi
+  // 🔹 getBoundingClientRect() restituisce pixel VISIVI, già moltiplicati
+  // per l'eventuale scala di adattamento di #gameFit. Le carte personaggio
+  // vengono però posizionate con "left"/"top" in CSS, coordinate LOCALI
+  // (pre-scala) che il browser scala di nuovo in fase di rendering finale:
+  // senza dividere qui per la scala corrente, su schermi dove il tabellone
+  // non entra a scala 1 (soprattutto smartphone) le carte finiscono
+  // disegnate più vicine all'origine di quanto dovrebbero — bug non visibile
+  // su PC (dove di solito la scala resta 1) ma evidente su mobile.
   const rectCarta = cartaDiv.getBoundingClientRect();
   const rectPG = containerPG.getBoundingClientRect();
+  const scala = ottieniScalaGameFit();
 
   return {
-    x: rectCarta.left - rectPG.left,
-    y: rectCarta.top - rectPG.top,
+    x: (rectCarta.left - rectPG.left) / scala,
+    y: (rectCarta.top - rectPG.top) / scala,
   };
 }
 
