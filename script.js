@@ -105,6 +105,19 @@ function mostraMenuGioco() {
   document.getElementById("gcBtnImpostazioni").onclick = () =>
     toggleSideMenu("menuImpostazioni", "right");
 
+  // 🔹 Pulsante "Termina Turno": stesso principio delle 4 icone d'angolo
+  // sopra, ora che vive anch'esso dentro questo overlay persistente
+  // (assegnazione diretta onclick, non addEventListener, per restare
+  // idempotente anche se mostraMenuGioco() viene richiamata più volte).
+  document.getElementById("btnAvanzaTurno").onclick = () => {
+    if (gameData.pgAttivo) {
+      gameData.turniCompletati.push(gameData.pgAttivo);
+      gameData.pgAttivo = null;
+      aggiornaIndicatoreFase();
+    }
+    faseGiocatori();
+  };
+
   // 🔹 A differenza dei pannelli laterali (rigenerati ogni volta dentro
   // document.body.innerHTML in mostraSchermataPrincipale), questo overlay
   // vive fuori da <body> ed è quindi lo STESSO elemento DOM per tutta la
@@ -115,12 +128,19 @@ function mostraMenuGioco() {
   // ogni volta che si (ri)apre la schermata di gioco.
   overlay.style.transform = "";
 
-  // 🔹 Stesso motivo: turnCounter e phaseIndicator sono ora dentro questo
-  // overlay persistente (vedi index.html), quindi anche un display:none
-  // lasciato da una partita precedente (nascosto alla vittoria di gruppo,
-  // vedi mostraMessaggioVittoriaGruppo) resterebbe altrimenti attivo.
+  // 🔹 Stesso motivo: turnCounter, phaseIndicator e btnAvanzaTurno sono ora
+  // dentro questo overlay persistente (vedi index.html), quindi anche un
+  // display:none/disabled lasciato da una partita precedente (nascosto/
+  // disabilitato a sconfitta/vittoria, vedi mostraSconfitta/mostraVittoria/
+  // mostraMessaggioVittoriaGruppo) resterebbe altrimenti attivo.
   const turnCounter = document.getElementById("turnCounter");
   if (turnCounter) turnCounter.style.display = "";
+
+  const btnAvanzaTurno = document.getElementById("btnAvanzaTurno");
+  if (btnAvanzaTurno) {
+    btnAvanzaTurno.style.display = "";
+    btnAvanzaTurno.disabled = false;
+  }
 
   overlay.classList.remove("nascosto");
 }
@@ -1433,7 +1453,6 @@ function mostraSchermataPrincipale() {
           <div class="game-background"></div>
           <div id="tabelloneDinamico" class="griglia-tabellone"></div>
           <div id="grigliaPersonaggi" class="griglia-personaggi"></div>
-          <button id="btnAvanzaTurno" class="advance-turn-btn">Termina Turno</button>
         </div>
       </div>
     </div>
@@ -1504,16 +1523,6 @@ function mostraSchermataPrincipale() {
     document.querySelector("#menuPersonaggi .side-menu-arrow-su"),
     document.querySelector("#menuPersonaggi .side-menu-arrow-giu")
   );
-
-  document.getElementById("btnAvanzaTurno").addEventListener("click", () => {
-    console.log("Pulsante Termina Turno cliccato");
-    if (gameData.pgAttivo) {
-      gameData.turniCompletati.push(gameData.pgAttivo);
-      gameData.pgAttivo = null;
-      aggiornaIndicatoreFase();
-    }
-    faseGiocatori();
-  });
 
   document.getElementById("overlaySfondo").addEventListener("click", () => {
     const popup = document.querySelector(".popup");
