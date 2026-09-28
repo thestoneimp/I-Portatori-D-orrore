@@ -538,6 +538,28 @@ button.btn-primary:hover {
   overflow: visible; /* il ritaglio avviene solo su .game-viewport */
 }
 
+/* 🔹 Strato "camera" (zoom/pan/inquadratura sul personaggio), separato da
+   .game-screen (che resta dedicato SOLO allo slide di apertura/chiusura
+   dei menu laterali, vedi toggleSideMenu in script.js). Prima erano lo
+   STESSO elemento/proprietà transform: ogni apertura di un menu
+   sovrascriveva di netto l'inquadratura attiva (zoom out improvviso su
+   tutta la griglia), e viceversa. Annidando due elementi, ciascuno con il
+   proprio transform, i due sistemi si compongono automaticamente invece
+   di sovrascriversi a vicenda — stessa dimensione/posizionamento di
+   .game-screen (ne eredita esattamente il box, 100%×100%, così tutta la
+   matematica esistente basata su "il box locale di game-screen combacia
+   con la finestra" resta valida identica, solo un livello più in
+   profondità). */
+.game-screen-camera {
+  transform-origin: top left;
+  will-change: transform;
+  position: relative;
+  transition: transform 0.4s ease;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
 /* 🔹 Figlio di .game-screen (di nuovo, come la primissima versione), MA con
    dimensione/posizione ricalcolate in JS (adattaGameScreenAllaFinestra,
    vedi lì il commento con la spiegazione geometrica) invece dei fissi

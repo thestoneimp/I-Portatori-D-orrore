@@ -1474,9 +1474,11 @@ function mostraSchermataPrincipale() {
     <div id="gameViewport" class="game-viewport">
       <div id="gameFit" class="game-fit">
         <div class="game-screen">
-          <div class="game-background"></div>
-          <div id="tabelloneDinamico" class="griglia-tabellone"></div>
-          <div id="grigliaPersonaggi" class="griglia-personaggi"></div>
+          <div class="game-screen-camera">
+            <div class="game-background"></div>
+            <div id="tabelloneDinamico" class="griglia-tabellone"></div>
+            <div id="grigliaPersonaggi" class="griglia-personaggi"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -5868,16 +5870,18 @@ function muoviPersonaggioConAnimazione(
         completaEsplorazione(cartaArrivo);
       }
 
-      // 🎥 NOTA: l'inquadratura dinamica (impostaInquadraturaPersonaggio) non
-      // viene più richiamata qui ad ogni arrivo. Un arrivo può innescare a
-      // sua volta un altro zoom (esplorazione/rivelazione strutture, dentro
-      // onComplete/completaEsplorazione qui sopra) — chiamarla PRIMA di
-      // quello creava un conflitto fra due inquadrature in rapida
-      // successione (un balzo visibile da una all'altra). La telecamera
-      // torna comunque sul personaggio attivo ai punti "naturali" di
-      // ritorno alla vista normale: inizio turno (avviaTurnoPer) e
-      // chiusura di qualunque interazione (resetZoom(), quando c'è un
-      // personaggio attivo — vedi sotto).
+      // 🎥 NOTA: qui nel ramo di "arrivo" NON richiamiamo di nuovo
+      // l'inquadratura dinamica: ci ha già pensato spostaStep() ad ogni
+      // singolo passo (incluso questo ultimo, appena eseguito) qui sopra.
+      // Un arrivo può innescare a sua volta un altro zoom
+      // (esplorazione/rivelazione strutture, dentro
+      // onComplete/completaEsplorazione qui sotto): lasciando questo ramo
+      // "silenzioso" quello zoom parte da una posizione già corretta
+      // (quella dell'ultimo passo) invece che da una stantia, producendo
+      // una transizione unica e pulita invece di un doppio scatto. La
+      // telecamera torna comunque sul personaggio attivo agli altri punti
+      // "naturali": inizio turno (avviaTurnoPer) e chiusura di qualunque
+      // interazione (resetZoom(), quando c'è un personaggio attivo).
       if (typeof onComplete === "function") onComplete(cellaArrivo);
 
       return;
@@ -5940,6 +5944,26 @@ function muoviPersonaggioConAnimazione(
         cartaPG.style.left = coords.x + "px";
         cartaPG.style.top = coords.y + "px";
       }
+    }
+
+    // 🎥 Segue il personaggio ad OGNI passo intermedio (non solo
+    // all'arrivo finale), in modo che l'inquadratura si riadatti in modo
+    // fluido insieme al movimento della carta invece di "scattare" solo a
+    // fine percorso. Solo per il personaggio ATTIVO di turno — muovere una
+    // minaccia o un PNG non deve spostare la telecamera. Uso la stessa
+    // durata di questo singolo step (stepSec), così le due animazioni
+    // (carta + inquadratura) restano sincronizzate. Non tocco il ramo di
+    // "arrivo" qui sotto: quello resta l'unico punto che può innescare un
+    // altro zoom (esplorazione/rivelazione strutture) — lasciarlo senza una
+    // chiamata concorrente evita di reintrodurre il conflitto fra due
+    // inquadrature in rapida successione già corretto in precedenza.
+    if (
+      nomePersonaggio === gameData.pgAttivo &&
+      typeof impostaInquadraturaPersonaggio === "function"
+    ) {
+      impostaInquadraturaPersonaggio(nomePersonaggio, {
+        durata: durataStepMs,
+      });
     }
 
     i++;
@@ -7337,7 +7361,7 @@ function ottieniScalaGameFit() {
 // un vecchio zoom-su-carta rimasto applicato. Serve a getCoordinateCarta()
 // qui sotto — vedi il commento lì per il motivo esatto.
 function ottieniScalaGameScreen() {
-  const gameScreen = document.querySelector(".game-screen");
+  const gameScreen = document.querySelector(".game-screen-camera");
   if (!gameScreen) return 1;
   const transform = getComputedStyle(gameScreen).transform;
   if (!transform || transform === "none") return 1;
@@ -8117,7 +8141,7 @@ Promise.all([
 // luogo intera sia per una singola struttura (finestra/porta), qualunque
 // sia la sua posizione o dimensione — niente più zoom leggermente storti.
 function zoomSuElemento(el, durata = 1000, zoom = 2, opts = {}) {
-  const gameScreen = document.querySelector(".game-screen");
+  const gameScreen = document.querySelector(".game-screen-camera");
   if (!gameScreen || !el) return;
 
   const viewport = opts.viewportEl || gameScreen;
@@ -8154,7 +8178,7 @@ function zoomSuElemento(el, durata = 1000, zoom = 2, opts = {}) {
 }
 
 function zoomSuCoordinate(x, y, durata = 1000, zoom = 2, opts = {}) {
-  const gameScreen = document.querySelector(".game-screen"); // viewport (overflow hidden)
+  const gameScreen = document.querySelector(".game-screen-camera"); // viewport (overflow hidden)
   const griglia = document.getElementById("tabelloneDinamico"); // grid
   if (!gameScreen || !griglia) return;
 
@@ -8269,7 +8293,7 @@ function zoomSuCoordinate(x, y, durata = 1000, zoom = 2, opts = {}) {
 //    Giardino), l'inquadratura resta decentrata verso il centro del
 //    tabellone invece di mostrare tanto spazio vuoto di sfondo ai lati.
 function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
-  const gameScreen = document.querySelector(".game-screen");
+  const gameScreen = document.querySelector(".game-screen-camera");
   const griglia = document.getElementById("tabelloneDinamico");
   const sfondo = document.querySelector(".game-background");
   if (!gameScreen || !griglia || !nomePG) return;
@@ -8351,7 +8375,7 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
 }
 
 function resetZoom() {
-  const gameScreen = document.querySelector(".game-screen");
+  const gameScreen = document.querySelector(".game-screen-camera");
   if (!gameScreen) return;
 
   // 🎥 Durante un turno attivo, "azzerare" lo zoom non deve più riportare
