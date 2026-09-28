@@ -1887,6 +1887,14 @@ button.casuale:hover {
   align-items: center;
   gap: clamp(6px, 1.6vh, 14px);
   padding: 6px 6px 6px 16px;
+  /* 🔹 Altezza esplicita "sottile", calcolata sul testo (font-size + un
+     fattore di interlinea) più il padding verticale: prima dell'arrivo del
+     contatore-calendario (più alto) era questa l'altezza reale del badge,
+     ottenuta implicitamente dal solo testo. Il calendario, più alto,
+     "sborda" volutamente sopra/sotto grazie a overflow:visible qui sotto,
+     invece di allargare di nuovo la pillola. */
+  height: calc(clamp(1rem, 3vh, 1.7rem) * 1.25 + 12px);
+  overflow: visible;
   border-radius: 999px;
   font-weight: 600;
   font-size: clamp(1rem, 3vh, 1.7rem);
