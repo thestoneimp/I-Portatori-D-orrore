@@ -5868,16 +5868,16 @@ function muoviPersonaggioConAnimazione(
         completaEsplorazione(cartaArrivo);
       }
 
-      // 🎥 Se a muoversi è il personaggio attivo di turno (non un PNG o una
-      // minaccia, che possono passare da qui tramite muoviPngVerso/gli altri
-      // punti d'innesto), la "telecamera" lo segue sulla nuova cella.
-      if (
-        nomePersonaggio === gameData.pgAttivo &&
-        typeof impostaInquadraturaPersonaggio === "function"
-      ) {
-        impostaInquadraturaPersonaggio(nomePersonaggio, { durata: 700 });
-      }
-
+      // 🎥 NOTA: l'inquadratura dinamica (impostaInquadraturaPersonaggio) non
+      // viene più richiamata qui ad ogni arrivo. Un arrivo può innescare a
+      // sua volta un altro zoom (esplorazione/rivelazione strutture, dentro
+      // onComplete/completaEsplorazione qui sopra) — chiamarla PRIMA di
+      // quello creava un conflitto fra due inquadrature in rapida
+      // successione (un balzo visibile da una all'altra). La telecamera
+      // torna comunque sul personaggio attivo ai punti "naturali" di
+      // ritorno alla vista normale: inizio turno (avviaTurnoPer) e
+      // chiusura di qualunque interazione (resetZoom(), quando c'è un
+      // personaggio attivo — vedi sotto).
       if (typeof onComplete === "function") onComplete(cellaArrivo);
 
       return;
@@ -7331,6 +7331,21 @@ function ottieniScalaGameFit() {
   return scala && !Number.isNaN(scala) ? scala : 1;
 }
 
+// 🔹 Scala PROPRIA di .game-screen (indipendente da #gameFit): normalmente
+// 1 (nessun transform proprio attivo), ma diventa >1 quando è attiva
+// l'inquadratura dinamica sul personaggio (impostaInquadraturaPersonaggio) o
+// un vecchio zoom-su-carta rimasto applicato. Serve a getCoordinateCarta()
+// qui sotto — vedi il commento lì per il motivo esatto.
+function ottieniScalaGameScreen() {
+  const gameScreen = document.querySelector(".game-screen");
+  if (!gameScreen) return 1;
+  const transform = getComputedStyle(gameScreen).transform;
+  if (!transform || transform === "none") return 1;
+  const match = transform.match(/^matrix\(([^,]+),/);
+  const scala = match ? parseFloat(match[1]) : 1;
+  return scala && !Number.isNaN(scala) ? scala : 1;
+}
+
 function getCoordinateCarta(codiceCarta) {
   const tabellone = document.getElementById("tabelloneDinamico");
   const containerPG = document.getElementById("grigliaPersonaggi");
@@ -7354,9 +7369,18 @@ function getCoordinateCarta(codiceCarta) {
   // non entra a scala 1 (soprattutto smartphone) le carte finiscono
   // disegnate più vicine all'origine di quanto dovrebbero — bug non visibile
   // su PC (dove di solito la scala resta 1) ma evidente su mobile.
+  // 🔹 Dall'introduzione dell'inquadratura dinamica
+  // (impostaInquadraturaPersonaggio), ANCHE .game-screen può avere una
+  // propria scala attiva (non solo
+  // #gameFit): rectCarta/rectPG sono entrambi dentro quel sistema
+  // trasformato, quindi il loro delta visivo va diviso per la scala TOTALE
+  // (gameFit × quella propria di .game-screen), non solo per quella di
+  // gameFit — altrimenti la carta viene ricalcolata più lontana
+  // dall'origine di quanto dovrebbe, sempre di più ad ogni passo con lo
+  // zoom attivo, fino a finire fuori schermo dopo pochi spostamenti.
   const rectCarta = cartaDiv.getBoundingClientRect();
   const rectPG = containerPG.getBoundingClientRect();
-  const scala = ottieniScalaGameFit();
+  const scala = ottieniScalaGameFit() * ottieniScalaGameScreen();
 
   return {
     x: (rectCarta.left - rectPG.left) / scala,
