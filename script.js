@@ -136,9 +136,21 @@ function mostraMenuGioco() {
       gameData.turniCompletati.push(gameData.pgAttivo);
       gameData.pgAttivo = null;
       aggiornaIndicatoreFase();
+      // Senza turno attivo non c'è più un personaggio a cui "tornare".
+      impostaCameraLibera(false);
     }
     faseGiocatori();
   };
+
+  // 🖐️ "Torna al personaggio": visibile solo dopo che il giocatore ha
+  // spostato/zoomato la mappa a mano (vedi abilitaNavigazioneTabellone);
+  // resetZoom() riporta l'inquadratura sul personaggio attivo.
+  document.getElementById("btnTornaAlPersonaggio").onclick = () => resetZoom();
+
+  // 🔹 Stesso motivo del reset del transform qui sotto: lo stato della camera
+  // libera è globale e sopravvive alla schermata (il DOM del tabellone no).
+  cameraCorrente = null;
+  impostaCameraLibera(false);
 
   // 🔹 A differenza dei pannelli laterali (rigenerati ogni volta dentro
   // document.body.innerHTML in mostraSchermataPrincipale), questo overlay
@@ -1533,6 +1545,7 @@ function mostraSchermataPrincipale() {
   aggiornaListaObiettivi();
   caricaTutorial();
   aggiornaListaPersonaggiMenu();
+  abilitaNavigazioneTabellone();
 
   abilitaScorrimentoMenu(
     document.getElementById("scrollObiettivi"),
@@ -8273,6 +8286,29 @@ function zoomSuCoordinate(x, y, durata = 1000, zoom = 2, opts = {}) {
 //    quando il personaggio è su una colonna laterale (es. Strada,
 //    Giardino), l'inquadratura resta decentrata verso il centro del
 //    tabellone invece di mostrare tanto spazio vuoto di sfondo ai lati.
+//
+// 🖐️ Camera "libera": passando opts.centro ({cx, cy}, in pixel visivi "piatti")
+// e opts.zoom, il centro dell'inquadratura lo decide il giocatore
+// (trascinamento/pinch, vedi abilitaNavigazioneTabellone) invece della carta
+// del personaggio — ma passa dallo STESSO calcolo/clamp, quindi i limiti
+// (niente nero ai bordi) valgono identici. Senza opts.centro la camera torna
+// sul personaggio e la modalità libera si spegne. Restituisce lo stato
+// effettivamente applicato (dopo il clamp).
+const ZOOM_CAMERA_MIN = 1;
+const ZOOM_CAMERA_MAX = 3;
+
+// Ultimo stato {cx, cy, s, scalaFit} applicato alla camera (il valore TARGET,
+// non quello interpolato a metà transizione) e se l'ha spostata il giocatore.
+let cameraCorrente = null;
+let cameraLibera = false;
+
+function impostaCameraLibera(attiva) {
+  cameraLibera = attiva;
+  document
+    .getElementById("btnTornaAlPersonaggio")
+    ?.classList.toggle("nascosto", !attiva);
+}
+
 function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
   const gameScreen = document.querySelector(".game-screen-camera");
   const griglia = document.getElementById("tabelloneDinamico");
@@ -8313,6 +8349,10 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
 
   let cx = elRect.left - gsRect.left + elRect.width / 2;
   let cy = elRect.top - gsRect.top + elRect.height / 2;
+  if (opts.centro) {
+    cx = opts.centro.cx;
+    cy = opts.centro.cy;
+  }
 
   // Semi-larghezza/altezza (pixel "piatti") della finestra REALMENTE
   // visibile alla zoom scelta. 🔹 Uso window.innerWidth/innerHeight (la
@@ -8339,8 +8379,8 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
     );
   }
 
-  if (sfondo) {
-    const bgRect = sfondo.getBoundingClientRect();
+  const bgRect = sfondo ? sfondo.getBoundingClientRect() : null;
+  if (bgRect) {
     const bgTop = bgRect.top - gsRect.top;
     cy = clampCentro(cy, bgTop, bgRect.height, halfH);
   }
@@ -8348,6 +8388,17 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
   const gridRect = griglia.getBoundingClientRect();
   const gridLeft = gridRect.left - gsRect.left;
   cx = clampCentro(cx, gridLeft, gridRect.width, halfW);
+
+  // 🔹 Vincolo anche sullo SFONDO in orizzontale, dopo quello sulla griglia:
+  // a zoom bassi (camera libera, vedi abilitaNavigazioneTabellone) una
+  // griglia più stretta della finestra, o non centrata in essa (succede su
+  // schermi piccoli, dove sbordando a destra del proprio box), porterebbe il
+  // centro fuori asse e scoprirebbe il nero ai lati. Alla zoom fissa del
+  // personaggio (1.7x) questo secondo clamp non interviene.
+  if (bgRect) {
+    const bgLeft = bgRect.left - gsRect.left;
+    cx = clampCentro(cx, bgLeft, bgRect.width, halfW);
+  }
 
   const scalaGameFit = ottieniScalaGameFit();
   // 🔹 X: il centro orizzontale "piatto" di .game-screen coincide già con
@@ -8369,6 +8420,174 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
 
   gameScreen.style.transition = `transform ${durata}ms ${easing}`;
   gameScreen.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+
+  cameraCorrente = { cx, cy, s, scalaFit: scalaGameFit };
+  impostaCameraLibera(Boolean(opts.centro));
+  return cameraCorrente;
+}
+
+// 🖐️ Navigazione manuale del tabellone: trascinamento (pan) con un dito o col
+// mouse, pinch a due dita e rotella per zoomare. Agisce sull'inquadratura
+// dinamica (impostaInquadraturaPersonaggio con opts.centro), quindi eredita
+// gli stessi limiti e non entra in conflitto con lo slide dei menu.
+//
+// Per non far partire per errore il movimento di un personaggio mentre si
+// scorre la mappa, un tocco è un "tap" (e arriva alla carta) solo se il
+// puntatore resta sotto una piccola soglia di spostamento; oltre la soglia è
+// un trascinamento e il click che il browser genera al rilascio viene
+// soppresso prima che raggiunga qualunque carta.
+const SOGLIA_TRASCINAMENTO_PX = { mouse: 5, touch: 12, pen: 12 };
+
+function abilitaNavigazioneTabellone() {
+  const viewport = document.getElementById("gameViewport");
+  if (!viewport) return;
+
+  const puntatori = new Map(); // pointerId -> {x, y} (ultima posizione)
+  let inizio = null; // {x, y, soglia} del primo puntatore
+  let trascinando = false; // soglia superata, oppure pinch a due dita
+  let ignoraClick = false;
+
+  // Non si naviga senza un turno attivo, né mentre un personaggio si sta
+  // muovendo (l'inseguimento della telecamera combatterebbe col gesto).
+  const puoNavigare = () => {
+    if (!gameData.pgAttivo || !cameraCorrente) return false;
+    return !document.querySelector(".carta-personaggio.in-movimento");
+  };
+
+  // Sposta il centro dell'inquadratura in modo che il punto di mappa che era
+  // sotto "focalePrima" (coordinate schermo) finisca sotto "focaleDopo",
+  // applicando il fattore di zoom. Con focali uguali e fattore 1 è un pan
+  // puro; con fattore ≠ 1 è uno zoom che tiene fermo il punto fra le dita.
+  function muoviCamera(focalePrima, focaleDopo, fattore) {
+    const { cx, cy, s, scalaFit } = cameraCorrente;
+
+    // La scala di #gameFit è cambiata (resize): le coordinate salvate non
+    // valgono più, si riparte dal personaggio.
+    if (Math.abs(scalaFit - ottieniScalaGameFit()) > 0.001) {
+      impostaInquadraturaPersonaggio(gameData.pgAttivo, { durata: 0 });
+      return;
+    }
+
+    const sNuovo = Math.min(
+      ZOOM_CAMERA_MAX,
+      Math.max(ZOOM_CAMERA_MIN, s * fattore)
+    );
+    const mezzoW = window.innerWidth / 2;
+    const mezzoH = window.innerHeight / 2;
+    const qx = cx + (focalePrima.x - mezzoW) / s;
+    const qy = cy + (focalePrima.y - mezzoH) / s;
+
+    impostaInquadraturaPersonaggio(gameData.pgAttivo, {
+      centro: {
+        cx: qx - (focaleDopo.x - mezzoW) / sNuovo,
+        cy: qy - (focaleDopo.y - mezzoH) / sNuovo,
+      },
+      zoom: sNuovo,
+      durata: 0,
+      easing: "linear",
+    });
+  }
+
+  const distanza = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  const punto = (e) => ({ x: e.clientX, y: e.clientY });
+  const puntiAttivi = () => Array.from(puntatori.values());
+  const centroDi = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+
+  viewport.addEventListener("pointerdown", (e) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (!puoNavigare()) return;
+
+    puntatori.set(e.pointerId, punto(e));
+    if (puntatori.size === 1) {
+      inizio = {
+        ...punto(e),
+        soglia:
+          SOGLIA_TRASCINAMENTO_PX[e.pointerType] ?? SOGLIA_TRASCINAMENTO_PX.touch,
+      };
+      trascinando = false;
+    } else if (puntatori.size === 2) {
+      trascinando = true;
+      ignoraClick = true;
+    }
+  });
+
+  viewport.addEventListener("pointermove", (e) => {
+    const prima = puntatori.get(e.pointerId);
+    if (!prima) return;
+    if (!puoNavigare()) return;
+
+    const ora = punto(e);
+
+    if (puntatori.size >= 2) {
+      const [a, b] = puntiAttivi();
+      const distPrima = distanza(a, b);
+      const centroPrima = centroDi(a, b);
+      puntatori.set(e.pointerId, ora);
+      const [a2, b2] = puntiAttivi();
+      const distDopo = distanza(a2, b2);
+      if (distPrima > 0 && distDopo > 0) {
+        muoviCamera(centroPrima, centroDi(a2, b2), distDopo / distPrima);
+      }
+      return;
+    }
+
+    puntatori.set(e.pointerId, ora);
+
+    if (!trascinando) {
+      if (distanza(ora, inizio) < inizio.soglia) return;
+      // Soglia superata: da qui è un trascinamento. Parte dalla posizione
+      // attuale (nessun "salto" pari alla soglia) e il click finale va
+      // soppresso.
+      trascinando = true;
+      ignoraClick = true;
+      try {
+        viewport.setPointerCapture(e.pointerId);
+      } catch (_) {
+        /* puntatore già rilasciato: nessun problema */
+      }
+      return;
+    }
+
+    muoviCamera(prima, ora, 1);
+  });
+
+  const rilascia = (e) => {
+    if (!puntatori.delete(e.pointerId)) return;
+    if (puntatori.size === 0) {
+      trascinando = false;
+      inizio = null;
+      // Il click generato da questo rilascio arriva subito dopo: se non
+      // arriva (nessun click), la soppressione scade comunque.
+      if (ignoraClick) setTimeout(() => (ignoraClick = false), 100);
+    }
+  };
+  viewport.addEventListener("pointerup", rilascia);
+  viewport.addEventListener("pointercancel", rilascia);
+
+  // Fase di cattura sul contenitore: il click soppresso non raggiunge né le
+  // carte né i listener globali.
+  viewport.addEventListener(
+    "click",
+    (e) => {
+      if (!ignoraClick) return;
+      e.stopPropagation();
+      e.preventDefault();
+      ignoraClick = false;
+    },
+    true
+  );
+
+  // Rotella (desktop) / pinch del trackpad: stesso zoom del pinch.
+  viewport.addEventListener(
+    "wheel",
+    (e) => {
+      if (!puoNavigare()) return;
+      e.preventDefault();
+      const p = punto(e);
+      muoviCamera(p, p, Math.exp(-e.deltaY * 0.0015));
+    },
+    { passive: false }
+  );
 }
 
 function resetZoom() {

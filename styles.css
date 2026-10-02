@@ -515,6 +515,12 @@ button.btn-primary:hover {
   inset: 0;
   overflow: hidden;
   z-index: 0;
+  /* Il trascinamento/pinch del tabellone è gestito da JS
+     (abilitaNavigazioneTabellone): il browser non deve scorrere o zoomare
+     la pagina al posto nostro, né selezionare il testo delle carte. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* 🔹 Riceve SOLO la scala automatica "adatta allo schermo" (calcolata in
@@ -684,6 +690,42 @@ button.btn-primary:hover {
 .corner-bottom-right {
   bottom: clamp(8px, 2vh, 16px);
   right: clamp(8px, 2vh, 16px);
+}
+
+/* 🖐️ "Torna al personaggio": chip in basso al centro dell'overlay, visibile
+   solo dopo che il giocatore ha spostato/zoomato la mappa a mano. Stessi
+   colori delle icone d'angolo, forma a pillola come il pulsante turno. */
+.torna-personaggio-btn {
+  position: fixed;
+  bottom: clamp(8px, 2vh, 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 7px 18px;
+  font-family: var(--font-title);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-size: clamp(0.65rem, 1.9vh, 0.95rem);
+  background-color: rgba(26, 26, 36, 0.85);
+  color: var(--text-main);
+  border: 1px solid #3d1418;
+  border-radius: 999px;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.torna-personaggio-btn:hover {
+  border-color: var(--torch-amber);
+  box-shadow: 0 0 12px var(--torch-amber-glow);
+}
+
+.torna-personaggio-btn.nascosto {
+  display: none;
 }
 
 @keyframes bounce {
