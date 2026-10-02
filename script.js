@@ -325,9 +325,11 @@ function aggiornaGestionePopupImpilati() {
 
   // Sfalsamento leggero: ogni popup successivo un po' più in basso,
   // così restano tutti visibili invece di sparire esattamente uno sotto l'altro.
-  const STEP_PX = 24;
+  // (passo e margine alto sono variabili CSS che si adattano allo schermo;
+  // lo sfalsamento è limitato così i popup in fondo alla pila restano alti
+  // abbastanza da essere leggibili)
   popups.forEach((p, i) => {
-    p.style.paddingTop = `${100 + i * STEP_PX}px`;
+    p.style.paddingTop = `calc(var(--popup-top) + ${Math.min(i, 6)} * var(--popup-step))`;
   });
 
   const voci = document.querySelectorAll(".popup-voce-tutorial");
@@ -357,6 +359,51 @@ function chiudiFlyoutTutorialECollegati(flyout) {
   flyout.remove();
 }
 
+function posizionaFlyoutDentroSchermo(flyout, ancoraEl) {
+  const margine = 8;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const rect = ancoraEl.getBoundingClientRect();
+
+  flyout.style.maxHeight = ""; // torna al limite CSS per misurare l'altezza naturale
+  const fRect = flyout.getBoundingClientRect();
+  const altezza = Math.min(fRect.height, vh - margine * 2);
+
+  const spazioSotto = vh - margine - (rect.bottom + margine);
+  const spazioSopra = rect.top - margine - margine;
+
+  let top;
+  let maxH = altezza;
+  if (altezza <= spazioSotto) {
+    top = rect.bottom + margine;
+  } else if (altezza <= spazioSopra) {
+    top = rect.top - margine - altezza;
+  } else if (Math.max(spazioSotto, spazioSopra) >= 90) {
+    // Nessun lato basta: usa il più spazioso e fai scorrere il testo
+    if (spazioSotto >= spazioSopra) {
+      top = rect.bottom + margine;
+      maxH = spazioSotto;
+    } else {
+      maxH = spazioSopra;
+      top = rect.top - margine - maxH;
+    }
+  } else {
+    // Link vicino a un bordo e poco spazio ovunque: sovrapponi al link
+    maxH = Math.min(altezza, vh - margine * 2);
+    top = Math.min(Math.max(margine, rect.bottom - maxH), vh - margine - maxH);
+  }
+  top = Math.min(Math.max(margine, top), vh - margine - Math.min(maxH, 40));
+
+  let left = rect.left;
+  const maxLeft = vw - fRect.width - margine;
+  if (left > maxLeft) left = maxLeft;
+  left = Math.max(margine, left);
+
+  flyout.style.maxHeight = `${Math.floor(maxH)}px`;
+  flyout.style.left = `${left}px`;
+  flyout.style.top = `${top}px`;
+}
+
 function creaFlyoutTutorial(titolo, ancoraEl, parentFlyoutId) {
   const voce = tutorialData.flatMap((c) => c.voci).find((v) => v.titolo === titolo);
   if (!voce) return null;
@@ -372,23 +419,9 @@ function creaFlyoutTutorial(titolo, ancoraEl, parentFlyoutId) {
   `;
   document.body.appendChild(flyout);
 
-  // Posizionamento: appena sotto il link, tenendosi dentro lo schermo
-  const rect = ancoraEl.getBoundingClientRect();
-  const margine = 8;
-  const fRect = flyout.getBoundingClientRect();
-
-  let left = rect.left;
-  const maxLeft = window.innerWidth - fRect.width - margine;
-  if (left > maxLeft) left = Math.max(margine, maxLeft);
-
-  let top = rect.bottom + margine;
-  if (top + fRect.height > window.innerHeight - margine) {
-    const topSopra = rect.top - fRect.height - margine;
-    if (topSopra >= margine) top = topSopra;
-  }
-
-  flyout.style.left = `${left}px`;
-  flyout.style.top = `${top}px`;
+  // Posizionamento: sotto il link (o sopra, dove c'è più spazio), SEMPRE
+  // dentro lo schermo: se manca spazio l'altezza si riduce e il testo scorre.
+  posizionaFlyoutDentroSchermo(flyout, ancoraEl);
 
   return flyout;
 }

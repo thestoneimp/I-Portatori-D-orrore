@@ -741,16 +741,26 @@ button.btn-primary:hover {
 /* ----------------------------- */
 /* Popup di messaggio generico   */
 /* ----------------------------- */
+:root {
+  --popup-top: clamp(52px, 10vh, 100px);
+  --popup-step: clamp(10px, 3.2vh, 24px);
+}
+
 .popup {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box; /* il padding NON deve far uscire il popup dallo schermo */
   display: flex;
   align-items: flex-start; /* allinea in alto */
   justify-content: center;
-  padding-top: 100px; /* regola a piacere per abbassare/sollevare */
+  /* Distanza dal bordo alto e sfalsamento dei popup impilati: si adattano
+     all'altezza dello schermo (lo schermo piccolo ha meno spazio da sprecare).
+     Il minimo lascia libero l'angolo del pulsante "Chiudi tutti". */
+  padding: var(--popup-top) 8px 8px;
   z-index: 9999;
   animation: fadeInPopup 0.25s ease-out forwards;
   pointer-events: none; /* lo sfondo scuro condiviso blocca i click, non ogni singolo popup */
@@ -759,13 +769,19 @@ button.btn-primary:hover {
 .popup-content {
   background-color: var(--bg-panel);
   color: var(--text-main);
-  padding: clamp(12px, 3vh, 24px) clamp(16px, 4vw, 32px);
+  padding: clamp(10px, 3vh, 24px) clamp(14px, 4vw, 32px);
   border-radius: 4px;
   border: 1px solid var(--bg-panel-border);
   border-top: 4px solid var(--blood-red);
-  max-width: 60%;
-  max-height: 90%;
+  box-sizing: border-box;
+  /* Mai più largo/alto dello schermo: se il testo non ci sta, scorre dentro
+     la finestra e i pulsanti restano raggiungibili. */
+  max-width: min(100%, max(60vw, 420px));
+  max-height: 100%;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
+  font-size: clamp(13px, 2.8vh, 16px);
   text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 16px var(--blood-red-glow);
   animation: scaleIn 0.25s ease-out forwards;
@@ -778,17 +794,20 @@ button.btn-primary:hover {
 .tutorial-flyout {
   position: fixed;
   z-index: 10100;
-  max-width: 320px;
-  max-height: 260px;
+  box-sizing: border-box;
+  max-width: min(320px, calc(100vw - 16px));
+  max-height: min(260px, 60vh); /* ridotta da script.js allo spazio realmente disponibile */
   overflow-y: auto;
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
   background-color: var(--bg-panel);
   color: var(--text-main);
-  padding: 14px 18px;
+  padding: clamp(8px, 2vh, 14px) clamp(12px, 2.5vw, 18px);
   border-radius: 4px;
   border: 1px solid #3d1c22;
   border-left: 4px solid var(--torch-amber);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 0 12px var(--torch-amber-glow);
-  font-size: 0.9em;
+  font-size: clamp(12px, 2.5vh, 14.5px);
   text-align: left;
   animation: fadeInPopup 0.15s ease-out forwards;
 }
@@ -810,13 +829,16 @@ button.btn-primary:hover {
   bottom: 0;
   z-index: 10200;
   display: none; /* mostrata via JS */
-  min-height: 160px;
-  max-height: 40vh;
+  box-sizing: border-box;
+  min-height: 0;
+  max-height: 55vh;
+  max-height: 55dvh;
+  overflow-y: auto;
   background: linear-gradient(180deg, #160a0d 0%, #09090d 100%);
   border-top: 3px solid var(--blood-red);
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.9), 0 -2px 12px var(--blood-red-glow);
-  padding: 18px 24px;
-  gap: 20px;
+  padding: clamp(8px, 2.5vh, 18px) clamp(12px, 3vw, 24px);
+  gap: clamp(10px, 2.5vw, 20px);
   color: var(--text-main);
   cursor: pointer;
   animation: fadeInPopup 0.2s ease-out forwards;
@@ -827,8 +849,8 @@ button.btn-primary:hover {
 }
 
 .dialogo-png-ritratto-placeholder {
-  width: 110px;
-  height: 110px;
+  width: clamp(56px, 22vh, 110px);
+  height: clamp(56px, 22vh, 110px);
   background-color: #1a1a24;
   color: #fff;
   border-radius: 4px;
@@ -883,10 +905,10 @@ button.btn-primary:hover {
   color: #fff;
   border: 1px solid #3d1c22;
   border-radius: 4px;
-  padding: 10px 14px;
+  padding: clamp(6px, 1.6vh, 10px) clamp(10px, 2vw, 14px);
   text-align: left;
   cursor: pointer;
-  font-size: 0.95em;
+  font-size: clamp(12px, 2.6vh, 15px);
   font-family: var(--font-body);
   transition: all 0.15s ease;
 }
@@ -944,6 +966,9 @@ button.btn-primary:hover {
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box;
+  padding: 8px;
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
@@ -955,11 +980,14 @@ button.btn-primary:hover {
 .popup-interazione-stanza .popup-content {
   background-color: #111;
   color: white;
-  padding: 20px 30px;
+  padding: clamp(10px, 3vh, 20px) clamp(14px, 4vw, 30px);
   border-radius: 10px;
-  max-width: 90%;
-  max-height: 90%;
+  box-sizing: border-box;
+  max-width: 100%;
+  max-height: 100%;
   overflow-y: auto;
+  overflow-wrap: anywhere;
+  font-size: clamp(13px, 2.8vh, 16px);
   text-align: center;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
   animation: scaleIn 0.25s ease-out forwards;
@@ -1412,6 +1440,17 @@ button.casuale:hover {
 
 .popup-content li {
   margin: 6px 0;
+}
+
+/* Barra pulsanti sempre visibile: se il testo è lungo scorre lui, mentre
+   i pulsanti restano agganciati al bordo basso della finestra. */
+.popup-content .popup-buttons {
+  position: sticky;
+  bottom: calc(-1 * clamp(10px, 3vh, 24px));
+  margin-bottom: calc(-1 * clamp(10px, 3vh, 24px));
+  padding-bottom: clamp(10px, 3vh, 24px);
+  background-color: var(--bg-panel);
+  z-index: 1;
 }
 
 /* Bottoni nei popup */
