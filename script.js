@@ -4771,8 +4771,15 @@ function mostraMenuTurniGiocatori(personaggiDisponibili) {
   popup.classList.add("popup");
   popup.id = "popupTurniGiocatori";
 
-  let html = `<div class="popup-content"><h2>Chi agisce ora?</h2>
-  <div class="lista-personaggi">`;
+  // Schede sempre tutte visibili senza scorrere: al massimo 2 righe
+  // (fino a 4 personaggi su una sola riga), il CSS le ridimensiona in
+  // base a colonne/righe e all'altezza dello schermo.
+  const n = personaggiDisponibili.length;
+  const righe = n <= 4 ? 1 : 2;
+  const colonne = Math.max(1, Math.ceil(n / righe));
+
+  let html = `<div class="popup-content popup-turni"><h2>Chi agisce ora?</h2>
+  <div class="lista-personaggi" style="--colonne:${colonne};--righe:${righe}">`;
 
   personaggiDisponibili.forEach((pg) => {
     html += `

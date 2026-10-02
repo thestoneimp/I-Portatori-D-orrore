@@ -1413,6 +1413,50 @@ button.casuale:hover {
   margin-bottom: clamp(4px, 1vh, 8px);
 }
 
+/* 🔹 Popup "Chi agisce ora?": griglia a 1-2 righe, schede che si
+   ridimensionano (larghezza = colonne, avatar = altezza disponibile) così
+   da stare sempre tutte nello schermo senza scorrere. */
+.popup-turni {
+  width: 100%;
+  max-width: min(100%, 900px);
+}
+
+.popup-turni h2 {
+  margin: 0 0 clamp(4px, 1.5vh, 12px);
+  font-size: clamp(1rem, 3.6vh, 1.5rem);
+}
+
+.popup-turni .lista-personaggi {
+  display: grid;
+  grid-template-columns: repeat(var(--colonne, 1), minmax(0, 1fr));
+  gap: clamp(6px, 1.6vh, 16px) clamp(6px, 1.6vw, 16px);
+}
+
+.popup-turni .personaggio-card {
+  width: auto;
+  min-width: 0;
+  box-sizing: border-box;
+  font-size: clamp(11px, 2.4vh, 15px);
+  overflow-wrap: anywhere;
+}
+
+.popup-turni .personaggio-card p {
+  margin: clamp(2px, 0.6vh, 6px) 0;
+}
+
+.popup-turni .avatar-placeholder {
+  height: clamp(22px, calc((100dvh - 250px) / var(--righe, 1) - 40px), 150px);
+  margin-bottom: 0;
+  font-size: clamp(10px, 2vh, 14px);
+}
+
+.popup-turni .personaggio-card button {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: clamp(4px, 1.2vh, 10px) 4px;
+}
+
 /* Avatar segnaposto */
 .avatar-placeholder {
   width: 100%;
