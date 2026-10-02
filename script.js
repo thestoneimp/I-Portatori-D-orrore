@@ -8012,17 +8012,32 @@ function adattaGrigliaSelezionePersonaggi() {
     const n = grid.children.length;
     if (!n) return;
 
-    const MIN_CARD = 95; // soglia minima di leggibilità: sotto, meglio andare a capo
+    // Le schede sono carte 3:4 (come .carta-personaggio sul tabellone).
+    // Si sceglie fra 1 e 3 righe quella che permette le carte più grandi,
+    // compatibilmente con larghezza e altezza disponibili (titolo/margini
+    // riservati in alto e in basso).
     const GAP = 14;
-    const disponibile = grid.clientWidth || window.innerWidth;
+    const MAX_W = 190;
+    // spazio verticale riservato a titolo/contatore: la schermata delle carte
+    // iniziali ha solo il titolo
+    const RISERVA_ALTEZZA = grid.id === "gridCarteIniziali" ? 110 : 150;
+    const disponibile = (grid.clientWidth || window.innerWidth) - 24;
+    const altezza = window.innerHeight - RISERVA_ALTEZZA;
 
-    let maxColonne = Math.max(1, Math.floor((disponibile + GAP) / (MIN_CARD + GAP)));
-    maxColonne = Math.min(maxColonne, n);
+    let migliore = { w: 0, righe: 1 };
+    for (let r = 1; r <= Math.min(3, n); r++) {
+      const c = Math.ceil(n / r);
+      const w = Math.min(
+        MAX_W,
+        (disponibile - GAP * (c - 1)) / c,
+        (((altezza - GAP * (r - 1)) / r) * 3) / 4
+      );
+      if (w > migliore.w + 1) migliore = { w, righe: r };
+    }
 
-    const righe = Math.ceil(n / maxColonne);
-    const colonne = Math.ceil(n / righe);
-
+    const colonne = Math.ceil(n / migliore.righe);
     grid.style.setProperty("--colonne-schede", colonne);
+    grid.style.setProperty("--w-carta-pg", `${Math.max(70, Math.floor(migliore.w))}px`);
   });
 }
 
@@ -9669,7 +9684,7 @@ function mostraInterazionePersonaggio(nomePG) {
   mostraPopupGenerico({
     titolo: nomePG,
     messaggio: `
-      <div class="avatar-placeholder">[Avatar PG]</div>
+      <div class="avatar-placeholder avatar-carta">[Avatar PG]</div>
       <div style="text-align:center;margin-top:6px">Scegli un'azione:</div>
     `,
     pulsanti,
