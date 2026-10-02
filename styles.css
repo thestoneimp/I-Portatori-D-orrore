@@ -1413,8 +1413,8 @@ button.casuale:hover {
   margin-bottom: clamp(4px, 1vh, 8px);
 }
 
-/* 🔹 Popup "Chi agisce ora?": le schede sono CARTE DA GIOCO (proporzione
-   fissa 5:7, mai stirate). La larghezza --w-carta è la più piccola fra:
+/* 🔹 Popup "Chi agisce ora?": le schede sono CARTE (proporzione
+   fissa 3:4, come .carta-personaggio sul tabellone: 60x80px, mai stirate). La larghezza --w-carta è la più piccola fra:
    un massimo assoluto, quella che fa entrare le righe nell'altezza dello
    schermo e quella che fa entrare le colonne nella larghezza. Più
    personaggi ci sono, più le carte si rimpiccioliscono, restando
@@ -1424,7 +1424,7 @@ button.casuale:hover {
   --h-riga: calc((100dvh - var(--popup-top) - 84px) / var(--righe, 1));
   --w-carta: min(
     var(--carta-max),
-    calc(var(--h-riga) * 5 / 7),
+    calc(var(--h-riga) * 3 / 4),
     calc((100vw - 72px) / var(--colonne, 1) - 14px)
   );
   width: fit-content;
@@ -1445,7 +1445,7 @@ button.casuale:hover {
 
 .popup-turni .personaggio-card {
   width: var(--w-carta);
-  aspect-ratio: 5 / 7;
+  aspect-ratio: 3 / 4;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

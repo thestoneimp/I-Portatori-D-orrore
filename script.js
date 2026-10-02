@@ -4782,7 +4782,7 @@ function mostraMenuTurniGiocatori(personaggiDisponibili) {
     const c = Math.ceil(n / r);
     return Math.min(
       190,
-      (((window.innerHeight - bordoAlto - 84) / r) * 5) / 7,
+      (((window.innerHeight - bordoAlto - 84) / r) * 3) / 4,
       (window.innerWidth - 72) / c - 14
     );
   };
