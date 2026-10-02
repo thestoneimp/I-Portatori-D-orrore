@@ -4772,14 +4772,25 @@ function mostraMenuTurniGiocatori(personaggiDisponibili) {
   popup.id = "popupTurniGiocatori";
 
   // Schede sempre tutte visibili senza scorrere: al massimo 2 righe
-  // (fino a 4 personaggi su una sola riga), il CSS le ridimensiona in
+  // (1 o 2 righe, scelta in base alla dimensione dello schermo), il CSS le ridimensiona in
   // base a colonne/righe e all'altezza dello schermo.
   const n = personaggiDisponibili.length;
-  const righe = n <= 4 ? 1 : 2;
+  // Sceglie 1 o 2 righe, quella che permette le carte più grandi (stesse
+  // formule del CSS .popup-turni: altezza per riga e larghezza per colonna).
+  const bordoAlto = Math.min(100, Math.max(52, window.innerHeight * 0.1));
+  const larghezzaCarta = (r) => {
+    const c = Math.ceil(n / r);
+    return Math.min(
+      190,
+      (((window.innerHeight - bordoAlto - 84) / r) * 5) / 7,
+      (window.innerWidth - 72) / c - 14
+    );
+  };
+  const righe = n > 1 && larghezzaCarta(2) > larghezzaCarta(1) ? 2 : 1;
   const colonne = Math.max(1, Math.ceil(n / righe));
 
-  let html = `<div class="popup-content popup-turni"><h2>Chi agisce ora?</h2>
-  <div class="lista-personaggi" style="--colonne:${colonne};--righe:${righe}">`;
+  let html = `<div class="popup-content popup-turni" style="--colonne:${colonne};--righe:${righe}"><h2>Chi agisce ora?</h2>
+  <div class="lista-personaggi">`;
 
   personaggiDisponibili.forEach((pg) => {
     html += `

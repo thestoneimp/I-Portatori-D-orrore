@@ -1413,12 +1413,22 @@ button.casuale:hover {
   margin-bottom: clamp(4px, 1vh, 8px);
 }
 
-/* 🔹 Popup "Chi agisce ora?": griglia a 1-2 righe, schede che si
-   ridimensionano (larghezza = colonne, avatar = altezza disponibile) così
-   da stare sempre tutte nello schermo senza scorrere. */
+/* 🔹 Popup "Chi agisce ora?": le schede sono CARTE DA GIOCO (proporzione
+   fissa 5:7, mai stirate). La larghezza --w-carta è la più piccola fra:
+   un massimo assoluto, quella che fa entrare le righe nell'altezza dello
+   schermo e quella che fa entrare le colonne nella larghezza. Più
+   personaggi ci sono, più le carte si rimpiccioliscono, restando
+   sempre tutte visibili senza scorrere. */
 .popup-turni {
-  width: 100%;
-  max-width: min(100%, 900px);
+  --carta-max: 190px;
+  --h-riga: calc((100dvh - var(--popup-top) - 84px) / var(--righe, 1));
+  --w-carta: min(
+    var(--carta-max),
+    calc(var(--h-riga) * 5 / 7),
+    calc((100vw - 72px) / var(--colonne, 1) - 14px)
+  );
+  width: fit-content;
+  max-width: 100%;
 }
 
 .popup-turni h2 {
@@ -1428,33 +1438,46 @@ button.casuale:hover {
 
 .popup-turni .lista-personaggi {
   display: grid;
-  grid-template-columns: repeat(var(--colonne, 1), minmax(0, 1fr));
-  gap: clamp(6px, 1.6vh, 16px) clamp(6px, 1.6vw, 16px);
+  grid-template-columns: repeat(var(--colonne, 1), var(--w-carta));
+  justify-content: center;
+  gap: clamp(6px, 1.6vh, 14px);
 }
 
 .popup-turni .personaggio-card {
-  width: auto;
-  min-width: 0;
+  width: var(--w-carta);
+  aspect-ratio: 5 / 7;
   box-sizing: border-box;
-  font-size: clamp(11px, 2.4vh, 15px);
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--w-carta) * 0.05);
+  font-size: clamp(9px, calc(var(--w-carta) * 0.085), 15px);
+  overflow: hidden;
   overflow-wrap: anywhere;
 }
 
-.popup-turni .personaggio-card p {
-  margin: clamp(2px, 0.6vh, 6px) 0;
+/* Spazio per l'immagine della carta: occupa tutto il resto, senza stirarsi
+   (quando ci sarà l'immagine: background-size:cover o <img> con cover). */
+.popup-turni .avatar-placeholder {
+  flex: 1 1 0;
+  min-height: 0;
+  height: auto;
+  margin-bottom: calc(var(--w-carta) * 0.04);
+  font-size: inherit;
+  background-size: cover;
+  background-position: center;
 }
 
-.popup-turni .avatar-placeholder {
-  height: clamp(22px, calc((100dvh - 250px) / var(--righe, 1) - 40px), 150px);
-  margin-bottom: 0;
-  font-size: clamp(10px, 2vh, 14px);
+.popup-turni .personaggio-card p {
+  margin: 0 0 calc(var(--w-carta) * 0.04);
+  line-height: 1.15;
 }
 
 .popup-turni .personaggio-card button {
   width: 100%;
   box-sizing: border-box;
   margin: 0;
-  padding: clamp(4px, 1.2vh, 10px) 4px;
+  padding: calc(var(--w-carta) * 0.04) 2px;
+  font-size: inherit;
 }
 
 /* Avatar segnaposto */
