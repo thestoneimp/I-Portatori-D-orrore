@@ -6363,6 +6363,13 @@ function aggiornaPercezioneMinaccia(minaccia) {
             : precedente?.ultimoStatoSaluteNoto ?? null,
       };
       associaRumoriRecenti(minaccia, idVittima, [cellaAttuale]);
+      // Vittima in vista: ogni rumore la cui UNICA possibile fonte è lei è
+      // "spiegato" e non è più un'ipotesi aperta. Quelli con altri candidati
+      // (o nessuno) restano.
+      minaccia.memoriaRumori = (minaccia.memoriaRumori || []).filter(
+        (r) =>
+          !(r.possibiliFonti?.length === 1 && r.possibiliFonti[0] === idVittima)
+      );
       aggiornaVittimaDesignata(minaccia, idVittima);
       return;
     }
