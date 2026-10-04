@@ -1851,6 +1851,39 @@ button.casuale:hover {
   z-index: 4;
 }
 
+/* Pulsazione sonora (generaRumore): alone che si espande sfumando */
+.onda-sonora {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba(240, 170, 70, 0) 0%,
+    rgba(240, 170, 70, 0.12) 65%,
+    rgba(240, 170, 70, 0.55) 93%,
+    rgba(240, 170, 70, 0) 100%
+  );
+  transform: scale(0.05);
+  animation-name: ondaSonoraScala, ondaSonoraSfuma;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1), linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes ondaSonoraScala {
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes ondaSonoraSfuma {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 /* cliccabile e con offset di “ventaglio” opzionale */
 .carta-personaggio {
   width: 60px;

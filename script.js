@@ -6867,6 +6867,36 @@ function associaRumoriRecenti(minaccia, idVittima, luoghiVittima) {
   });
 }
 
+// 🔊 Effetto visivo: pulsazione sonora semitrasparente che parte dal centro
+// della carta d'origine e si espande sfumando fino a coprire "valore" carte
+// (ellisse con raggi = (valore + 0.5) × passo reale della griglia, che non è
+// quadrata). Vive in #grigliaPersonaggi, quindi eredita scala e camera.
+function mostraOndaSonora(codiceCarta, valore) {
+  const tabellone = document.getElementById("tabelloneDinamico");
+  const container = document.getElementById("grigliaPersonaggi");
+  const cartaDiv = tabellone?.querySelector(
+    `.carta-tabellone[data-codice="${codiceCarta}"]`
+  );
+  const coord = getCoordinateCarta(codiceCarta);
+  if (!container || !cartaDiv || !coord) return;
+
+  const stile = getComputedStyle(tabellone);
+  const passoX = cartaDiv.offsetWidth + (parseFloat(stile.columnGap) || 0);
+  const passoY = cartaDiv.offsetHeight + (parseFloat(stile.rowGap) || 0);
+  const rx = (valore + 0.5) * passoX;
+  const ry = (valore + 0.5) * passoY;
+
+  const onda = document.createElement("div");
+  onda.className = "onda-sonora";
+  onda.style.width = rx * 2 + "px";
+  onda.style.height = ry * 2 + "px";
+  onda.style.left = coord.x + cartaDiv.offsetWidth / 2 - rx + "px";
+  onda.style.top = coord.y + cartaDiv.offsetHeight / 2 - ry + "px";
+  onda.style.animationDuration = 0.9 + valore * 0.25 + "s";
+  onda.addEventListener("animationend", () => onda.remove());
+  container.insertBefore(onda, container.firstChild);
+}
+
 function generaRumore(codiceCartaOrigine, valorePropagazione, opts = {}) {
   if (!codiceCartaOrigine || !valorePropagazione) return;
 
@@ -6874,6 +6904,8 @@ function generaRumore(codiceCartaOrigine, valorePropagazione, opts = {}) {
     (c) => c.codice === codiceCartaOrigine
   );
   if (!cartaOrigine || !cartaOrigine.posizione) return;
+
+  mostraOndaSonora(codiceCartaOrigine, valorePropagazione);
 
   console.log(
     `🔊 Rumore generato in ${codiceCartaOrigine} (propagazione ${valorePropagazione})${
