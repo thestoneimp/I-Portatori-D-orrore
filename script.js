@@ -6342,6 +6342,22 @@ function aggiornaPercezioneMinaccia(minaccia) {
   const visibili = calcolaLineaDiVista(codiceCartaMinaccia);
   minaccia.memoriaVittime = minaccia.memoriaVittime || {};
 
+  // 🧠 Intelligenza 0, regola 1: con almeno una vittima in vista si concentra
+  // solo su quelle (la designata è la più vicina, vedi aggiornaVittimaDesignata)
+  // e scarta ogni altra informazione pregressa: rumori e memoria delle
+  // vittime non in vista.
+  if ((minaccia.intelligenza ?? 0) === 0) {
+    const inVista = elencoPotenzialiVittime().filter((id) =>
+      visibili.has(gameData.posizioniPersonaggi[id])
+    );
+    if (inVista.length > 0) {
+      minaccia.memoriaRumori = [];
+      Object.keys(minaccia.memoriaVittime).forEach((id) => {
+        if (!inVista.includes(id)) delete minaccia.memoriaVittime[id];
+      });
+    }
+  }
+
   elencoPotenzialiVittime().forEach((idVittima) => {
     const cellaAttuale = gameData.posizioniPersonaggi[idVittima];
     if (!cellaAttuale) return;
@@ -6960,6 +6976,21 @@ function generaRumore(codiceCartaOrigine, valorePropagazione, opts = {}) {
     if (distanza > valorePropagazione) return;
 
     const visibiliMinaccia = calcolaLineaDiVista(codiceCartaMinaccia);
+
+    // 🧠 Intelligenza 0, regola 2: con una vittima in vista ignora del tutto
+    // il rumore (resta concentrata su di lei); senza vittime in vista, il
+    // rumore attira la sua attenzione e cancella ogni ipotesi, rumore e
+    // vittima designata pregressi.
+    if ((minaccia.intelligenza ?? 0) === 0) {
+      const vittimaInVista = elencoPotenzialiVittime().some((id) =>
+        visibiliMinaccia.has(gameData.posizioniPersonaggi[id])
+      );
+      if (vittimaInVista) return;
+      minaccia.memoriaRumori = [];
+      minaccia.memoriaVittime = {};
+      minaccia.vittimaDesignata = null;
+      minaccia.distanzaVittimaDesignata = null;
+    }
 
     // 🧠 Intelligenza >= 3, solo per un urlo: impara/riconosce la voce di
     // una vittima specifica. Se la vede urlare, memorizza quella voce
