@@ -6399,10 +6399,8 @@ function aggiornaPercezioneMinaccia(minaccia) {
             );
             return (
               cr?.posizione &&
-              Math.max(
-                Math.abs(cr.posizione.x - cartaVista.posizione.x),
-                Math.abs(cr.posizione.y - cartaVista.posizione.y)
-              ) <= 1
+              cr.posizione.y === cartaVista.posizione.y &&
+              Math.abs(cr.posizione.x - cartaVista.posizione.x) <= 1
             );
           });
         if (vicinoAllOrigine) return false;
@@ -6900,12 +6898,14 @@ function associaRumoriRecenti(minaccia, idVittima, luoghiVittima) {
       )
       .filter((c) => c?.posizione);
 
+    // "Vicino" = stesso piano (y) e al massimo una carta di distanza in
+    // orizzontale: chi sta a un altro piano non può aver prodotto il rumore.
     const vicino = carteRumore.some((cr) =>
-      carteVittima.some((cv) => {
-        const ddx = Math.abs(cr.posizione.x - cv.posizione.x);
-        const ddy = Math.abs(cr.posizione.y - cv.posizione.y);
-        return Math.max(ddx, ddy) <= 1;
-      })
+      carteVittima.some(
+        (cv) =>
+          cr.posizione.y === cv.posizione.y &&
+          Math.abs(cr.posizione.x - cv.posizione.x) <= 1
+      )
     );
     if (!vicino) return;
 
@@ -7066,11 +7066,11 @@ function generaRumore(codiceCartaOrigine, valorePropagazione, opts = {}) {
           );
           if (!cartaVittima?.posizione) return false;
 
-          const vicinoAAlmenoUno = carteLuoghiPossibili.some((cOrig) => {
-            const ddx = Math.abs(cartaVittima.posizione.x - cOrig.posizione.x);
-            const ddy = Math.abs(cartaVittima.posizione.y - cOrig.posizione.y);
-            return Math.max(ddx, ddy) <= 1;
-          });
+          const vicinoAAlmenoUno = carteLuoghiPossibili.some(
+            (cOrig) =>
+              cartaVittima.posizione.y === cOrig.posizione.y &&
+              Math.abs(cartaVittima.posizione.x - cOrig.posizione.x) <= 1
+          );
           if (!vicinoAAlmenoUno) return false;
 
           // Se conosciamo il genere della voce, escludo solo i candidati
