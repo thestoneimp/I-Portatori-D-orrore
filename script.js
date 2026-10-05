@@ -6363,13 +6363,39 @@ function aggiornaPercezioneMinaccia(minaccia) {
             : precedente?.ultimoStatoSaluteNoto ?? null,
       };
       associaRumoriRecenti(minaccia, idVittima, [cellaAttuale]);
-      // Vittima in vista: ogni rumore la cui UNICA possibile fonte è lei è
-      // "spiegato" e non è più un'ipotesi aperta. Quelli con altri candidati
-      // (o nessuno) restano.
-      minaccia.memoriaRumori = (minaccia.memoriaRumori || []).filter(
-        (r) =>
-          !(r.possibiliFonti?.length === 1 && r.possibiliFonti[0] === idVittima)
+      // Vittima in vista:
+      // 1) esce dalle possibili fonti di ogni rumore; se era l'unica, il
+      //    rumore è spiegato e sparisce.
+      // 2) 🧠 Intelligenza >= 1: se è avvistata nel luogo d'origine del rumore
+      //    (uno qualsiasi, nel caso di una porta) o in uno adiacente, la
+      //    minaccia dà per scontato che l'abbia causato lei: il rumore sparisce
+      //    insieme a tutte le altre fonti associate.
+      const cartaVista = (gameData.tabelloneAttivo || []).find(
+        (c) => c.codice === cellaAttuale
       );
+      minaccia.memoriaRumori = (minaccia.memoriaRumori || []).filter((r) => {
+        const vicinoAllOrigine =
+          (minaccia.intelligenza ?? 0) >= 1 &&
+          cartaVista?.posizione &&
+          (Array.isArray(r.luogo) ? r.luogo : [r.luogo]).some((codice) => {
+            const cr = (gameData.tabelloneAttivo || []).find(
+              (c) => c.codice === codice
+            );
+            return (
+              cr?.posizione &&
+              Math.max(
+                Math.abs(cr.posizione.x - cartaVista.posizione.x),
+                Math.abs(cr.posizione.y - cartaVista.posizione.y)
+              ) <= 1
+            );
+          });
+        if (vicinoAllOrigine) return false;
+        if (r.possibiliFonti?.includes(idVittima)) {
+          r.possibiliFonti = r.possibiliFonti.filter((f) => f !== idVittima);
+          return r.possibiliFonti.length > 0;
+        }
+        return true;
+      });
       aggiornaVittimaDesignata(minaccia, idVittima);
       return;
     }
