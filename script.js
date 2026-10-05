@@ -6999,7 +6999,7 @@ function generaRumore(codiceCartaOrigine, valorePropagazione, opts = {}) {
     // riconosce PERFETTAMENTE: il luogo da cui parte l'urlo diventa la sua
     // nuova ultima posizione nota con certezza, cancellando ogni ipotesi
     // precedente sul suo conto.
-    if (opts.tipo === "urlo" && opts.chi && (minaccia.intelligenza ?? 0) >= 3) {
+    if (opts.tipo === "voce" && opts.chi && (minaccia.intelligenza ?? 0) >= 3) {
       minaccia.vociApprese = minaccia.vociApprese || {};
 
       if (visibiliMinaccia.has(codiceCartaOrigine)) {
@@ -7045,7 +7045,7 @@ function generaRumore(codiceCartaOrigine, valorePropagazione, opts = {}) {
     // sono più d'una nei paraggi.
     let genereSospetto = null;
     if ((minaccia.intelligenza ?? 0) >= 2) {
-      if (opts.tipo === "urlo" && opts.chi) {
+      if (opts.tipo === "voce" && opts.chi) {
         genereSospetto = genereDiVittima(opts.chi);
       }
 
@@ -9756,10 +9756,32 @@ function mostraInterazionePersonaggio(nomePG) {
           testo: "Fai Rumore",
           azione: () => {
             chiudiPopup();
+            const faiRumore = (descrizione, potenza, tipo) => {
+              chiudiPopup();
+              generaRumore(gameData.posizioniPersonaggi?.[nomePG], potenza, {
+                descrizione,
+                tipo,
+                chi: nomePG,
+              });
+            };
             mostraPopupGenerico({
               titolo: "Fai Rumore",
-              messaggio: `${nomePG} fa rumore attirando l'attenzione. (placeholder)`,
-              pulsanti: [{ testo: "Chiudi", azione: chiudiPopup }],
+              messaggio: `Che rumore fa ${nomePG}?`,
+              pulsanti: [
+                {
+                  testo: "Bussa sul muro",
+                  azione: () => faiRumore("Bussa sul muro", 2, null),
+                },
+                {
+                  testo: "Attira a voce",
+                  azione: () => faiRumore("Attira a voce", 3, "voce"),
+                },
+                {
+                  testo: "Urla",
+                  azione: () => faiRumore("Urla", 4, "voce"),
+                },
+                { testo: "Chiudi", azione: chiudiPopup },
+              ],
             });
           },
         }

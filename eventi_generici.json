@@ -24,7 +24,7 @@
           "stato": "rumore",
           "valore": 3,
           "descrizione": "Urlo (Ragno)",
-          "tipoRumore": "urlo"
+          "tipoRumore": "voce"
         }
       ]
     }
