@@ -4090,8 +4090,8 @@ function generaGrigliaTabellone() {
       cella.appendChild(overlayDiv);
     });
 
-    // Scale (solo se esplorata)
-    if (carta.esplorata && carta.scale && carta.scale !== "no") {
+    // Scale (solo se esplorata, oppure rivelata da una minaccia che le ha usate in vista)
+    if ((carta.esplorata || carta.scaleRivelate) && carta.scale && carta.scale !== "no") {
       if (carta.scale === "giu" || carta.scale === "suegiu") {
         const connGiu = document.createElement("div");
         connGiu.className = "connessione-verticale-giu";
@@ -6712,6 +6712,75 @@ function bloccaMovimentoTraCarte(cartaA, cartaB) {
   });
 }
 
+// 🪜 Scala REALE di una carta ("no" | "su" | "giu" | "suegiu"): unisce quella
+// già rivelata ai giocatori (carta.scale) con quella prevista dal progetto
+// nascosto (gameData.progettoScale), senza modificare nulla. Convenzione: la
+// carta in alto ha "giu", quella in basso ha "su" (stessa logica di collegaScale).
+function scalaRealeDi(carta) {
+  if (!carta?.posizione) return "no";
+  const prog = gameData.progettoScale || {};
+  const tab = gameData.tabelloneAttivo || [];
+  const alPiano = (dy) =>
+    tab.find(
+      (c) =>
+        c.posizione &&
+        c.posizione.x === carta.posizione.x &&
+        c.posizione.y === carta.posizione.y + dy
+    );
+  const sopra = alPiano(-1);
+  const sotto = alPiano(1);
+  const proprio = prog[carta.codice] || "no";
+  const rivelata = carta.scale || "no";
+  const ha = (v, d) => v === d || v === "suegiu";
+  const su =
+    ha(proprio, "su") ||
+    ha(rivelata, "su") ||
+    (sopra && ha(prog[sopra.codice], "giu"));
+  const giu =
+    ha(proprio, "giu") ||
+    ha(rivelata, "giu") ||
+    (sotto && ha(prog[sotto.codice], "su"));
+  return su && giu ? "suegiu" : su ? "su" : giu ? "giu" : "no";
+}
+
+// Vero se almeno un personaggio dei giocatori vede quel luogo (stessa vista
+// usata dalle minacce: solo stesso piano, bloccata dagli sbarramenti).
+function luogoInVistaAiGiocatori(codice) {
+  return (gameData.personaggi || []).some((nome) => {
+    const cella = gameData.posizioniPersonaggi[nome];
+    return cella && calcolaLineaDiVista(cella).has(codice);
+  });
+}
+
+// Una minaccia usa una scala tra due carte. Se uno dei due luoghi è in vista
+// ai giocatori la scala viene rivelata (compare sul tabellone, ma i luoghi
+// restano NON esplorati); altrimenti la usa senza che appaia.
+function rivelaScalaUsataDaMinaccia(codiceDa, codiceA) {
+  const tab = gameData.tabelloneAttivo || [];
+  const da = tab.find((c) => c.codice === codiceDa);
+  const a = tab.find((c) => c.codice === codiceA);
+  if (!da?.posizione || !a?.posizione || da.posizione.y === a.posizione.y) {
+    return false;
+  }
+  if (!luogoInVistaAiGiocatori(codiceDa) && !luogoInVistaAiGiocatori(codiceA)) {
+    return false;
+  }
+  const alto = da.posizione.y < a.posizione.y ? da : a;
+  const basso = alto === da ? a : da;
+  const unisci = (carta, dir) => {
+    const v = carta.scale || "no";
+    carta.scale = v === "no" || v === dir ? dir : "suegiu";
+    carta.scaleRivelate = true;
+  };
+  const eraGiaRivelata =
+    ["giu", "suegiu"].includes(alto.scale) && ["su", "suegiu"].includes(basso.scale);
+  if (eraGiaRivelata) return false;
+  unisci(alto, "giu");
+  unisci(basso, "su");
+  generaGrigliaTabellone();
+  return true;
+}
+
 // Tutti i luoghi raggiungibili da codicePartenza entro "budget" spostamenti
 // (orizzontali sullo stesso piano + verticali via scale, come il movimento
 // vero dei personaggi), rispettando gli sbarramenti REALI. Include anche il
@@ -6739,13 +6808,19 @@ function calcolaLuoghiRaggiungibili(codicePartenza, budget) {
         Math.abs(c.posizione.x - cartaAttuale.posizione.x) === 1;
       if (stessaRiga) return true;
 
-      const suOkA = cartaAttuale.scale === "su" || cartaAttuale.scale === "suegiu";
-      const giuOkA = cartaAttuale.scale === "giu" || cartaAttuale.scale === "suegiu";
-      const suOkC = c.scale === "su" || c.scale === "suegiu";
-      const giuOkC = c.scale === "giu" || c.scale === "suegiu";
+      // 👹 Qui contano le scale REALI (progetto), anche se i giocatori non le
+      // hanno ancora scoperte: le minacce le conoscono e le usano. Convenzione
+      // (come collegaScale e il movimento dei PG): la carta più in basso ha
+      // "su", quella più in alto ha "giu".
+      const scalaA = scalaRealeDi(cartaAttuale);
+      const scalaC = scalaRealeDi(c);
+      const suOkA = scalaA === "su" || scalaA === "suegiu";
+      const giuOkA = scalaA === "giu" || scalaA === "suegiu";
+      const suOkC = scalaC === "su" || scalaC === "suegiu";
+      const giuOkC = scalaC === "giu" || scalaC === "suegiu";
       return (
-        (c.posizione.y === cartaAttuale.posizione.y - 1 && suOkC && giuOkA) ||
-        (c.posizione.y === cartaAttuale.posizione.y + 1 && giuOkC && suOkA)
+        (c.posizione.y === cartaAttuale.posizione.y - 1 && suOkA && giuOkC) ||
+        (c.posizione.y === cartaAttuale.posizione.y + 1 && giuOkA && suOkC)
       );
     });
 
@@ -7304,6 +7379,7 @@ function prossimoPassoMinaccia(minaccia, luogoObiettivo) {
 }
 
 function muoviMinacciaDiUnPasso(minaccia, da, a) {
+  rivelaScalaUsataDaMinaccia(da, a);
   return new Promise((risolvi) => {
     // Rete di sicurezza: se per qualche motivo l'animazione non parte, non
     // blocchiamo il turno.
