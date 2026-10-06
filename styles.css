@@ -597,6 +597,29 @@ button.btn-primary:hover {
   z-index: -1;
 }
 
+/* 🔹 Prolungamento laterale dello sfondo: copie speculari ai due lati (si
+   raccordano senza stacchi) perché l'inquadratura sul personaggio resta
+   centrata anche sulle colonne laterali, oltre il bordo dello sfondo. */
+.game-background::before,
+.game-background::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-image: inherit;
+  background-size: cover;
+  background-position: center;
+}
+.game-background::before {
+  right: 100%;
+  transform: scaleX(-1);
+}
+.game-background::after {
+  left: 100%;
+  transform: scaleX(-1);
+}
+
 /* 🔹 Le 4 icone di menu della schermata di gioco (Obiettivi/Personaggi/
    Tutorial/Impostazioni): stesso principio di .nav-overlay sopra, fuori da
    .game-screen e quindi immuni sia allo scale-to-fit di .game-fit sia ai

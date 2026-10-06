@@ -9045,9 +9045,13 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
     cy = clampCentro(cy, bgTop, bgRect.height, halfH);
   }
 
+  // 🔹 Inquadratura sul personaggio: SEMPRE centrata in orizzontale (anche
+  // sulle colonne laterali); ai lati lo sfondo è prolungato con copie
+  // speculari (vedi .game-background::before/::after). Il clamp orizzontale
+  // resta solo per la camera libera (opts.centro).
   const gridRect = griglia.getBoundingClientRect();
   const gridLeft = gridRect.left - gsRect.left;
-  cx = clampCentro(cx, gridLeft, gridRect.width, halfW);
+  if (opts.centro) cx = clampCentro(cx, gridLeft, gridRect.width, halfW);
 
   // 🔹 Vincolo anche sullo SFONDO in orizzontale, dopo quello sulla griglia:
   // a zoom bassi (camera libera, vedi abilitaNavigazioneTabellone) una
@@ -9055,7 +9059,7 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
   // schermi piccoli, dove sbordando a destra del proprio box), porterebbe il
   // centro fuori asse e scoprirebbe il nero ai lati. Alla zoom fissa del
   // personaggio (1.7x) questo secondo clamp non interviene.
-  if (bgRect) {
+  if (bgRect && opts.centro) {
     const bgLeft = bgRect.left - gsRect.left;
     cx = clampCentro(cx, bgLeft, bgRect.width, halfW);
   }
