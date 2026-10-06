@@ -8998,7 +8998,7 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
   // di sconfinare oltre i bordi reali dello sfondo (bug osservato in test:
   // bordo inferiore dello sfondo che non arrivava in fondo allo schermo).
   // 🔹 Zoom standard (quando il chiamante non ne passa uno): inquadra
-  // 3 luoghi di raggio in orizzontale (7 colonne) e il piano del personaggio
+  // 2 luoghi di raggio in orizzontale (5 colonne) e il piano del personaggio
   // più uno sopra e uno sotto (3 righe), con mezzo "vuoto" di margine. Passo
   // e dimensione delle carte sono misurati dal DOM (px piatti).
   if (s === null) {
@@ -9013,7 +9013,7 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
     );
     const passoX = passo(rettangoli.map((r) => r.left), elRect.width * (170 / 120));
     const passoY = passo(rettangoli.map((r) => r.top), elRect.height * (150 / 80));
-    const larghezzaVista = 6 * passoX + elRect.width + (passoX - elRect.width);
+    const larghezzaVista = 4 * passoX + elRect.width + (passoX - elRect.width);
     const altezzaVista = 2 * passoY + elRect.height + (passoY - elRect.height);
     s = Math.min(
       ZOOM_CAMERA_MAX,
