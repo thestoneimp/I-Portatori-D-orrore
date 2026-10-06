@@ -8958,7 +8958,7 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
   if (!cartaCella) return;
 
   const durata = Number.isFinite(opts.durata) ? opts.durata : 900;
-  const s = Number.isFinite(opts.zoom) ? opts.zoom : 1.7;
+  let s = Number.isFinite(opts.zoom) ? opts.zoom : null;
   const easing = opts.easing || "ease";
   const viewport = opts.viewportEl || gameScreen;
 
@@ -8997,6 +8997,32 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
   // sottostimerebbe il margine di sicurezza e permetterebbe all'inquadratura
   // di sconfinare oltre i bordi reali dello sfondo (bug osservato in test:
   // bordo inferiore dello sfondo che non arrivava in fondo allo schermo).
+  // 🔹 Zoom standard (quando il chiamante non ne passa uno): inquadra
+  // 3 luoghi di raggio in orizzontale (7 colonne) e il piano del personaggio
+  // più uno sopra e uno sotto (3 righe), con mezzo "vuoto" di margine. Passo
+  // e dimensione delle carte sono misurati dal DOM (px piatti).
+  if (s === null) {
+    const passo = (valori, ripiego) => {
+      const v = [...new Set(valori.map((n) => Math.round(n)))].sort((a, b) => a - b);
+      let minimo = Infinity;
+      for (let i = 1; i < v.length; i++) minimo = Math.min(minimo, v[i] - v[i - 1]);
+      return Number.isFinite(minimo) && minimo > elRect.width * 0.5 ? minimo : ripiego;
+    };
+    const rettangoli = [...griglia.querySelectorAll(".carta-tabellone[data-codice]")].map((el) =>
+      el.getBoundingClientRect()
+    );
+    const passoX = passo(rettangoli.map((r) => r.left), elRect.width * (170 / 120));
+    const passoY = passo(rettangoli.map((r) => r.top), elRect.height * (150 / 80));
+    const larghezzaVista = 6 * passoX + elRect.width + (passoX - elRect.width);
+    const altezzaVista = 2 * passoY + elRect.height + (passoY - elRect.height);
+    s = Math.min(
+      ZOOM_CAMERA_MAX,
+      Math.max(
+        ZOOM_CAMERA_MIN,
+        Math.min(window.innerWidth / larghezzaVista, window.innerHeight / altezzaVista)
+      )
+    );
+  }
   const halfW = window.innerWidth / (2 * s);
   const halfH = window.innerHeight / (2 * s);
 
