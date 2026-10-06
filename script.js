@@ -7345,6 +7345,9 @@ function scegliObiettivoMinaccia(minaccia) {
   if (!pos) return null;
   dimenticaLuogoRaggiunto(minaccia, pos);
   segnaLuogoVuoto(minaccia, pos);
+  // L'obiettivo "casuale" (piano) dura finché non lo si raggiunge, non lo
+  // sostituisce un obiettivo primario o non diventa inaccessibile.
+  if (minaccia.obiettivoCasuale === pos) minaccia.obiettivoCasuale = null;
 
   const dist = distanzeRealiDa(pos);
   aggiornaLuoghiInaccessibili(minaccia, pos, dist);
@@ -7365,6 +7368,7 @@ function scegliObiettivoMinaccia(minaccia) {
         ? precedente.luogo
         : migliori[Math.floor(Math.random() * migliori.length)];
     minaccia.obiettivoScelto = { tipo, luogo };
+    if (tipo !== "esplorazione") minaccia.obiettivoCasuale = null;
     return { tipo, luogo };
   };
 
@@ -7373,7 +7377,10 @@ function scegliObiettivoMinaccia(minaccia) {
   // 1) Designata in vista
   if (designata && memoria[designata]?.vista) {
     const luogo = gameData.posizioniPersonaggi[designata];
-    if (dist[luogo] !== undefined) return { tipo: "vittima", luogo };
+    if (dist[luogo] !== undefined) {
+      minaccia.obiettivoCasuale = null;
+      return { tipo: "vittima", luogo };
+    }
   }
   // 2) Ipotesi sulla designata
   if (designata) {
@@ -7417,6 +7424,7 @@ function scegliObiettivoMinaccia(minaccia) {
   if (minaccia.obiettivoCasuale && ancoraValido(minaccia.obiettivoCasuale)) {
     return { tipo: "piano", luogo: minaccia.obiettivoCasuale };
   }
+  minaccia.obiettivoCasuale = null;
   const piani = tutti.filter((c) => c.posizione).map((c) => c.posizione.y);
   const distanzaMassimaPiani = Math.max(
     carta.posizione.y - Math.min(...piani),
@@ -7491,7 +7499,6 @@ function muoviMinacciaDiUnPasso(minaccia, da, a) {
 }
 
 async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
-  minaccia.obiettivoCasuale = null;
   minaccia.obiettivoScelto = null;
   let punti = minaccia.movimento ?? 0;
   let passi = 0;
