@@ -9049,30 +9049,14 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
     cy = clampCentro(cy, bgTop, bgRect.height, halfH);
   }
 
-  // 🔹 Ai lati lo sfondo è prolungato con copie speculari (vedi
-  // .game-background::before/::after). Il clamp alla griglia resta per la
-  // camera libera (opts.centro); per il personaggio vale il limite di una
-  // colonna oltre le carte (più sotto).
-  const gridRect = griglia.getBoundingClientRect();
-  const gridLeft = gridRect.left - gsRect.left;
-  if (opts.centro) cx = clampCentro(cx, gridLeft, gridRect.width, halfW);
-  // Inquadratura sul personaggio: si vede al massimo UNA colonna oltre le
-  // carte più laterali (lo sfondo è prolungato con copie speculari).
-  if (!opts.centro && Number.isFinite(passoX)) {
+  // 🔹 Limite orizzontale valido anche per la camera libera (trascinamento/
+  // zoom): si vede al massimo UNA colonna oltre le carte più laterali (ai lati
+  // lo sfondo è prolungato con copie speculari, vedi .game-background::before/
+  // ::after). Così il punto di partenza del gesto coincide con l'inquadratura.
+  if (Number.isFinite(passoX)) {
     const minCx = carteSinistra - passoX + halfW;
     const maxCx = carteDestra + passoX - halfW;
     cx = minCx > maxCx ? (carteSinistra + carteDestra) / 2 : Math.min(Math.max(cx, minCx), maxCx);
-  }
-
-  // 🔹 Vincolo anche sullo SFONDO in orizzontale, dopo quello sulla griglia:
-  // a zoom bassi (camera libera, vedi abilitaNavigazioneTabellone) una
-  // griglia più stretta della finestra, o non centrata in essa (succede su
-  // schermi piccoli, dove sbordando a destra del proprio box), porterebbe il
-  // centro fuori asse e scoprirebbe il nero ai lati. Alla zoom fissa del
-  // personaggio (1.7x) questo secondo clamp non interviene.
-  if (bgRect && opts.centro) {
-    const bgLeft = bgRect.left - gsRect.left;
-    cx = clampCentro(cx, bgLeft, bgRect.width, halfW);
   }
 
   const scalaGameFit = ottieniScalaGameFit();
