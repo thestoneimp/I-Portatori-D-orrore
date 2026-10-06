@@ -6439,6 +6439,22 @@ function aggiornaPercezioneMinaccia(minaccia) {
       // muoversi (porta chiusa tra i due), quindi l'ipotesi è l'ultimo luogo
       // in cui l'ha avvistata.
       posizioneIpotizzata = precedente.ultimaPosizioneNota;
+      // 🧠 Intelligenza 3: conosce il movimento della vittima, quindi capisce
+      // se la porta è stata chiusa PRIMA o DOPO il suo movimento. Dopo: è
+      // sicuramente ancora lì (ipotesi già impostata). Prima (fase dei
+      // giocatori, movimento di quel turno non ancora usato): potrebbe
+      // raggiungere tutti i luoghi entro il movimento che ha memorizzato.
+      // Nella fase delle minacce nessuna vittima si muove: è ferma lì.
+      if (
+        (minaccia.intelligenza ?? 0) >= 3 &&
+        faseCorrente === "giocatori" &&
+        gameData.movimentoUsato?.[idVittima] !== true
+      ) {
+        const budget = Math.max(minaccia.movimentoAppreso?.[idVittima] || 0, 1);
+        posizioniIpotizzate = Object.keys(
+          calcolaLuoghiRaggiungibili(posizioneIpotizzata, budget)
+        );
+      }
     } else {
       const cartaUltima = gameData.tabelloneAttivo.find(
         (c) => c.codice === precedente.ultimaPosizioneNota
@@ -7388,27 +7404,52 @@ function scegliObiettivoMinaccia(minaccia) {
   const r5 = piuVicino(delPiano, "esplorazione");
   if (r5) return r5;
 
-  // 6) Piano esaurito: va verso il piano adiacente con più luoghi ancora da
-  //    esplorare (raggiungibili, non vuoti né inaccessibili). A parità, a caso;
-  //    la scelta resta per tutto il turno finché valida.
+  // 6) Piano esaurito: cerca il piano più vicino (adiacenti, poi quelli
+  //    adiacenti a questi, e così via) con luoghi ancora da esplorare
+  //    (raggiungibili, non vuoti né inaccessibili): a pari distanza di piano
+  //    quello con più luoghi, a parità ancora a caso. La scelta resta per
+  //    tutto il turno finché valida.
+  const tutti = gameData.tabelloneAttivo || [];
   const ancoraValido = (cod) => {
-    const c = (gameData.tabelloneAttivo || []).find((x) => x.codice === cod);
+    const c = tutti.find((x) => x.codice === cod);
     return c && cod !== pos && dist[cod] !== undefined && daEsplorare(c);
   };
   if (minaccia.obiettivoCasuale && ancoraValido(minaccia.obiettivoCasuale)) {
     return { tipo: "piano", luogo: minaccia.obiettivoCasuale };
   }
-  const perPiano = [carta.posizione.y - 1, carta.posizione.y + 1]
-    .map((y) =>
-      (gameData.tabelloneAttivo || []).filter(
-        (c) => daEsplorare(c) && c.posizione.y === y && dist[c.codice] !== undefined
-      )
-    )
-    .filter((celle) => celle.length > 0);
-  if (perPiano.length === 0) return null;
-  const massimo = Math.max(...perPiano.map((celle) => celle.length));
-  const migliori = perPiano.filter((celle) => celle.length === massimo);
-  const celle = migliori[Math.floor(Math.random() * migliori.length)];
+  const piani = tutti.filter((c) => c.posizione).map((c) => c.posizione.y);
+  const distanzaMassimaPiani = Math.max(
+    carta.posizione.y - Math.min(...piani),
+    Math.max(...piani) - carta.posizione.y
+  );
+  const cercaPiano = () => {
+    for (let d = 1; d <= distanzaMassimaPiani; d++) {
+      const perPiano = [carta.posizione.y - d, carta.posizione.y + d]
+        .map((y) =>
+          tutti.filter(
+            (c) => daEsplorare(c) && c.posizione.y === y && dist[c.codice] !== undefined
+          )
+        )
+        .filter((celle) => celle.length > 0);
+      if (perPiano.length === 0) continue;
+      const massimo = Math.max(...perPiano.map((celle) => celle.length));
+      const migliori = perPiano.filter((celle) => celle.length === massimo);
+      return migliori[Math.floor(Math.random() * migliori.length)];
+    }
+    return null;
+  };
+  let celle = cercaPiano();
+  if (!celle) {
+    // Nessun piano ha più luoghi da esplorare: dimentica i luoghi vuoti di
+    // tutti i piani tranne quello in cui si trova (appena esplorato) e riprova.
+    minaccia.luoghiVuoti = (minaccia.luoghiVuoti || []).filter(
+      (cod) => tutti.find((c) => c.codice === cod)?.posizione?.y === carta.posizione.y
+    );
+    vuoti.clear();
+    minaccia.luoghiVuoti.forEach((cod) => vuoti.add(cod));
+    celle = cercaPiano();
+  }
+  if (!celle) return null;
   const minDist = Math.min(...celle.map((c) => dist[c.codice]));
   const vicine = celle.filter((c) => dist[c.codice] === minDist);
   minaccia.obiettivoCasuale =
