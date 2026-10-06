@@ -8997,22 +8997,26 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
   // sottostimerebbe il margine di sicurezza e permetterebbe all'inquadratura
   // di sconfinare oltre i bordi reali dello sfondo (bug osservato in test:
   // bordo inferiore dello sfondo che non arrivava in fondo allo schermo).
+  // 🔹 Misure del tabellone (px piatti): passo orizzontale/verticale fra
+  // le carte e estensione orizzontale delle carte vere.
+  const passo = (valori, ripiego) => {
+    const v = [...new Set(valori.map((n) => Math.round(n)))].sort((a, b) => a - b);
+    let minimo = Infinity;
+    for (let i = 1; i < v.length; i++) minimo = Math.min(minimo, v[i] - v[i - 1]);
+    return Number.isFinite(minimo) && minimo > elRect.width * 0.5 ? minimo : ripiego;
+  };
+  const rettangoli = [...griglia.querySelectorAll(".carta-tabellone[data-codice]")].map((el) =>
+    el.getBoundingClientRect()
+  );
+  const passoX = passo(rettangoli.map((r) => r.left), elRect.width * (170 / 120));
+  const passoY = passo(rettangoli.map((r) => r.top), elRect.height * (150 / 80));
+  const carteSinistra = Math.min(...rettangoli.map((r) => r.left)) - gsRect.left;
+  const carteDestra = Math.max(...rettangoli.map((r) => r.right)) - gsRect.left;
+
   // 🔹 Zoom standard (quando il chiamante non ne passa uno): inquadra
   // 2 luoghi di raggio in orizzontale (5 colonne) e il piano del personaggio
-  // più uno sopra e uno sotto (3 righe), con mezzo "vuoto" di margine. Passo
-  // e dimensione delle carte sono misurati dal DOM (px piatti).
+  // più uno sopra e uno sotto (3 righe), con mezzo "vuoto" di margine.
   if (s === null) {
-    const passo = (valori, ripiego) => {
-      const v = [...new Set(valori.map((n) => Math.round(n)))].sort((a, b) => a - b);
-      let minimo = Infinity;
-      for (let i = 1; i < v.length; i++) minimo = Math.min(minimo, v[i] - v[i - 1]);
-      return Number.isFinite(minimo) && minimo > elRect.width * 0.5 ? minimo : ripiego;
-    };
-    const rettangoli = [...griglia.querySelectorAll(".carta-tabellone[data-codice]")].map((el) =>
-      el.getBoundingClientRect()
-    );
-    const passoX = passo(rettangoli.map((r) => r.left), elRect.width * (170 / 120));
-    const passoY = passo(rettangoli.map((r) => r.top), elRect.height * (150 / 80));
     const larghezzaVista = 4 * passoX + elRect.width + (passoX - elRect.width);
     const altezzaVista = 2 * passoY + elRect.height + (passoY - elRect.height);
     s = Math.min(
@@ -9045,13 +9049,20 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
     cy = clampCentro(cy, bgTop, bgRect.height, halfH);
   }
 
-  // 🔹 Inquadratura sul personaggio: SEMPRE centrata in orizzontale (anche
-  // sulle colonne laterali); ai lati lo sfondo è prolungato con copie
-  // speculari (vedi .game-background::before/::after). Il clamp orizzontale
-  // resta solo per la camera libera (opts.centro).
+  // 🔹 Ai lati lo sfondo è prolungato con copie speculari (vedi
+  // .game-background::before/::after). Il clamp alla griglia resta per la
+  // camera libera (opts.centro); per il personaggio vale il limite di una
+  // colonna oltre le carte (più sotto).
   const gridRect = griglia.getBoundingClientRect();
   const gridLeft = gridRect.left - gsRect.left;
   if (opts.centro) cx = clampCentro(cx, gridLeft, gridRect.width, halfW);
+  // Inquadratura sul personaggio: si vede al massimo UNA colonna oltre le
+  // carte più laterali (lo sfondo è prolungato con copie speculari).
+  if (!opts.centro && Number.isFinite(passoX)) {
+    const minCx = carteSinistra - passoX + halfW;
+    const maxCx = carteDestra + passoX - halfW;
+    cx = minCx > maxCx ? (carteSinistra + carteDestra) / 2 : Math.min(Math.max(cx, minCx), maxCx);
+  }
 
   // 🔹 Vincolo anche sullo SFONDO in orizzontale, dopo quello sulla griglia:
   // a zoom bassi (camera libera, vedi abilitaNavigazioneTabellone) una
