@@ -6732,7 +6732,21 @@ function bloccaMovimentoTraCarte(cartaA, cartaB) {
     const traY =
       Math.abs(pos.y - (ay + by) / 2) < 0.01 && pos.x === ax && ax === bx;
 
-    return traX || traY;
+    if (!(traX || traY)) return false;
+
+    // 🪟 Le minacce (qualunque intelligenza) attraversano le finestre APERTE
+    // o ROTTE che separano l'interno della casa dal giardino (piano terra).
+    // Non vale per finestre chiuse/bloccate/con sbarre né per quelle dei
+    // piani superiori (lì dall'altra parte non c'è un giardino).
+    const nomeStruttura = struttura.nome || def.nome;
+    const finestraPraticabile =
+      nomeStruttura === "Finestra Aperta" || nomeStruttura === "Finestra Rotta";
+    const casaGiardino =
+      (cartaA.piano === "casa" && cartaB.piano === "giardino") ||
+      (cartaA.piano === "giardino" && cartaB.piano === "casa");
+    if (finestraPraticabile && casaGiardino) return false;
+
+    return true;
   });
 }
 
