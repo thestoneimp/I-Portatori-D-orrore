@@ -1957,8 +1957,6 @@ function faseMinacce() {
   // rumore↔vittima entro un certo numero di fasi, vedi associaRumoriRecenti).
   gameData.turnoMinacceAttuale = (gameData.turnoMinacceAttuale || 0) + 1;
 
-  // Qui in futuro: azioni delle minacce...
-
   // 🔹 Fine turni disponibili → sconfitta
   if (gameData.turniRimanenti <= 0) {
     mostraSconfitta();
@@ -1968,6 +1966,14 @@ function faseMinacce() {
   gameData.turniCompletati = []; // Reset turni
   gameData.movimentoUsato = {}; // Reset movimento: nuovo round, nuovo movimento per tutti
   gameData.inizioFase = true;
+
+  // 👹 Turno delle minacce (movimento). Il pulsante "Termina Turno" resta
+  // disattivato finché non hanno finito: poi si passa ai giocatori come prima.
+  eseguiTurnoMinacce().catch((e) => {
+    console.error("[eseguiTurnoMinacce]", e);
+    const btn = document.getElementById("btnAvanzaTurno");
+    if (btn) btn.disabled = false;
+  });
 }
 
 // === DIAGNOSTICA TABELLONE (log compatto e ordinato) ===
@@ -5574,6 +5580,7 @@ function mostraPopupGenerico({
   });
 
   document.body.appendChild(popup);
+  return popup;
 }
 
 function costruisciMappaNavigabile() {
@@ -5822,6 +5829,7 @@ function muoviPersonaggioConAnimazione(
     durataStepMs = 400,
     onComplete,
     autoEsplora = true,
+    seguiCamera = false, // le minacce nel loro turno: la camera le segue
   } = opzioni;
 
   // 👹 Solo i personaggi dei giocatori possono "esplorare" un luogo. Le
@@ -6022,7 +6030,7 @@ function muoviPersonaggioConAnimazione(
     // concorrente evita di reintrodurre il conflitto fra due inquadrature
     // in rapida successione già corretto in precedenza.
     if (
-      nomePersonaggio === gameData.pgAttivo &&
+      (nomePersonaggio === gameData.pgAttivo || seguiCamera) &&
       typeof impostaInquadraturaPersonaggio === "function"
     ) {
       impostaInquadraturaPersonaggio(nomePersonaggio, {
@@ -6454,13 +6462,13 @@ function aggiornaPercezioneMinaccia(minaccia) {
               ? "salito"
               : "sceso";
           motivo = `Ha ${direzione} le scale`;
-          // 🧠 Intelligenza >= 1: sa dedurre dove portano le scale che ha
-          // visto l'ultima volta — l'ipotesi coincide col luogo collegato,
-          // che è un dato di gioco noto (la scala porta lì e basta), non un
-          // "barare" leggendo la posizione reale della vittima.
-          if ((minaccia.intelligenza ?? 0) >= 1) {
-            posizioneIpotizzata = cellaAttuale;
-          }
+          // 🧠 Qualunque intelligenza (anche 0, altrimenti non potrebbe
+          // inseguire una vittima che scappa tra un piano e l'altro): sa
+          // dedurre dove portano le scale che ha visto l'ultima volta —
+          // l'ipotesi coincide col luogo collegato, che è un dato di gioco
+          // noto (la scala porta lì e basta), non un "barare" leggendo la
+          // posizione reale della vittima.
+          posizioneIpotizzata = cellaAttuale;
         } else {
           motivo = "Ha cambiato piano tramite una finestra";
           // 🧠 Intelligenza >= 2: sa che una finestra porta sempre al piano
@@ -7097,6 +7105,292 @@ function generaRumore(codiceCartaOrigine, valorePropagazione, opts = {}) {
       turno: gameData.turnoMinacceAttuale || 0,
     });
   });
+}
+
+// ============================
+// 📌 TURNO DELLE MINACCE: MOVIMENTO (regole comuni a tutte le minacce)
+// ============================
+// 1) Nella fase minacce ogni minaccia ha un proprio turno, con un solo
+//    movimento (future abilità potranno derogare).
+// 2) Ordine: movimento decrescente (a parità, casuale).
+// 3) Si muove UN PASSO ALLA VOLTA, ricalcolando l'obiettivo dopo ogni passo,
+//    finché non raggiunge un luogo con una vittima o finisce i punti
+//    movimento (1 per passo, scale comprese).
+// 4) Obiettivo, in ordine: vittima designata in vista → luogo ipotizzato più
+//    vicino della designata → luogo ipotizzato più vicino di qualunque
+//    vittima → luogo di un rumore udito più vicino → piano adiacente a caso.
+//    "Vicino" = passi reali (sbarramenti reali inclusi). A parità di
+//    distanza si sceglie a caso, e la scelta resta finché è valida.
+// Ogni passaggio del turno è un messaggio che l'utente deve chiudere, per
+// poter riprodurre le mosse sul tabellone reale.
+let sequenzaMinacceId = 0;
+
+const pausaMs = (ms) => new Promise((risolvi) => setTimeout(risolvi, ms));
+
+function attendiPopupChiusi(idSequenza) {
+  return new Promise((risolvi) => {
+    const controlla = () => {
+      if (
+        idSequenza !== sequenzaMinacceId ||
+        (!document.querySelector(".popup") &&
+          !document.getElementById("overlayfase"))
+      ) {
+        risolvi();
+      } else {
+        setTimeout(controlla, 250);
+      }
+    };
+    controlla();
+  });
+}
+
+// Mostra un messaggio e si risolve quando l'utente lo chiude (o se il popup
+// sparisce per altre cause).
+function messaggioTurnoMinaccia(titolo, messaggio) {
+  return new Promise((risolvi) => {
+    let chiuso = false;
+    const fine = () => {
+      if (chiuso) return;
+      chiuso = true;
+      clearInterval(sorveglia);
+      risolvi();
+    };
+    const popup = mostraPopupGenerico({
+      titolo,
+      messaggio,
+      pulsanti: [
+        {
+          testo: "Avanti",
+          azione: (btn, p) => {
+            chiudiPopupSelettivo(p);
+            fine();
+          },
+        },
+      ],
+    });
+    const sorveglia = setInterval(() => {
+      if (!popup.isConnected) fine();
+    }, 300);
+  });
+}
+
+function distanzeRealiDa(codice) {
+  return calcolaLuoghiRaggiungibili(
+    codice,
+    (gameData.tabelloneAttivo || []).length || 1
+  );
+}
+
+function vittimaNelLuogo(codice) {
+  return elencoPotenzialiVittime().some(
+    (id) => gameData.posizioniPersonaggi[id] === codice
+  );
+}
+
+function luoghiIpotizzatiDa(voceMemoria) {
+  if (!voceMemoria || voceMemoria.vista) return [];
+  if (voceMemoria.posizioniIpotizzate?.length) {
+    return voceMemoria.posizioniIpotizzate;
+  }
+  return voceMemoria.posizioneIpotizzata ? [voceMemoria.posizioneIpotizzata] : [];
+}
+
+// La minaccia è arrivata in "codice" e non ha trovato nessuno (se ci fosse
+// stata una vittima in vista, l'ipotesi sarebbe già stata riscritta): ipotesi
+// e rumori riferiti a quel luogo vengono dimenticati.
+function dimenticaLuogoRaggiunto(minaccia, codice) {
+  Object.values(minaccia.memoriaVittime || {}).forEach((voce) => {
+    if (voce.vista) return;
+    if (voce.posizioneIpotizzata === codice) voce.posizioneIpotizzata = null;
+    if (Array.isArray(voce.posizioniIpotizzate)) {
+      voce.posizioniIpotizzate = voce.posizioniIpotizzate.filter(
+        (l) => l !== codice
+      );
+      if (voce.posizioniIpotizzate.length === 0) voce.posizioniIpotizzate = null;
+    }
+  });
+  minaccia.memoriaRumori = (minaccia.memoriaRumori || []).filter(
+    (r) => !(Array.isArray(r.luogo) ? r.luogo : [r.luogo]).includes(codice)
+  );
+}
+
+// Restituisce { tipo, luogo } oppure null se non c'è nessun obiettivo.
+function scegliObiettivoMinaccia(minaccia) {
+  const pos = gameData.posizioniPersonaggi[minaccia.id];
+  if (!pos) return null;
+  dimenticaLuogoRaggiunto(minaccia, pos);
+
+  const dist = distanzeRealiDa(pos);
+  const memoria = minaccia.memoriaVittime || {};
+
+  // Tra i luoghi raggiungibili, il/i più vicino/i; a parità si sceglie a
+  // caso, mantenendo la scelta già fatta se ancora tra i migliori.
+  const piuVicino = (luoghi, tipo) => {
+    const raggiungibili = [...new Set(luoghi)].filter(
+      (l) => dist[l] !== undefined
+    );
+    if (raggiungibili.length === 0) return null;
+    const minimo = Math.min(...raggiungibili.map((l) => dist[l]));
+    const migliori = raggiungibili.filter((l) => dist[l] === minimo);
+    const precedente = minaccia.obiettivoScelto;
+    const luogo =
+      precedente && precedente.tipo === tipo && migliori.includes(precedente.luogo)
+        ? precedente.luogo
+        : migliori[Math.floor(Math.random() * migliori.length)];
+    minaccia.obiettivoScelto = { tipo, luogo };
+    return { tipo, luogo };
+  };
+
+  const designata = minaccia.vittimaDesignata;
+
+  // 1) Designata in vista
+  if (designata && memoria[designata]?.vista) {
+    const luogo = gameData.posizioniPersonaggi[designata];
+    if (dist[luogo] !== undefined) return { tipo: "vittima", luogo };
+  }
+  // 2) Ipotesi sulla designata
+  if (designata) {
+    const r = piuVicino(luoghiIpotizzatiDa(memoria[designata]), "ipotesi");
+    if (r) return r;
+  }
+  // 3) Ipotesi su qualunque vittima
+  const ipotesi = Object.values(memoria).flatMap(luoghiIpotizzatiDa);
+  const r3 = piuVicino(ipotesi, "ipotesi");
+  if (r3) return r3;
+  // 4) Rumori uditi
+  const luoghiRumori = (minaccia.memoriaRumori || []).flatMap((r) =>
+    Array.isArray(r.luogo) ? r.luogo : [r.luogo]
+  );
+  const r4 = piuVicino(luoghiRumori, "rumore");
+  if (r4) return r4;
+  // 5) Piano adiacente a caso (scelto una volta per turno, finché valido)
+  const carta = (gameData.tabelloneAttivo || []).find((c) => c.codice === pos);
+  if (!carta?.posizione) return null;
+  if (
+    minaccia.obiettivoCasuale &&
+    minaccia.obiettivoCasuale !== pos &&
+    dist[minaccia.obiettivoCasuale] !== undefined
+  ) {
+    return { tipo: "piano", luogo: minaccia.obiettivoCasuale };
+  }
+  const candidati = (gameData.tabelloneAttivo || []).filter(
+    (c) =>
+      c.posizione &&
+      dist[c.codice] !== undefined &&
+      Math.abs(c.posizione.y - carta.posizione.y) === 1
+  );
+  if (candidati.length === 0) return null;
+  const piani = [...new Set(candidati.map((c) => c.posizione.y))];
+  const piano = piani[Math.floor(Math.random() * piani.length)];
+  const sulPiano = candidati.filter((c) => c.posizione.y === piano);
+  minaccia.obiettivoCasuale =
+    sulPiano[Math.floor(Math.random() * sulPiano.length)].codice;
+  return { tipo: "piano", luogo: minaccia.obiettivoCasuale };
+}
+
+// Prossima carta lungo un percorso minimo verso l'obiettivo (stesse regole
+// di raggiungibilità di calcolaLuoghiRaggiungibili), oppure null.
+function prossimoPassoMinaccia(minaccia, luogoObiettivo) {
+  const pos = gameData.posizioniPersonaggi[minaccia.id];
+  const dallObiettivo = distanzeRealiDa(luogoObiettivo);
+  const dPos = dallObiettivo[pos];
+  if (dPos === undefined || dPos === 0) return null;
+  const vicini = calcolaLuoghiRaggiungibili(pos, 1);
+  return (
+    Object.keys(vicini).find(
+      (c) => vicini[c] === 1 && dallObiettivo[c] === dPos - 1
+    ) || null
+  );
+}
+
+function muoviMinacciaDiUnPasso(minaccia, da, a) {
+  return new Promise((risolvi) => {
+    // Rete di sicurezza: se per qualche motivo l'animazione non parte, non
+    // blocchiamo il turno.
+    const sicurezza = setTimeout(risolvi, 3000);
+    muoviPersonaggioConAnimazione(minaccia.id, [da, a], {
+      durataStepMs: 600,
+      autoEsplora: false,
+      seguiCamera: true,
+      onComplete: () => {
+        clearTimeout(sicurezza);
+        risolvi();
+      },
+    });
+  });
+}
+
+async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
+  minaccia.obiettivoCasuale = null;
+  minaccia.obiettivoScelto = null;
+  let punti = minaccia.movimento ?? 0;
+  let passi = 0;
+
+  while (punti > 0) {
+    if (idSequenza !== sequenzaMinacceId) return;
+    const pos = gameData.posizioniPersonaggi[minaccia.id];
+    if (vittimaNelLuogo(pos)) break;
+    const obiettivo = scegliObiettivoMinaccia(minaccia);
+    if (!obiettivo) break;
+    const prossimo = prossimoPassoMinaccia(minaccia, obiettivo.luogo);
+    if (!prossimo) break;
+
+    if (passi === 0) {
+      await messaggioTurnoMinaccia(
+        minaccia.nome,
+        `<b>${minaccia.nome}</b> compie un movimento.`
+      );
+      await pausaMs(350);
+      if (idSequenza !== sequenzaMinacceId) return;
+    }
+    await muoviMinacciaDiUnPasso(minaccia, pos, prossimo);
+    passi++;
+    punti--;
+  }
+}
+
+async function eseguiTurnoMinacce() {
+  const idSequenza = ++sequenzaMinacceId;
+  const attive = (gameData.minacceAttive || []).filter(
+    (m) => gameData.posizioniPersonaggi[m.id]
+  );
+  if (attive.length === 0) return;
+
+  const btnTurno = document.getElementById("btnAvanzaTurno");
+  if (btnTurno) btnTurno.disabled = true;
+
+  try {
+    // Più veloce per prima; a parità, ordine casuale.
+    const ordine = attive
+      .map((m) => ({ m, r: Math.random() }))
+      .sort((a, b) => (b.m.movimento ?? 0) - (a.m.movimento ?? 0) || a.r - b.r)
+      .map((x) => x.m);
+
+    // Aspetta il banner di fase (3s) e gli eventuali popup degli eventi.
+    await pausaMs(3200);
+    await attendiPopupChiusi(idSequenza);
+
+    for (const m of ordine) {
+      const grigliaPresente = document.getElementById("grigliaPersonaggi");
+      if (idSequenza !== sequenzaMinacceId || !grigliaPresente) return;
+      if (!gameData.posizioniPersonaggi[m.id]) continue;
+
+      impostaInquadraturaPersonaggio(m.id, { durata: 900 });
+      await pausaMs(950);
+      await messaggioTurnoMinaccia(m.nome, `È il turno di <b>${m.nome}</b>.`);
+      await pausaMs(350);
+
+      await eseguiMovimentoMinaccia(m, idSequenza);
+      if (idSequenza !== sequenzaMinacceId) return;
+      // 🔜 Qui in futuro: abilità ("<nome> usa un'abilità").
+
+      await messaggioTurnoMinaccia(m.nome, `<b>${m.nome}</b> termina il turno.`);
+      await pausaMs(350);
+    }
+    resetZoom(); // senza personaggio attivo: torna alla vista d'insieme
+  } finally {
+    if (idSequenza === sequenzaMinacceId && btnTurno) btnTurno.disabled = false;
+  }
 }
 
 function spawnMinacciaTest() {
