@@ -6177,6 +6177,10 @@ function creaMinaccia(definizioneOCodice, codiceCartaIniziale, opts = {}) {
     memoriaVittime: {},
     // Log dei rumori percepiti: [{ luogo, valore, descrizione }, ...]
     memoriaRumori: [],
+    // Luoghi in cui è arrivata e non c'erano vittime / luoghi del proprio
+    // piano che non riesce a raggiungere per colpa di uno sbarramento.
+    luoghiVuoti: [],
+    luoghiInaccessibili: [],
   };
 
   gameData.minacceAttive.push(istanza);
@@ -6431,6 +6435,10 @@ function aggiornaPercezioneMinaccia(minaccia) {
     let posizioniIpotizzate = null; // insieme esteso, solo intelligenza >= 3
     if (cellaAttuale === precedente.ultimaPosizioneNota) {
       motivo = "Uno sbarramento ha interrotto la linea di vista";
+      // 🧠 Qualunque intelligenza (anche 0): la vittima è sparita senza
+      // muoversi (porta chiusa tra i due), quindi l'ipotesi è l'ultimo luogo
+      // in cui l'ha avvistata.
+      posizioneIpotizzata = precedente.ultimaPosizioneNota;
     } else {
       const cartaUltima = gameData.tabelloneAttivo.find(
         (c) => c.codice === precedente.ultimaPosizioneNota
@@ -7289,13 +7297,41 @@ function dimenticaLuogoRaggiunto(minaccia, codice) {
   );
 }
 
+// La minaccia è in "codice" e non ci sono vittime: lo ricorda come vuoto.
+function segnaLuogoVuoto(minaccia, codice) {
+  minaccia.luoghiVuoti = minaccia.luoghiVuoti || [];
+  if (!vittimaNelLuogo(codice) && !minaccia.luoghiVuoti.includes(codice)) {
+    minaccia.luoghiVuoti.push(codice);
+  }
+}
+
+// Luoghi del piano in cui si trova che non riesce a raggiungere (sbarramenti):
+// li ricorda come inaccessibili. Quelli degli altri piani restano com'erano;
+// quelli del piano attuale sono rivalutati (se una porta si apre, tornano
+// raggiungibili e vengono dimenticati).
+function aggiornaLuoghiInaccessibili(minaccia, pos, dist) {
+  const tab = gameData.tabelloneAttivo || [];
+  const carta = tab.find((c) => c.codice === pos);
+  if (!carta?.posizione) return;
+  const y = carta.posizione.y;
+  const altrove = (minaccia.luoghiInaccessibili || []).filter(
+    (cod) => tab.find((c) => c.codice === cod)?.posizione?.y !== y
+  );
+  const ora = tab
+    .filter((c) => c.posizione && c.posizione.y === y && dist[c.codice] === undefined)
+    .map((c) => c.codice);
+  minaccia.luoghiInaccessibili = [...altrove, ...ora];
+}
+
 // Restituisce { tipo, luogo } oppure null se non c'è nessun obiettivo.
 function scegliObiettivoMinaccia(minaccia) {
   const pos = gameData.posizioniPersonaggi[minaccia.id];
   if (!pos) return null;
   dimenticaLuogoRaggiunto(minaccia, pos);
+  segnaLuogoVuoto(minaccia, pos);
 
   const dist = distanzeRealiDa(pos);
+  aggiornaLuoghiInaccessibili(minaccia, pos, dist);
   const memoria = minaccia.memoriaVittime || {};
 
   // Tra i luoghi raggiungibili, il/i più vicino/i; a parità si sceglie a
@@ -7338,28 +7374,45 @@ function scegliObiettivoMinaccia(minaccia) {
   );
   const r4 = piuVicino(luoghiRumori, "rumore");
   if (r4) return r4;
-  // 5) Piano adiacente a caso (scelto una volta per turno, finché valido)
+  // 5) Esplorazione del piano: il luogo più vicino del piano in cui si trova
+  //    che non ricorda né vuoto né inaccessibile.
   const carta = (gameData.tabelloneAttivo || []).find((c) => c.codice === pos);
   if (!carta?.posizione) return null;
-  if (
-    minaccia.obiettivoCasuale &&
-    minaccia.obiettivoCasuale !== pos &&
-    dist[minaccia.obiettivoCasuale] !== undefined
-  ) {
+  const vuoti = new Set(minaccia.luoghiVuoti || []);
+  const inaccessibili = new Set(minaccia.luoghiInaccessibili || []);
+  const daEsplorare = (c) =>
+    c.posizione && !vuoti.has(c.codice) && !inaccessibili.has(c.codice);
+  const delPiano = (gameData.tabelloneAttivo || [])
+    .filter((c) => daEsplorare(c) && c.posizione.y === carta.posizione.y)
+    .map((c) => c.codice);
+  const r5 = piuVicino(delPiano, "esplorazione");
+  if (r5) return r5;
+
+  // 6) Piano esaurito: va verso il piano adiacente con più luoghi ancora da
+  //    esplorare (raggiungibili, non vuoti né inaccessibili). A parità, a caso;
+  //    la scelta resta per tutto il turno finché valida.
+  const ancoraValido = (cod) => {
+    const c = (gameData.tabelloneAttivo || []).find((x) => x.codice === cod);
+    return c && cod !== pos && dist[cod] !== undefined && daEsplorare(c);
+  };
+  if (minaccia.obiettivoCasuale && ancoraValido(minaccia.obiettivoCasuale)) {
     return { tipo: "piano", luogo: minaccia.obiettivoCasuale };
   }
-  const candidati = (gameData.tabelloneAttivo || []).filter(
-    (c) =>
-      c.posizione &&
-      dist[c.codice] !== undefined &&
-      Math.abs(c.posizione.y - carta.posizione.y) === 1
-  );
-  if (candidati.length === 0) return null;
-  const piani = [...new Set(candidati.map((c) => c.posizione.y))];
-  const piano = piani[Math.floor(Math.random() * piani.length)];
-  const sulPiano = candidati.filter((c) => c.posizione.y === piano);
+  const perPiano = [carta.posizione.y - 1, carta.posizione.y + 1]
+    .map((y) =>
+      (gameData.tabelloneAttivo || []).filter(
+        (c) => daEsplorare(c) && c.posizione.y === y && dist[c.codice] !== undefined
+      )
+    )
+    .filter((celle) => celle.length > 0);
+  if (perPiano.length === 0) return null;
+  const massimo = Math.max(...perPiano.map((celle) => celle.length));
+  const migliori = perPiano.filter((celle) => celle.length === massimo);
+  const celle = migliori[Math.floor(Math.random() * migliori.length)];
+  const minDist = Math.min(...celle.map((c) => dist[c.codice]));
+  const vicine = celle.filter((c) => dist[c.codice] === minDist);
   minaccia.obiettivoCasuale =
-    sulPiano[Math.floor(Math.random() * sulPiano.length)].codice;
+    vicine[Math.floor(Math.random() * vicine.length)].codice;
   return { tipo: "piano", luogo: minaccia.obiettivoCasuale };
 }
 
@@ -7422,6 +7475,7 @@ async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
     await muoviMinacciaDiUnPasso(minaccia, pos, prossimo);
     passi++;
     punti--;
+    segnaLuogoVuoto(minaccia, prossimo);
   }
 }
 
