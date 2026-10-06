@@ -5971,6 +5971,49 @@ function muoviPersonaggioConAnimazione(
         ? getCoordinateCarta(cellaTarget)
         : null;
 
+    // 🪟 Passo attraverso una finestra (stesso piano, es. casa ↔ giardino):
+    // effetto "si china" — la carta si abbassa, rimpicciolisce e s'inclina a
+    // metà passaggio, poi si raddrizza. Vale per chiunque (PG e minacce).
+    // Usa le proprietà CSS indipendenti scale/rotate/translate, che si
+    // compongono col transform a variabili senza toccarlo. Il passo dura
+    // almeno 1s per essere leggibile.
+    const cartaDaStep = gameData.tabelloneAttivo.find(
+      (c) => c.codice === percorso[i - 1]
+    );
+    const cartaAStep = gameData.tabelloneAttivo.find(
+      (c) => c.codice === cellaTarget
+    );
+    const sbarramentoStep =
+      cartaDaStep && cartaAStep
+        ? trovaSbarramentoTra(cartaDaStep, cartaAStep)
+        : null;
+    const traFinestra =
+      effetto !== "scavalcamento" &&
+      !!sbarramentoStep &&
+      /finestr/i.test(sbarramentoStep.struttura.nome) &&
+      cartaDaStep.posizione.y === cartaAStep.posizione.y;
+    const durataQuestoStep = traFinestra
+      ? Math.max(durataStepMs, 1000)
+      : durataStepMs;
+    const stepSecQuesto = durataQuestoStep / 1000;
+    cartaPG.style.transition = `left ${stepSecQuesto}s ease, top ${stepSecQuesto}s ease, transform ${stepSecQuesto}s ease`;
+
+    if (traFinestra && typeof cartaPG.animate === "function") {
+      const verso = Math.sign(cartaAStep.posizione.x - cartaDaStep.posizione.x) || 1;
+      const frames = [];
+      for (let k = 0; k <= 20; k++) {
+        const u = k / 20;
+        const g = Math.exp(-Math.pow((u - 0.5) / 0.13, 2));
+        frames.push({
+          offset: u,
+          scale: String(1 - 0.3 * g),
+          rotate: `${-18 * verso * g}deg`,
+          translate: `0px ${6 * g}px`,
+        });
+      }
+      cartaPG.animate(frames, { duration: durataQuestoStep, easing: "linear" });
+    }
+
     if (coords) {
       if (effetto === "scavalcamento") {
         // Effetto “salto” in 2 fasi + centratura offset al touchdown
@@ -6034,13 +6077,13 @@ function muoviPersonaggioConAnimazione(
       typeof impostaInquadraturaPersonaggio === "function"
     ) {
       impostaInquadraturaPersonaggio(nomePersonaggio, {
-        durata: durataStepMs,
+        durata: durataQuestoStep,
         easing: "linear",
       });
     }
 
     i++;
-    setTimeout(spostaStep, durataStepMs);
+    setTimeout(spostaStep, durataQuestoStep);
   }
 
   spostaStep();
