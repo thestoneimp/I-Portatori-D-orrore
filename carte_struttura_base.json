@@ -2,6 +2,7 @@
   {
     "codice": "S01",
     "nome": "Porta Chiusa",
+    "condizioniApertura": ["Nessuna"],
     "bloccante": "sì",
     "tipo": "sbarramento",
     "descrizione": "Blocca il passaggio tra due luoghi.",
@@ -67,6 +68,7 @@
   {
     "codice": "S03",
     "nome": "Porta Sbarrata",
+    "condizioniApertura": ["Abbattimento"],
     "bloccante": "sì",
     "tipo": "sbarramento",
     "descrizione": "Blocca il passaggio tra due luoghi.",
@@ -98,6 +100,7 @@
   {
     "codice": "S04",
     "nome": "Porta chiusa a chiave",
+    "condizioniApertura": ["Chiave", "Abbattimento"],
     "bloccante": "sì",
     "tipo": "sbarramento",
     "descrizione": "Blocca il passaggio tra due luoghi.",
@@ -260,6 +263,7 @@
   {
     "codice": "S12",
     "nome": "Finestra con Sbarre",
+    "condizioniApertura": ["Abbattimento"],
     "tipo": "sbarramento",
     "descrizione": "Delle sbarre sono a protezione della finestra.",
     "interazioni": [
@@ -291,6 +295,7 @@
   {
     "codice": "S13",
     "nome": "Finestra Bloccata",
+    "condizioniApertura": ["Chiave", "Abbattimento"],
     "tipo": "sbarramento",
     "descrizione": "Il vetro della finestra è sudicio.",
     "interazioni": [
@@ -356,6 +361,7 @@
   {
     "codice": "S15",
     "nome": "Finestra Chiusa",
+    "condizioniApertura": ["Nessuna"],
     "tipo": "sbarramento",
     "descrizione": "La finestra è chiusa.",
     "interazioni": [

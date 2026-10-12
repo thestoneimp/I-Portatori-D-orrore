@@ -3162,6 +3162,26 @@ function rivelaLuogoAdiacenteSbloccato(luoghi) {
   }
 }
 
+// Sostituisce uno sbarramento con la sua variante "nuovoNome" (es. "Porta
+// Aperta") nella stessa posizione logica (stessa carta base + direzione).
+function ripiazzaSbarramento(strutt, nuovoNome, opts = {}) {
+  // Salvo i riferimenti necessari PRIMA di rimuovere
+  const base = Array.isArray(strutt.luoghi) ? strutt.luoghi[0] : null; // carta A
+  const dir = strutt.direzione || null;
+
+  rimuoviStruttura(strutt.codice, strutt.codiceCarta, strutt.luoghi);
+
+  if (!base || !dir) {
+    console.warn(
+      "[ripiazzaSbarramento] Mancano base o direzione per ripiazzare lo sbarramento.",
+      { base, dir, strutt }
+    );
+    return false;
+  }
+  aggiungiSbarramentoSpecifico(base, dir, nuovoNome, opts);
+  return true;
+}
+
 function gestisciInterazioneStruttura(
   nomeStruttura,
   codiceIstanza,
@@ -3213,30 +3233,12 @@ function gestisciInterazioneStruttura(
         return;
       }
 
-      // Salvo i riferimenti necessari PRIMA di rimuovere
-      const base = Array.isArray(strutt.luoghi) ? strutt.luoghi[0] : null; // carta A
-      const dir = strutt.direzione || null;
       const luoghiPrecedenti = strutt.luoghi;
-
-      // Rimuovo la struttura attuale usando la tua funzione esistente
-      rimuoviStruttura(strutt.codice, strutt.codiceCarta, strutt.luoghi);
-
-      // Ripiazzo nella stessa posizione logica (stessa carta base + stessa direzione)
-      if (base && dir) {
-        aggiungiSbarramentoSpecifico(base, dir, nuovoNome); // riusa la tua funzione
-
-        // 🔹 Se si tratta di un'apertura, il varco è ora aperto: il luogo
-        // adiacente viene rivelato (esplorato) anche se il personaggio non
-        // vi si è ancora spostato.
-        if (post === "apertura") {
-          rivelaLuogoAdiacenteSbloccato(luoghiPrecedenti);
-        }
-      } else {
-        console.warn(
-          "[gestisciInterazioneStruttura] Mancano base o direzione per ripiazzare lo sbarramento.",
-          { base, dir, strutt }
-        );
-        // opzionale: potresti qui fare un fallback via coordinate, ma per ora evitiamo.
+      // 🔹 Se si tratta di un'apertura, il varco è ora aperto: il luogo
+      // adiacente viene rivelato (esplorato) anche se il personaggio non
+      // vi si è ancora spostato.
+      if (ripiazzaSbarramento(strutt, nuovoNome) && post === "apertura") {
+        rivelaLuogoAdiacenteSbloccato(luoghiPrecedenti);
       }
     };
 
@@ -6224,6 +6226,8 @@ function creaMinaccia(definizioneOCodice, codiceCartaIniziale, opts = {}) {
     // piano che non riesce a raggiungere per colpa di uno sbarramento.
     luoghiVuoti: [],
     luoghiInaccessibili: [],
+    // Tipo degli sbarramenti visti da vicino: { "x,y": nome struttura }.
+    sbarramentiNoti: {},
   };
 
   gameData.minacceAttive.push(istanza);
@@ -6393,6 +6397,7 @@ function genereDiVittima(idVittima) {
 // in cui una vittima esce dalla linea di vista (posizione + motivo), senza
 // più toccare quella memoria finché non torna visibile.
 function aggiornaPercezioneMinaccia(minaccia) {
+  memorizzaSbarramentiAdiacenti(minaccia);
   const codiceCartaMinaccia = gameData.posizioniPersonaggi[minaccia.id];
   const visibili = calcolaLineaDiVista(codiceCartaMinaccia);
   minaccia.memoriaVittime = minaccia.memoriaVittime || {};
@@ -6495,7 +6500,7 @@ function aggiornaPercezioneMinaccia(minaccia) {
       ) {
         const budget = Math.max(minaccia.movimentoAppreso?.[idVittima] || 0, 1);
         posizioniIpotizzate = Object.keys(
-          calcolaLuoghiRaggiungibili(posizioneIpotizzata, budget)
+          calcolaLuoghiRaggiungibili(posizioneIpotizzata, budget, minaccia)
         );
       }
     } else {
@@ -6561,7 +6566,8 @@ function aggiornaPercezioneMinaccia(minaccia) {
             precedente.ultimaPosizioneNota;
           const distanze = calcolaLuoghiRaggiungibili(
             origineMovimento,
-            Math.max(budget, 1)
+            Math.max(budget, 1),
+            minaccia
           );
           const direzioneSegno = Math.sign(
             cartaAttuale.posizione.y - cartaUltima.posizione.y
@@ -6695,6 +6701,23 @@ function interagisciConMinaccia(idMinaccia) {
         }`
       : "";
 
+  // Sbarramenti visti da vicino, coi luoghi che separano e le condizioni di
+  // apertura associate al tipo.
+  const righeSbarramenti =
+    Object.entries(minaccia.sbarramentiNoti || {})
+      .map(([chiave, nome]) => {
+        const s = (gameData.tabelloneStrutture || []).find(
+          (x) => chiaveSbarramento(x) === chiave
+        );
+        const luoghi = (s?.luoghi || []).map(nomeLuogo).join("–") || chiave;
+        const condizioni = condizioniAperturaDi(nome);
+        const apertura = condizioni.length
+          ? ` (apertura: ${condizioni.join(", ")})`
+          : "";
+        return `• ${luoghi}: ${nome}${apertura}`;
+      })
+      .join("<br/>") || "nessuno";
+
   mostraPopupGenerico({
     titolo: minaccia.nome,
     messaggio: `<strong>Intelligenza:</strong> ${minaccia.intelligenza}<br/><strong>Vittima designata:</strong> ${
@@ -6703,7 +6726,7 @@ function interagisciConMinaccia(idMinaccia) {
             minaccia.distanzaVittimaDesignata
           } passi)`
         : "nessuna"
-    }<br/><br/><strong>Luoghi nella linea di vista:</strong><br/>${righeLuoghi}<br/><br/><strong>Memoria delle vittime:</strong><br/>${righeMemoria}<br/><br/><strong>Rumori uditi:</strong><br/>${righeRumori}${sezioneVoci}`,
+    }<br/><br/><strong>Luoghi nella linea di vista:</strong><br/>${righeLuoghi}<br/><br/><strong>Memoria delle vittime:</strong><br/>${righeMemoria}<br/><br/><strong>Rumori uditi:</strong><br/>${righeRumori}${sezioneVoci}<br/><br/><strong>Sbarramenti noti:</strong><br/>${righeSbarramenti}`,
     pulsanti: [
       {
         testo: "Chiudi",
@@ -6740,29 +6763,17 @@ function aggiornaPercezioneTutteLeMinacce() {
 // può muoversi una vittima osservandola muoversi entro la propria vista.
 // ============================
 
-// Vero se un vero sbarramento bloccante (stato REALE, non quello scoperto
-// dai giocatori) impedisce il movimento tra due carte adiacenti — stessa
-// idea di bloccaVistaTraCarte ma sul flag "bloccante", non "bloccaVista".
-function bloccaMovimentoTraCarte(cartaA, cartaB) {
+// Vero se uno sbarramento bloccante impedisce il movimento tra due carte
+// adiacenti — stessa idea di bloccaVistaTraCarte ma sul flag "bloccante",
+// non "bloccaVista". Senza "minaccia" conta lo stato REALE; con la minaccia
+// conta ciò che QUELLA minaccia sa (minaccia.sbarramentiNoti): uno
+// sbarramento mai visto da vicino non la ferma, e quelli che sa aprire
+// senza condizioni (intelligenza 1+) sono "raggiungibili dopo l'apertura".
+function bloccaMovimentoTraCarte(cartaA, cartaB, minaccia = null) {
   if (!cartaA.posizione || !cartaB.posizione) return false;
 
   return (gameData.tabelloneStrutture || []).some((struttura) => {
     if (struttura.tipo !== "sbarramento") return false;
-
-    const def = (gameData.catalogoStrutture || []).find(
-      (s) => s.codice === struttura.codiceCarta || s.nome === struttura.nome
-    );
-    if (!def) return false;
-
-    let bloccante = true;
-    if (Object.prototype.hasOwnProperty.call(def, "bloccante")) {
-      bloccante =
-        typeof def.bloccante === "boolean"
-          ? def.bloccante
-          : String(def.bloccante).trim().toLowerCase().replace("ì", "i") !==
-            "no";
-    }
-    if (!bloccante) return false;
 
     const pos = struttura.posizione;
     const ax = cartaA.posizione.x,
@@ -6777,11 +6788,40 @@ function bloccaMovimentoTraCarte(cartaA, cartaB) {
 
     if (!(traX || traY)) return false;
 
+    let nomeNoto = struttura.nome;
+    if (minaccia) {
+      nomeNoto = minaccia.sbarramentiNoti?.[chiaveSbarramento(struttura)];
+      if (!nomeNoto) return false; // mai visto da vicino: lo ignora
+      if (
+        (minaccia.intelligenza ?? 0) >= 1 &&
+        condizioniAperturaDi(nomeNoto).includes("Nessuna")
+      ) {
+        return false; // raggiungibile dopo l'apertura
+      }
+    }
+
+    const def = (gameData.catalogoStrutture || []).find((s) =>
+      minaccia
+        ? s.nome === nomeNoto
+        : s.codice === struttura.codiceCarta || s.nome === struttura.nome
+    );
+    if (!def) return false;
+
+    let bloccante = true;
+    if (Object.prototype.hasOwnProperty.call(def, "bloccante")) {
+      bloccante =
+        typeof def.bloccante === "boolean"
+          ? def.bloccante
+          : String(def.bloccante).trim().toLowerCase().replace("ì", "i") !==
+            "no";
+    }
+    if (!bloccante) return false;
+
     // 🪟 Le minacce (qualunque intelligenza) attraversano le finestre APERTE
     // o ROTTE che separano l'interno della casa dal giardino (piano terra).
     // Non vale per finestre chiuse/bloccate/con sbarre né per quelle dei
     // piani superiori (lì dall'altra parte non c'è un giardino).
-    const nomeStruttura = struttura.nome || def.nome;
+    const nomeStruttura = nomeNoto || def.nome;
     const finestraPraticabile =
       nomeStruttura === "Finestra Aperta" || nomeStruttura === "Finestra Rotta";
     const casaGiardino =
@@ -6790,6 +6830,36 @@ function bloccaMovimentoTraCarte(cartaA, cartaB) {
     if (finestraPraticabile && casaGiardino) return false;
 
     return true;
+  });
+}
+
+// Identifica uno sbarramento per la sua posizione sul tabellone: resta la
+// stessa anche quando la struttura viene sostituita (aperta, chiusa, rotta).
+function chiaveSbarramento(struttura) {
+  return `${struttura.posizione?.x},${struttura.posizione?.y}`;
+}
+
+// Condizioni di apertura di un tipo di sbarramento (dal catalogo):
+// ["Nessuna"], ["Chiave", "Abbattimento"], ["Abbattimento"]; [] = nessun
+// modo noto per aprirlo.
+function condizioniAperturaDi(nomeStruttura) {
+  const def = (gameData.catalogoStrutture || []).find(
+    (s) => s.nome === nomeStruttura
+  );
+  return def?.condizioniApertura || [];
+}
+
+// 🚪 Qualunque intelligenza: la minaccia memorizza il tipo (stato attuale)
+// di ogni sbarramento tra il luogo in cui si trova e un luogo adiacente.
+// Quelli mai visti da vicino restano sconosciuti (e non la fermano).
+function memorizzaSbarramentiAdiacenti(minaccia) {
+  const pos = gameData.posizioniPersonaggi[minaccia.id];
+  if (!pos) return;
+  minaccia.sbarramentiNoti = minaccia.sbarramentiNoti || {};
+  (gameData.tabelloneStrutture || []).forEach((s) => {
+    if (s.tipo !== "sbarramento" || !Array.isArray(s.luoghi)) return;
+    if (!s.luoghi.includes(pos) || s.luoghi.some((l) => !l)) return;
+    minaccia.sbarramentiNoti[chiaveSbarramento(s)] = s.nome;
   });
 }
 
@@ -6866,7 +6936,7 @@ function rivelaScalaUsataDaMinaccia(codiceDa, codiceA) {
 // (orizzontali sullo stesso piano + verticali via scale, come il movimento
 // vero dei personaggi), rispettando gli sbarramenti REALI. Include anche il
 // punto di partenza (distanza 0).
-function calcolaLuoghiRaggiungibili(codicePartenza, budget) {
+function calcolaLuoghiRaggiungibili(codicePartenza, budget, minaccia = null) {
   const distanze = { [codicePartenza]: 0 };
   if (!codicePartenza) return distanze;
 
@@ -6907,7 +6977,7 @@ function calcolaLuoghiRaggiungibili(codicePartenza, budget) {
 
     candidati.forEach((c) => {
       if (distanze[c.codice] !== undefined) return;
-      if (bloccaMovimentoTraCarte(cartaAttuale, c)) return;
+      if (bloccaMovimentoTraCarte(cartaAttuale, c, minaccia)) return;
       distanze[c.codice] = distAttuale + 1;
       frontiera.push(c.codice);
     });
@@ -6924,8 +6994,8 @@ function calcolaLuoghiRaggiungibili(codicePartenza, budget) {
 // vittima (cioè la vede attualmente, vista:true — non una semplice
 // ipotesi), valuta se designarla come bersaglio: sceglie sempre la più
 // VICINA in termini di passi reali da percorrere (non in linea d'aria: la
-// distanza rispetta gli sbarramenti bloccanti REALI — porte chiuse/chiuse a
-// chiave/sbarrate — non solo quelli già scoperti dai giocatori). Se la
+// distanza rispetta gli sbarramenti bloccanti che la minaccia CONOSCE, vedi
+// memorizzaSbarramentiAdiacenti; quelli che sa aprire non la fermano). Se la
 // minaccia ha già una vittima designata ma la sua posizione non è più
 // esatta (non più vista:true), qualunque nuova vittima esattamente nota la
 // sostituisce; altrimenti la sostituisce solo se più vicina.
@@ -6935,7 +7005,11 @@ function aggiornaVittimaDesignata(minaccia, idVittima) {
   if (!codiceCartaMinaccia || !cellaVittima) return;
 
   const budgetMassimo = (gameData.tabelloneAttivo || []).length || 1;
-  const distanze = calcolaLuoghiRaggiungibili(codiceCartaMinaccia, budgetMassimo);
+  const distanze = calcolaLuoghiRaggiungibili(
+    codiceCartaMinaccia,
+    budgetMassimo,
+    minaccia
+  );
   const distanzaNuova = distanze[cellaVittima];
   if (distanzaNuova === undefined) return; // irraggiungibile: la ignoro
 
@@ -7330,10 +7404,11 @@ function messaggioTurnoMinaccia(titolo, messaggio) {
   });
 }
 
-function distanzeRealiDa(codice) {
+function distanzeRealiDa(codice, minaccia) {
   return calcolaLuoghiRaggiungibili(
     codice,
-    (gameData.tabelloneAttivo || []).length || 1
+    (gameData.tabelloneAttivo || []).length || 1,
+    minaccia
   );
 }
 
@@ -7400,13 +7475,14 @@ function aggiornaLuoghiInaccessibili(minaccia, pos, dist) {
 function scegliObiettivoMinaccia(minaccia) {
   const pos = gameData.posizioniPersonaggi[minaccia.id];
   if (!pos) return null;
+  memorizzaSbarramentiAdiacenti(minaccia);
   dimenticaLuogoRaggiunto(minaccia, pos);
   segnaLuogoVuoto(minaccia, pos);
   // L'obiettivo "casuale" (piano) dura finché non lo si raggiunge, non lo
   // sostituisce un obiettivo primario o non diventa inaccessibile.
   if (minaccia.obiettivoCasuale === pos) minaccia.obiettivoCasuale = null;
 
-  const dist = distanzeRealiDa(pos);
+  const dist = distanzeRealiDa(pos, minaccia);
   aggiornaLuoghiInaccessibili(minaccia, pos, dist);
   const memoria = minaccia.memoriaVittime || {};
 
@@ -7526,15 +7602,44 @@ function scegliObiettivoMinaccia(minaccia) {
 // di raggiungibilità di calcolaLuoghiRaggiungibili), oppure null.
 function prossimoPassoMinaccia(minaccia, luogoObiettivo) {
   const pos = gameData.posizioniPersonaggi[minaccia.id];
-  const dallObiettivo = distanzeRealiDa(luogoObiettivo);
+  const dallObiettivo = distanzeRealiDa(luogoObiettivo, minaccia);
   const dPos = dallObiettivo[pos];
   if (dPos === undefined || dPos === 0) return null;
-  const vicini = calcolaLuoghiRaggiungibili(pos, 1);
+  const vicini = calcolaLuoghiRaggiungibili(pos, 1, minaccia);
   return (
     Object.keys(vicini).find(
       (c) => vicini[c] === 1 && dallObiettivo[c] === dPos - 1
     ) || null
   );
+}
+
+// 🚪 Intelligenza 1+: se tra "da" e "a" c'è uno sbarramento che la
+// minaccia sa aprire senza condizioni (porta/finestra chiusa), lo apre e
+// mostra il messaggio. Restituisce true se ha aperto qualcosa. Il cambio di
+// stato non esplora nulla (solo i PG esplorano) e lascia lo sbarramento
+// visibile/nascosto ai giocatori com'era.
+async function apriSbarramentoSeServe(minaccia, da, a) {
+  if ((minaccia.intelligenza ?? 0) < 1) return false;
+  const tab = gameData.tabelloneAttivo || [];
+  const trovato = trovaSbarramentoTra(
+    tab.find((c) => c.codice === da),
+    tab.find((c) => c.codice === a)
+  );
+  const strutt = trovato?.struttura;
+  if (!strutt || !trovato.isBlocking) return false;
+  if (!condizioniAperturaDi(strutt.nome).includes("Nessuna")) return false;
+
+  const finestra = /finestr/i.test(strutt.nome);
+  const oggetto = finestra ? "la finestra" : "la porta";
+  ripiazzaSbarramento(strutt, finestra ? "Finestra Aperta" : "Porta Aperta", {
+    visual: strutt.visibile !== false,
+  });
+  await messaggioTurnoMinaccia(
+    minaccia.nome,
+    `<b>${minaccia.nome}</b> ha aperto ${oggetto}.`
+  );
+  await pausaMs(350);
+  return true;
 }
 
 function muoviMinacciaDiUnPasso(minaccia, da, a) {
@@ -7558,7 +7663,7 @@ function muoviMinacciaDiUnPasso(minaccia, da, a) {
 async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
   minaccia.obiettivoScelto = null;
   let punti = minaccia.movimento ?? 0;
-  let passi = 0;
+  let annunciato = false;
 
   while (punti > 0) {
     if (idSequenza !== sequenzaMinacceId) return;
@@ -7569,7 +7674,8 @@ async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
     const prossimo = prossimoPassoMinaccia(minaccia, obiettivo.luogo);
     if (!prossimo) break;
 
-    if (passi === 0) {
+    if (!annunciato) {
+      annunciato = true;
       await messaggioTurnoMinaccia(
         minaccia.nome,
         `<b>${minaccia.nome}</b> compie un movimento.`
@@ -7577,8 +7683,14 @@ async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
       await pausaMs(350);
       if (idSequenza !== sequenzaMinacceId) return;
     }
+    // Si ferma davanti alla porta/finestra, la apre (non costa punti
+    // movimento) e poi riprende, ricalcolando l'obiettivo: aprendo potrebbe
+    // aver visto qualcuno.
+    if (await apriSbarramentoSeServe(minaccia, pos, prossimo)) {
+      if (idSequenza !== sequenzaMinacceId) return;
+      continue;
+    }
     await muoviMinacciaDiUnPasso(minaccia, pos, prossimo);
-    passi++;
     punti--;
     segnaLuogoVuoto(minaccia, prossimo);
   }
