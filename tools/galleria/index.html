@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galleria Carte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@600;700&family=Oswald:wght@500;700&family=Permanent+Marker&family=Special+Elite&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/s/carta.css">
+<link rel="stylesheet" href="/s/editor.css">
+<style>
+  :root {
+    --bg: #0f0a0a; --pannello: #1a1212; --pannello2: #241818; --bordo: #3a2626;
+    --testo: #e9dfd6; --tenue: #a89488; --rosso: #c0392b; --verde: #6b8e4e; --ambra: #d9a441;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--testo); font: 15px/1.45 "Segoe UI", system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: rgba(15,10,10,.96); border-bottom: 1px solid var(--bordo); padding: 12px 20px; }
+  h1 { margin: 0 0 8px; font-size: 20px; letter-spacing: .5px; }
+  .barra { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .tab, button { background: var(--pannello2); color: var(--testo); border: 1px solid var(--bordo); border-radius: 6px; padding: 6px 12px; cursor: pointer; font: inherit; }
+  .tab:hover, button:hover { border-color: var(--rosso); }
+  .tab.attivo { background: var(--rosso); border-color: var(--rosso); color: #fff; }
+  .tab .n { opacity: .75; font-size: 12px; margin-left: 4px; }
+  button.primario { background: var(--rosso); border-color: var(--rosso); color: #fff; }
+  button.verde { background: var(--verde); border-color: var(--verde); color: #fff; }
+  button:disabled { opacity: .45; cursor: default; }
+  label.filtro { margin-left: auto; color: var(--tenue); font-size: 13px; display: flex; gap: 6px; align-items: center; }
+  main { padding: 16px 20px 60px; max-width: 1500px; margin: 0 auto; }
+  .vuoto { color: var(--tenue); padding: 40px 0; text-align: center; }
+  .carta { background: var(--pannello); border: 1px solid var(--bordo); border-radius: 10px; margin-bottom: 22px; padding: 14px; }
+  .carta.approvata { border-color: var(--verde); }
+  .testata { display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; margin-bottom: 4px; }
+  .testata h2 { margin: 0; font-size: 18px; }
+  .id { color: var(--tenue); font-size: 12px; }
+  .stato { font-size: 12px; padding: 2px 8px; border-radius: 10px; background: var(--pannello2); color: var(--tenue); }
+  .stato.ok { background: var(--verde); color: #fff; }
+  .stato.att { background: var(--ambra); color: #1a1212; }
+  .descr { color: var(--tenue); font-size: 13px; margin-bottom: 10px; }
+  .varianti { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .carta.orizz .varianti { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .var { background: var(--pannello2); border: 2px solid transparent; border-radius: 8px; overflow: hidden; position: relative; }
+  .var.sel { border-color: var(--ambra); }
+  .var.appr { border-color: var(--verde); }
+  .var.scartata { opacity: .35; }
+  .var .info { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; font-size: 12px; color: var(--tenue); gap: 6px; }
+  .var .azioni { display: flex; gap: 4px; padding: 0 8px 8px; flex-wrap: wrap; }
+  .var .azioni button { padding: 3px 8px; font-size: 12px; }
+  .badge { position: absolute; top: 6px; left: 6px; background: var(--verde); color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 10px; }
+  .badge.da { background: #000a; left: auto; right: 6px; color: var(--ambra); }
+  .richieste { margin-top: 12px; border-top: 1px dashed var(--bordo); padding-top: 10px; }
+  .richieste .r { font-size: 13px; display: flex; gap: 8px; align-items: baseline; padding: 2px 0; }
+  .r.evasa, .r.annullata { color: var(--tenue); text-decoration: none; opacity: .7; }
+  .r .tag { font-size: 11px; padding: 1px 6px; border-radius: 8px; background: var(--pannello2); }
+  .r.in_attesa .tag { background: var(--ambra); color: #1a1212; }
+  .pannello-azione { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+  textarea, input[type=number] { background: #120c0c; color: var(--testo); border: 1px solid var(--bordo); border-radius: 6px; padding: 6px 8px; font: inherit; }
+  textarea { flex: 1 1 320px; min-height: 54px; resize: vertical; }
+  input[type=number] { width: 64px; }
+  .modale { position: fixed; inset: 0; background: rgba(0,0,0,.92); display: none; z-index: 20; align-items: center; justify-content: center; flex-direction: column; gap: 10px; padding: 16px; }
+  .modale.aperta { display: flex; }
+  .modale img { max-width: 96vw; max-height: 82vh; border-radius: 6px; }
+  .modale .did { color: var(--tenue); max-width: 900px; font-size: 12px; text-align: center; }
+  .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--verde); color: #fff; padding: 8px 16px; border-radius: 20px; opacity: 0; transition: opacity .25s; z-index: 30; pointer-events: none; }
+  .toast.on { opacity: 1; }
+  .toast.err { background: var(--rosso); }
+  @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .varianti { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>I Portatori d'Orrore &mdash; Galleria Carte</h1>
+  <div class="barra" id="tabs"></div>
+  <div style="margin-top:6px;font-size:13px"><a href="/layout" style="color:#a89488">Anteprima layout carte &rarr;</a></div>
+</header>
+<main id="main"></main>
+<div class="modale" id="modale"><img id="modaleImg" alt=""><div class="did" id="modaleDid"></div><button id="modaleChiudi">Chiudi (Esc)</button></div>
+<div class="toast" id="toast"></div>
+
+<script src="/s/carta.js"></script>
+<script src="/s/editor.js"></script>
+<script>
+const TIPI = [
+  ["personaggio", "Personaggi"], ["luogo", "Luoghi"], ["oggetto", "Oggetti"],
+  ["abilita", "Abilità"], ["sbarramento", "Sbarramenti"]
+];
+let dati = { carte: [] };
+let tipoAttivo = "personaggio";
+let soloApprovate = false;
+const selezionata = {};   // id carta -> id variante selezionata (per modifica)
+const bozze = {};         // id carta -> { nuove: testo, modifica: testo, quante: n } (non perdere il testo ai ridisegni)
+let toastTimer;
+
+function el(tag, attrs = {}, ...figli) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) e.setAttribute(k, v === true ? "" : v);
+  }
+  figli.flat().forEach(f => e.append(f && f.nodeType ? f : document.createTextNode(f ?? "")));
+  return e;
+}
+function avviso(testo, errore) {
+  const t = document.getElementById("toast");
+  t.textContent = testo; t.className = "toast on" + (errore ? " err" : "");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("on"), 2200);
+}
+async function api(percorso, corpo) {
+  try {
+    const r = await fetch(percorso, corpo ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) } : undefined);
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.errore || r.status);
+    dati = j.carte ? j : dati;
+    return true;
+  } catch (e) { avviso("Errore: " + e.message, true); return false; }
+}
+async function carica() {
+  if (!(await api("/api/galleria"))) return;
+  disegna();
+  // ?edit=<idCarta>:<idVariante> apre subito l'editor su quella carta (comodo per tornarci o condividere il link)
+  const m = (new URLSearchParams(location.search).get("edit") || "").split(":");
+  const c = dati.carte.find(x => x.id === m[0]), v = c && c.varianti.find(x => x.id === m[1]);
+  if (c && v) { tipoAttivo = c.tipo; disegna(); apriEditor(c, v); }
+}
+
+function disegnaTab() {
+  const barra = document.getElementById("tabs"); barra.replaceChildren();
+  TIPI.forEach(([t, nome]) => {
+    const carte = dati.carte.filter(c => c.tipo === t);
+    const att = carte.reduce((n, c) => n + c.richieste.filter(r => r.stato === "in_attesa").length, 0);
+    const appr = carte.filter(c => c.approvata).length;
+    barra.append(el("button", { class: "tab" + (t === tipoAttivo ? " attivo" : ""), onclick: () => { tipoAttivo = t; disegna(); } },
+      nome, el("span", { class: "n" }, `${appr}/${carte.length}` + (att ? ` · ${att} richieste` : ""))));
+  });
+  barra.append(el("label", { class: "filtro" },
+    el("input", { type: "checkbox", checked: soloApprovate, onchange: e => { soloApprovate = e.target.checked; disegna(); } }),
+    "Solo carte approvate"));
+}
+
+// La tessera mostra la carta come sarà stampata: immagine + elementi del layout (cornice, nome...). Click = editor.
+function cartaVariante(c, v) {
+  const w = Carta.render(c, v, { src: "/mini/" + v.file });
+  w.style.cursor = "pointer"; w.title = "Clicca per modificare la carta";
+  w.onclick = () => apriEditor(c, v);
+  return w;
+}
+function apriEditor(c, v) {
+  Editor.apri(c, v, { salva: async p => { const ok = await api("/api/layout", p); if (ok) disegna(); return ok; }, avviso: t => avviso(t) });
+}
+
+function disegnaCarta(c) {
+  const bozza = bozze[c.id] ||= { nuove: "", modifica: "", quante: 4 };
+  const sel = selezionata[c.id];
+  const selVar = c.varianti.find(v => v.id === sel);
+  const attive = c.richieste.filter(r => r.stato === "in_attesa");
+  const nVis = c.varianti.filter(v => !v.scartata).length;
+
+  const griglia = el("div", { class: "varianti" }, c.varianti.map(v => {
+    const cls = "var" + (v.id === c.approvata ? " appr" : "") + (v.id === sel ? " sel" : "") + (v.scartata ? " scartata" : "");
+    return el("div", { class: cls },
+      v.id === c.approvata ? el("span", { class: "badge" }, "✓ Approvata") : null,
+      v.da ? el("span", { class: "badge da" }, "da " + v.da) : null,
+      cartaVariante(c, v),
+      el("div", { class: "info" }, el("span", {}, v.id + (v.nota ? " · " + v.nota : "")), el("span", {}, "seed " + v.seed)),
+      el("div", { class: "azioni" },
+        el("button", { class: v.id === c.approvata ? "" : "verde", disabled: v.scartata, onclick: async () => {
+          if (await api("/api/approva", { carta: c.id, variante: v.id === c.approvata ? null : v.id })) { disegna(); avviso(v.id === c.approvata ? "Approvazione tolta" : `${c.nome}: ${v.id} approvata`); } } },
+          v.id === c.approvata ? "Togli approvazione" : "Approva"),
+        el("button", { disabled: v.scartata, onclick: () => apriEditor(c, v) }, "Modifica carta"),
+        el("button", { disabled: v.scartata, onclick: () => { selezionata[c.id] = v.id === sel ? null : v.id; disegna(); } }, v.id === sel ? "Deseleziona" : "Richiedi ritocco"),
+        el("button", { onclick: async () => { if (await api("/api/scarta", { carta: c.id, variante: v.id, scartata: !v.scartata })) disegna(); } }, v.scartata ? "Ripristina" : "Scarta")));
+  }));
+
+  const elencoRich = c.richieste.length ? el("div", { class: "richieste" }, c.richieste.map(r =>
+    el("div", { class: "r " + r.stato },
+      el("span", { class: "tag" }, r.stato === "in_attesa" ? "in attesa" : r.stato),
+      el("span", {}, `${r.id} · ` + (r.tipo === "modifica" ? `modifica di ${r.variante}` : `${r.quante} nuove varianti`) + (r.testo ? ` — ${r.testo}` : "") + (r.esito ? ` ⇒ ${r.esito}` : "")),
+      r.stato === "in_attesa" ? el("button", { onclick: async () => { if (await api("/api/richiesta/annulla", { carta: c.id, id: r.id })) disegna(); } }, "Annulla") : null))) : null;
+
+  const campoNuove = el("textarea", { placeholder: "Indicazioni per le nuove varianti (facoltativo): es. 'più anziano', 'ambientazione diurna'…",
+    oninput: e => bozza.nuove = e.target.value }); campoNuove.value = bozza.nuove;
+  const quante = el("input", { type: "number", min: 1, max: 8, value: bozza.quante, title: "Quante varianti", oninput: e => bozza.quante = e.target.value });
+  const campoMod = el("textarea", { placeholder: selVar ? `Cosa vuoi cambiare in ${selVar.id}? es. 'togli il sangue dal viso, giacca rossa'` : "Prima seleziona una variante (pulsante «Richiedi ritocco» su una variante)…",
+    disabled: !selVar, oninput: e => bozza.modifica = e.target.value }); campoMod.value = bozza.modifica;
+
+  return el("section", { class: "carta" + (c.approvata ? " approvata" : "") + (c.formato === "orizzontale" ? " orizz" : "") },
+    el("div", { class: "testata" }, el("h2", {}, c.nome), el("span", { class: "id" }, c.id),
+      el("span", { class: "stato" + (c.approvata ? " ok" : "") }, c.approvata ? `approvata: ${c.approvata}` : "da scegliere"),
+      attive.length ? el("span", { class: "stato att" }, `${attive.length} richieste in attesa`) : null,
+      el("span", { class: "stato" }, `${nVis} varianti`)),
+    c.descrizione ? el("div", { class: "descr" }, c.descrizione) : null,
+    griglia,
+    el("div", { class: "pannello-azione" }, campoNuove, quante,
+      el("button", { class: "primario", onclick: async () => {
+        if (await api("/api/richiesta", { carta: c.id, tipo: "nuove_varianti", testo: bozza.nuove, quante: Number(bozza.quante) || 4 })) {
+          bozza.nuove = ""; disegna(); avviso("Richiesta registrata: dillo a Claude per farla elaborare"); } } }, "Richiedi nuove varianti")),
+    el("div", { class: "pannello-azione" }, campoMod,
+      el("button", { class: "primario", disabled: !selVar, onclick: async () => {
+        if (!bozza.modifica.trim()) return avviso("Descrivi la modifica", true);
+        if (await api("/api/richiesta", { carta: c.id, tipo: "modifica", variante: selVar.id, testo: bozza.modifica.trim(), quante: 1 })) {
+          bozza.modifica = ""; disegna(); avviso("Richiesta registrata: dillo a Claude per farla elaborare"); } } },
+        selVar ? `Richiedi modifica di ${selVar.id}` : "Richiedi modifica")),
+    elencoRich);
+}
+
+function disegna() {
+  disegnaTab();
+  const main = document.getElementById("main");
+  // conserva scroll e focus: la pagina si ridisegna dopo ogni azione
+  const y = window.scrollY, foco = document.activeElement?.placeholder;
+  let carte = dati.carte.filter(c => c.tipo === tipoAttivo);
+  if (soloApprovate) carte = carte.filter(c => c.approvata);
+  main.replaceChildren(...(carte.length ? carte.map(disegnaCarta)
+    : [el("div", { class: "vuoto" }, soloApprovate ? "Nessuna carta approvata in questa categoria." : "Ancora nessuna carta in questa categoria: ne generiamo insieme a Claude.")]));
+  window.scrollTo(0, y);
+}
+
+function apriModale(c, v) {
+  document.getElementById("modaleImg").src = "/arte/" + v.file;
+  document.getElementById("modaleDid").textContent = `${c.nome} — ${v.id} — seed ${v.seed}` + (v.nota ? ` — ${v.nota}` : "");
+  document.getElementById("modale").classList.add("aperta");
+}
+const chiudiModale = () => document.getElementById("modale").classList.remove("aperta");
+document.getElementById("modaleChiudi").onclick = chiudiModale;
+document.getElementById("modale").onclick = e => { if (e.target.id === "modale") chiudiModale(); };
+document.addEventListener("keydown", e => { if (e.key === "Escape") chiudiModale(); });
+
+carica();
+// aggiornamento leggero: quando Claude aggiunge varianti o evade richieste, la pagina si aggiorna da sola
+// (solo se non stai scrivendo in un campo di testo)
+setInterval(async () => {
+  if (document.activeElement && document.activeElement.tagName === "TEXTAREA") return;
+  const prima = JSON.stringify(dati);
+  const r = await fetch("/api/galleria").then(r => r.json()).catch(() => null);
+  if (r && JSON.stringify(r) !== prima) { dati = r; disegna(); }
+}, 5000);
+</script>
+</body>
+</html>

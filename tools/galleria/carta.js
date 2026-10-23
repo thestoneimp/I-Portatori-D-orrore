@@ -1,0 +1,92 @@
+/* Rendering condiviso delle carte (galleria ed editor). Layout attuale: "locandina".
+ *
+ * Una carta ha una lista ordinata di ELEMENTI (l'ordine è lo z-order, dal fondo alla cima):
+ *   immagine   – l'illustrazione (la sua posizione/scala sta nella variante: variante.imm = {x, y, s})
+ *   sfumatura  – ombra nera in alto e in basso + vignettatura
+ *   cornice    – filo sottile a distanza `inset` dal bordo
+ *   testo      – nome (testo=null => nome della carta) o testi aggiunti dall'utente
+ * Nuovi tipi di elemento: aggiungere un case in nodo(), un default in predefiniti() e le proprietà in editor.js.
+ * Gli elementi della carta stanno in carta.layout.elementi (uguali per tutte le varianti); se mancano si usano i predefiniti.
+ */
+const Carta = (() => {
+  const FONT = ["Bebas Neue", "Oswald", "Special Elite", "Cinzel", "Permanent Marker", "VT323"];
+  // s = 1.07: rifila il margine di carta con pennellate che le immagini generate hanno quasi sempre
+  const IMM_DEF = { x: 0, y: 0, s: 1.07, st: 1 };   // s = scala (larghezza), st = stiramento verticale rispetto alle proporzioni originali
+
+  const rapporto = c => (c.formato === "orizzontale" ? 3 / 2 : 3 / 4);
+  const div = cl => Object.assign(document.createElement("div"), { className: cl });
+  const clona = o => JSON.parse(JSON.stringify(o));
+
+  function predefiniti(c) {
+    const vert = c.formato !== "orizzontale";
+    return [
+      { id: "immagine", tipo: "immagine", nome: "Immagine", visibile: true },
+      { id: "sfumatura", tipo: "sfumatura", nome: "Sfumatura", visibile: true, altezza: 48, intensita: 1 },
+      { id: "cornice", tipo: "cornice", nome: "Cornice", visibile: true, inset: 2.6, spessore: 0.3, colore: "#ffffff", opacita: 0.22, raggio: 2.4 },
+      { id: "nome", tipo: "testo", nome: "Nome", visibile: true, testo: null, x: 50, y: vert ? 88 : 86, dim: vert ? 13 : 11,
+        font: "Bebas Neue", colore: "#d6281c", spaziatura: 0.6, maiuscolo: true, alone: true, rot: 0 },
+    ];
+  }
+  const elementi = c => clona((c.layout && c.layout.elementi) || predefiniti(c));
+  const imm = v => ({ ...IMM_DEF, ...((v && v.imm) || {}) });
+
+  function nodo(c, v, e, im, o) {
+    if (e.tipo === "immagine") {
+      const box = div("cx-el cx-immagine");
+      const src = o.src || "/mini/" + v.file;
+      // l'elemento <img> viene riusato tra un ridisegno e l'altro (cache): evita lampeggi durante il trascinamento
+      let img = o.cacheImg && o.cacheImg.get(src);
+      if (!img) { img = new Image(); img.draggable = false; img.src = src; o.cacheImg && o.cacheImg.set(src, img); }
+      img.alt = c.nome;
+      const applica = () => {
+        const r = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : rapporto(c);
+        box.style.width = Math.max(100, (r / rapporto(c)) * 100) * im.s + "%"; // "cover" × scala
+      };
+      img.addEventListener("load", applica); applica();
+      box.style.left = `calc(50% + ${im.x}%)`; box.style.top = `calc(50% + ${im.y}%)`;
+      box.style.transform = `translate(-50%, -50%) scale(1, ${im.st})`;   // stiramento: solo in verticale (la larghezza è già in s)
+      box.append(img); return box;
+    }
+    if (e.tipo === "sfumatura") {
+      const n = div("cx-el cx-sfumatura"), k = e.intensita;
+      n.style.background = `linear-gradient(180deg, rgba(0,0,0,${0.28 * k}) 0%, transparent 22%, transparent ${100 - e.altezza}%, rgba(0,0,0,${Math.min(1, 0.88 * k)}) 100%)`;
+      n.style.boxShadow = `inset 0 0 0 .5cqw rgba(0,0,0,${0.6 * k}), inset 0 0 14cqw rgba(0,0,0,${0.55 * k})`;
+      return n;
+    }
+    if (e.tipo === "cornice") {
+      const n = div("cx-el cx-cornice");
+      n.style.inset = e.inset + "cqw";
+      n.style.border = `${e.spessore}cqw solid ${e.colore}`;
+      n.style.opacity = e.opacita;
+      n.style.borderRadius = e.raggio + "cqw";
+      return n;
+    }
+    // testo
+    const n = div("cx-el cx-testo");
+    n.textContent = e.testo == null ? c.nome : e.testo;
+    Object.assign(n.style, {
+      left: e.x + "%", top: e.y + "%", transform: `translate(-50%, -50%) rotate(${e.rot || 0}deg)`,
+      fontFamily: `"${e.font}", Impact, sans-serif`, fontSize: e.dim + "cqw", color: e.colore, letterSpacing: e.spaziatura + "cqw",
+      textTransform: e.maiuscolo ? "uppercase" : "none", textAlign: "center",
+      textShadow: e.alone
+        ? `0 .5cqw 0 rgba(0,0,0,.75), 0 0 3cqw color-mix(in srgb, ${e.colore} 75%, transparent), 0 0 .8cqw #000`
+        : "0 .3cqw .8cqw rgba(0,0,0,.8)",
+    });
+    return n;
+  }
+
+  /* Costruisce la carta. Opzioni: elementi/imm (per l'editor, altrimenti quelli salvati), src (immagine),
+   * soloImmagine, modifica (cursori dell'editor), cacheImg (Map per riusare le <img>). */
+  function render(c, v, o = {}) {
+    const els = o.elementi || elementi(c), im = o.imm || imm(v);
+    const wrap = div(`cx-wrap ${c.formato === "orizzontale" ? "cx-orizz" : "cx-vert"}` + (o.modifica ? " cx-modifica" : ""));
+    const carta = div("cx-carta"); wrap.append(carta);
+    els.forEach((e, i) => {
+      if (!e.visibile || (o.soloImmagine && e.tipo !== "immagine")) return;
+      const n = nodo(c, v, e, im, o); n.dataset.id = e.id; n.style.zIndex = i + 1; carta.append(n);
+    });
+    return wrap;
+  }
+
+  return { FONT, IMM_DEF, rapporto, predefiniti, elementi, imm, render, clona };
+})();

@@ -51,7 +51,7 @@ I JSON sono caricati con `fetch` all'avvio da `script.js` (vedi le chiamate `fet
 - **Rumori**: "Fai Rumore" con tre opzioni (Bussa sul muro 2, Attira a voce 3, Urla 4); il rumore si propaga per N carte con effetto visivo. L'adiacenza per attribuire la fonte vale solo sullo stesso piano.
 - **Intelligenza delle minacce** (comportamento cumulativo):
   - 0: se vede una vittima cancella ogni informazione e ignora i rumori; senza vittime il rumore azzera memoria e designata.
-  - 1+: ricordano gli sbarramenti visti da vicino e aprono porte/finestre chiuse.
+  - 1+: ricordano gli sbarramenti visti da vicino e aprono porte/finestre chiuse (non a chiave), salvo regola specifica `"apreSbarramenti": false` in `minacce_base.json` (oggi solo il Cane Rabbioso M03); controllo in `minacciaApreSbarramenti()`.
   - 2+: attraversano finestre aperte/rotte tra casa e giardino (piano terra).
   - 3: distingue porta chiusa prima/dopo il movimento; ricerca del piano esteso a piani non adiacenti con reset dei luoghi vuoti.
   - Le minacce usano le scale reali e le rivelano solo se in vista ai giocatori; ricordano luoghi vuoti/inaccessibili e l'obiettivo casuale di piano persiste tra i turni.
@@ -65,6 +65,14 @@ I JSON sono caricati con `fetch` all'avvio da `script.js` (vedi le chiamate `fet
 - Cambiando struttura dei dati nei JSON, controlla tutti i punti di `script.js` che li leggono (grep sul nome del campo): non ci sono schemi né test a proteggere.
 - Per verificare una modifica: servi la cartella, apri nel browser (anteprima Claude o Chrome) in orizzontale, ed esercita il flusso interessato. C'è un log di diagnostica del tabellone (`DIAGNOSTICA TABELLONE`, ~riga 1979) utile per il debug.
 - Non esiste un file di handoff nel repo: se ne viene prodotto uno, mettilo nella root e linkalo qui.
+
+## Immagini delle carte (galleria)
+
+- Stile predefinito ("V2": matita e inchiostro colorati a mano, acquarello): `tools/comfyui/stile.py`. Generazione con Qwen-Image su ComfyUI locale (condiviso con un altro progetto: non toccare i suoi workflow/output, coda vuota prima di generare) tramite `tools/comfyui/genera.py`.
+- Galleria locale per scegliere le varianti: `python tools/galleria/server.py` (http://127.0.0.1:8765) o `tools/galleria/avvia_galleria.bat`. Stato in `arte/galleria.json` (approvazioni, varianti con prompt e seed, richieste di nuove varianti/modifiche); libreria `tools/galleria/galleria.py`. Le richieste `in_attesa` le evade Claude generando e registrando le nuove varianti.
+- Formati: luoghi in orizzontale **3:2** (come `.carta-tabellone` 120×80; generati a 1152×768, quelli del primo lotto ritagliati a 1020×680 con gli originali 4:3 in `arte/luoghi/_originali_4x3/`), personaggi 3:4 (768×1024). Costanti in `tools/comfyui/stile.py`.
+- **Layout delle carte ("Locandina") ed editor**: `tools/galleria/carta.js`+`carta.css` disegnano la carta (immagine + elementi: sfumatura, cornice, testi; scala con `cqw`), `editor.js`+`editor.css` sono l'editor (apre dalla galleria con "Modifica carta", o `/?edit=<idCarta>:<idVariante>`). Gli elementi stanno in `carta.layout.elementi` di `arte/galleria.json` (comuni a tutte le varianti), posizione/scala dell'immagine in `variante.imm = {x,y,s}`; salvataggio via `POST /api/layout`. Per un nuovo tipo di elemento: `predefiniti()` e `nodo()` in carta.js, proprietà in `pannello()` di editor.js, tipo ammesso in server.py. Anteprima degli altri 5 stili grafici: `/layout`.
+- Immagini in `arte/<categoria>/<id>_v<N>.png` (miniature in `arte/.miniature`, rigenerabili).
 
 ## Stato attuale
 

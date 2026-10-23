@@ -1,0 +1,6 @@
+# Immagini generate e stato della galleria (arte/galleria.json): restano solo sul PC
+arte/
+
+# Python
+__pycache__/
+*.pyc

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anteprima layout carte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@600;700&family=Oswald:wght@500;700&family=Permanent+Marker&family=Special+Elite&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0f0a0a; --pannello:#1a1212; --bordo:#3a2626; --testo:#e9dfd6; --tenue:#a89488; --rosso:#c0392b; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--testo); font:15px/1.4 "Segoe UI", system-ui, sans-serif; }
+  header { padding:14px 20px; border-bottom:1px solid var(--bordo); position:sticky; top:0; background:rgba(15,10,10,.96); z-index:5; display:flex; flex-wrap:wrap; gap:14px; align-items:center; }
+  h1 { margin:0; font-size:19px; }
+  header a { color:var(--tenue); font-size:13px; }
+  label { color:var(--tenue); font-size:13px; display:flex; gap:6px; align-items:center; }
+  select { background:#241818; color:var(--testo); border:1px solid var(--bordo); border-radius:6px; padding:5px 8px; font:inherit; }
+  main { padding:18px 20px 60px; max-width:1500px; margin:0 auto; }
+  h2 { font-size:15px; letter-spacing:.5px; text-transform:uppercase; color:var(--tenue); margin:26px 0 12px; }
+  .nota { color:var(--tenue); font-size:13px; max-width:900px; }
+  .fila { display:flex; flex-wrap:wrap; gap:26px 28px; align-items:flex-start; }
+  figure { margin:0; }
+  figcaption { color:var(--tenue); font-size:12px; margin-top:8px; text-align:center; }
+  figcaption b { color:var(--testo); }
+
+  /* ---------- struttura comune: la carta scala con la larghezza del contenitore (unità cqw) ---------- */
+  .wrap { container-type:inline-size; }
+  .wrap.vert { width:230px; }
+  .wrap.orizz { width:345px; }
+  .carta { position:relative; overflow:hidden; box-shadow:0 8px 22px rgba(0,0,0,.65); border-radius:4.2cqw; }
+  .vert .carta { aspect-ratio:3/4; }
+  .orizz .carta { aspect-ratio:3/2; }
+  /* le immagini generate hanno spesso un margine di carta con pennellate irregolari: in anteprima lo si rifila (3% ai lati) */
+  .carta img { display:block; width:100%; height:100%; object-fit:cover; object-view-box:inset(3.5% 3.5% 3.5% 3.5%); }
+  .nome { position:absolute; }
+
+  /* ---------- 1. PELLICOLA: striscia di negativo con perforazioni ---------- */
+  .L1 .carta { background:#0a0a0a; }
+  .L1.vert .carta { padding:0 9cqw; }
+  .L1.orizz .carta { padding:9cqw 0 ; }
+  .L1 .carta::before, .L1 .carta::after { content:""; position:absolute; background:
+      repeating-linear-gradient(var(--dir), transparent 0 2.2cqw, #d8d2c4 2.2cqw 5cqw, transparent 5cqw 7.2cqw); opacity:.9; }
+  .L1.vert .carta::before, .L1.vert .carta::after { --dir:180deg; top:1.5cqw; bottom:1.5cqw; width:3.6cqw; -webkit-mask:none;
+      background:repeating-linear-gradient(180deg, transparent 0 1.6cqw, #d8d2c4 1.6cqw 5.2cqw, transparent 5.2cqw 7.4cqw); }
+  .L1.vert .carta::before { left:2.6cqw; } .L1.vert .carta::after { right:2.6cqw; }
+  .L1.orizz .carta::before, .L1.orizz .carta::after { left:1.5cqw; right:1.5cqw; height:3.6cqw;
+      background:repeating-linear-gradient(90deg, transparent 0 1.6cqw, #d8d2c4 1.6cqw 5.2cqw, transparent 5.2cqw 7.4cqw); }
+  .L1.orizz .carta::before { top:2.6cqw; } .L1.orizz .carta::after { bottom:2.6cqw; }
+  .L1 img { filter:contrast(1.05) saturate(.95); }
+  .L1 .nome { left:50%; bottom:3.4cqw; transform:translateX(-50%); font:700 6.4cqw/1 "Oswald",sans-serif; letter-spacing:.35cqw; text-transform:uppercase;
+      color:#f4eee2; background:rgba(8,6,6,.78); padding:1.4cqw 3.2cqw; border-left:1cqw solid #c0392b; white-space:nowrap; }
+  .L1.orizz .nome { bottom:10.5cqw; font-size:5.6cqw; }
+
+  /* ---------- 2. LOCANDINA: titolo rosso su sfumatura nera, come i poster anni '80 ---------- */
+  .L2 .carta::after { content:""; position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(180deg, rgba(0,0,0,.28) 0%, transparent 22%, transparent 52%, rgba(0,0,0,.88) 100%);
+      box-shadow:inset 0 0 0 .5cqw rgba(0,0,0,.6), inset 0 0 14cqw rgba(0,0,0,.55); }
+  .L2 .nome { left:0; right:0; bottom:5.5cqw; text-align:center; z-index:2; font:400 13cqw/.9 "Bebas Neue",sans-serif; letter-spacing:.6cqw; text-transform:uppercase;
+      color:#d6281c; text-shadow:0 .5cqw 0 #3a0705, 0 0 3cqw rgba(214,40,28,.75), 0 0 .8cqw #000; padding:0 4cqw; }
+  .L2.orizz .nome { font-size:11cqw; bottom:4cqw; }
+  .L2 .carta::before { content:""; position:absolute; inset:2.6cqw; border:.3cqw solid rgba(255,255,255,.22); border-radius:2.4cqw; z-index:3; pointer-events:none; }
+
+  /* ---------- 3. PAPERBACK: bordo di carta ingiallita e striscia strappata in macchina da scrivere ---------- */
+  .L3 .carta { background:#e5d8bb; padding:4.2cqw; }
+  .L3 .carta::before { content:""; position:absolute; inset:0; pointer-events:none; z-index:3; mix-blend-mode:multiply; opacity:.55;
+      background:radial-gradient(ellipse at center, transparent 55%, rgba(120,84,30,.55) 100%),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 .4  0 0 0 0 .3  0 0 0 0 .15  0 0 0 .45 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .L3 .carta > img { height:100%; border:.4cqw solid #2a1b12; filter:sepia(.18) saturate(1.05); }
+  .L3 .nome { left:7%; right:7%; bottom:8cqw; z-index:2; text-align:center; background:#f3ead2; color:#1b1210; font:400 6.2cqw/1.1 "Special Elite",serif;
+      padding:2cqw 2cqw 2.4cqw; transform:rotate(-1.4deg); text-transform:uppercase; letter-spacing:.2cqw; border-bottom:.9cqw solid #a52a1f;
+      clip-path:polygon(0 8%,3% 0,8% 6%,14% 0,20% 5%,27% 0,34% 6%,41% 0,49% 5%,57% 0,64% 6%,72% 0,80% 5%,88% 0,94% 6%,100% 0,100% 94%,96% 100%,90% 94%,82% 100%,74% 95%,66% 100%,58% 94%,50% 100%,41% 95%,33% 100%,24% 94%,16% 100%,9% 95%,3% 100%,0 94%); }
+  .L3.orizz .nome { font-size:4.8cqw; bottom:7cqw; left:20%; right:20%; }
+
+  /* ---------- 4. FOTO: istantanea ingiallita con nome a pennarello e nastro adesivo ---------- */
+  .L4 .carta { background:#ece3cf; padding:5cqw 5cqw 0; }
+  .L4.vert .carta > img { height:78%; }
+  .L4.orizz .carta > img { height:76%; }
+  .L4 .carta > img { filter:sepia(.22) contrast(1.04); box-shadow:inset 0 0 0 .3cqw rgba(0,0,0,.4); }
+  .L4 .carta::before { content:""; position:absolute; inset:0; z-index:3; pointer-events:none; mix-blend-mode:multiply; opacity:.6;
+      background:radial-gradient(ellipse at 30% 20%, transparent 40%, rgba(130,95,40,.45) 100%); }
+  .L4 .nome { left:0; right:0; bottom:2.4cqw; text-align:center; z-index:2; font:400 8cqw/1 "Permanent Marker",cursive; color:#201512; transform:rotate(-2deg); }
+  .L4.orizz .nome { font-size:6.4cqw; bottom:2cqw; }
+  .L4 .nastro { position:absolute; top:-1.5cqw; width:20cqw; height:6.5cqw; background:rgba(214,198,150,.72); z-index:4; box-shadow:0 .3cqw .8cqw rgba(0,0,0,.25); }
+  .L4 .nastro.a { left:-3cqw; transform:rotate(-38deg); top:1cqw; } .L4 .nastro.b { right:-3cqw; transform:rotate(38deg); top:1cqw; }
+
+  /* ---------- 5. OCCULTO: bordo a doppia linea, angoli ornamentali, titolo inciso ---------- */
+  .L5 .carta { background:#140d0c; padding:3.6cqw; }
+  .L5 .carta::before { content:""; position:absolute; inset:1.5cqw; border:.45cqw solid #8b2a22; border-radius:3cqw; z-index:3; pointer-events:none;
+      box-shadow:inset 0 0 0 1cqw #140d0c, inset 0 0 0 1.35cqw #5c1a15; }
+  .L5 .carta > img { height:100%; border-radius:1.4cqw; filter:saturate(1.08) contrast(1.04); }
+  .L5 .angolo { position:absolute; color:#b8362b; font:700 6cqw/1 "Cinzel",serif; z-index:4; }
+  .L5 .angolo.a { top:3cqw; left:4.4cqw; } .L5 .angolo.b { top:3cqw; right:4.4cqw; } .L5 .angolo.c { bottom:3cqw; left:4.4cqw; } .L5 .angolo.d { bottom:3cqw; right:4.4cqw; }
+  .L5 .nome { left:50%; bottom:6.5cqw; transform:translateX(-50%); z-index:2; background:rgba(16,9,8,.9); border:.4cqw solid #8b2a22; outline:.3cqw solid #3d1612; outline-offset:.5cqw;
+      padding:1.8cqw 6cqw; color:#e8d5b0; font:700 5.6cqw/1.1 "Cinzel",serif; letter-spacing:.7cqw; text-transform:uppercase; white-space:nowrap; text-shadow:0 .3cqw .6cqw #000; }
+  .L5.orizz .nome { font-size:4.8cqw; bottom:5.6cqw; }
+
+  /* ---------- 6. VHS: righe di scansione, parentesi da videocamera, nome in stile display ---------- */
+  .L6 .carta::before { content:""; position:absolute; inset:0; z-index:2; pointer-events:none; mix-blend-mode:multiply;
+      background:repeating-linear-gradient(180deg, rgba(0,0,0,.0) 0 .5cqw, rgba(0,0,0,.28) .5cqw .9cqw); }
+  .L6 .carta::after { content:""; position:absolute; inset:0; z-index:2; pointer-events:none;
+      background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.65) 100%); }
+  .L6 img { filter:saturate(1.2) contrast(1.08); }
+  .L6 .ang { position:absolute; width:8cqw; height:8cqw; border:0 solid rgba(255,255,255,.85); z-index:3; }
+  .L6 .ang.a { top:5cqw; left:5cqw; border-width:.7cqw 0 0 .7cqw; } .L6 .ang.b { top:5cqw; right:5cqw; border-width:.7cqw .7cqw 0 0; }
+  .L6 .ang.c { bottom:5cqw; left:5cqw; border-width:0 0 .7cqw .7cqw; } .L6 .ang.d { bottom:5cqw; right:5cqw; border-width:0 .7cqw .7cqw 0; }
+  .L6 .nome { left:9cqw; bottom:9cqw; z-index:4; font:400 10.5cqw/1 "VT323",monospace; color:#f2f2f2; text-transform:uppercase; letter-spacing:.3cqw;
+      text-shadow:.5cqw 0 rgba(255,0,40,.55), -.5cqw 0 rgba(0,200,255,.0), 0 0 1.2cqw rgba(0,0,0,.9); }
+  .L6.orizz .nome { font-size:9cqw; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Anteprima layout carte</h1>
+  <label>Personaggio <select id="selPers"></select></label>
+  <label>Luogo <select id="selLuogo"></select></label>
+  <a href="/">← Galleria</a>
+</header>
+<main>
+  <p class="nota">Solo immagine e nome, come nelle carte reali (statistiche ed eventi stanno nella companion app). I personaggi sono in formato 3:4 (verticale), i luoghi in 3:2 (orizzontale). L'immagine usata è la variante approvata, altrimenti la prima non scartata. Le proporzioni sono quelle delle immagini: se la carta stampata avrà un formato diverso (es. 5:7) i layout vanno adattati.</p>
+  <h2>Carta personaggio</h2><div class="fila" id="filaPers"></div>
+  <h2>Carta luogo</h2><div class="fila" id="filaLuogo"></div>
+</main>
+<script>
+const LAYOUT = [
+  ["L1", "Pellicola", "Striscia di negativo con perforazioni, nome su etichetta con barra rossa."],
+  ["L2", "Locandina", "Titolo rosso con alone sul fondo sfumato, stile poster horror anni '80."],
+  ["L3", "Paperback", "Bordo di carta ingiallita e striscia strappata in macchina da scrivere."],
+  ["L4", "Foto", "Istantanea ingiallita con nome a pennarello e nastro adesivo."],
+  ["L5", "Occulto", "Doppia cornice rossa, angoli ornamentali, titolo inciso in maiuscoletto."],
+  ["L6", "VHS", "Righe di scansione, parentesi da videocamera, nome in stile display."]
+];
+let dati = { carte: [] };
+
+function immagine(c) {
+  const v = c.varianti.find(x => x.id === c.approvata) || c.varianti.find(x => !x.scartata) || c.varianti[0];
+  return v ? "/media/" + v.file : "";
+}
+function carta(layout, c, orient) {
+  const wrap = document.createElement("div");
+  wrap.className = `wrap ${orient} ${layout}`;
+  const inner = document.createElement("div"); inner.className = "carta";
+  const img = document.createElement("img"); img.src = immagine(c); img.alt = c.nome; inner.append(img);
+  const extra = { L4: ["nastro a", "nastro b"], L5: ["angolo a", "angolo b", "angolo c", "angolo d"], L6: ["ang a", "ang b", "ang c", "ang d"] }[layout] || [];
+  extra.forEach(cl => {
+    const e = document.createElement("div"); e.className = cl;
+    if (layout === "L5") e.textContent = "✦";
+    inner.append(e);
+  });
+  const nome = document.createElement("div"); nome.className = "nome";
+  nome.textContent = layout === "L6" ? "▶ " + c.nome : c.nome;
+  inner.append(nome); wrap.append(inner);
+  return wrap;
+}
+function disegna(fila, sel, orient) {
+  const c = dati.carte.find(x => x.id === sel.value);
+  fila.replaceChildren();
+  if (!c) { fila.textContent = "Nessuna carta disponibile."; return; }
+  LAYOUT.forEach(([cl, nome, desc]) => {
+    const f = document.createElement("figure");
+    f.append(carta(cl, c, orient));
+    const cap = document.createElement("figcaption");
+    cap.innerHTML = `<b>${nome}</b><br>${desc}`; cap.style.maxWidth = orient === "vert" ? "230px" : "345px";
+    f.append(cap); fila.append(f);
+  });
+}
+function riempi(sel, tipo) {
+  const carte = dati.carte.filter(c => c.tipo === tipo && c.varianti.length);
+  sel.replaceChildren(...carte.map(c => Object.assign(document.createElement("option"), { value: c.id, textContent: c.nome })));
+}
+const selPers = document.getElementById("selPers"), selLuogo = document.getElementById("selLuogo");
+selPers.onchange = () => disegna(document.getElementById("filaPers"), selPers, "vert");
+selLuogo.onchange = () => disegna(document.getElementById("filaLuogo"), selLuogo, "orizz");
+fetch("/api/galleria").then(r => r.json()).then(d => {
+  dati = d; riempi(selPers, "personaggio"); riempi(selLuogo, "luogo");
+  const p = new URLSearchParams(location.search);
+  if (p.get("pers")) selPers.value = p.get("pers");
+  if (p.get("luogo")) selLuogo.value = p.get("luogo");
+  selPers.onchange(); selLuogo.onchange();
+});
+</script>
+</body>
+</html>

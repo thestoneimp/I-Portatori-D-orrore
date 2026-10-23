@@ -1,0 +1,44 @@
+/* Editor delle carte */
+.ed-modale { position: fixed; inset: 0; z-index: 50; background: #0b0707; display: flex; flex-direction: column; color: #e9dfd6; font: 14px/1.4 "Segoe UI", system-ui, sans-serif; }
+.ed-testa { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px; border-bottom: 1px solid #3a2626; background: #140d0d; }
+.ed-testa b { margin-right: 8px; }
+.ed-testa .ed-spazio { flex: 1; }
+.ed-testa button, .ed-pannello button, .ed-pannello select, .ed-pannello textarea, .ed-pannello input[type=text] {
+  background: #241818; color: #e9dfd6; border: 1px solid #3a2626; border-radius: 6px; padding: 5px 10px; font: inherit; cursor: pointer; }
+.ed-testa button:hover, .ed-pannello button:hover { border-color: #c0392b; }
+.ed-testa button:disabled { opacity: .4; cursor: default; }
+.ed-testa .ed-primario { background: #c0392b; border-color: #c0392b; color: #fff; }
+.ed-testa .ed-sporco { color: #d9a441; font-size: 12px; }
+.ed-testa label { color: #a89488; font-size: 13px; display: flex; gap: 5px; align-items: center; }
+.ed-corpo { flex: 1; min-height: 0; display: flex; overflow: hidden; }
+.ed-stage-outer { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; padding: 34px; overflow: visible; }
+.ed-stage { position: relative; flex: none; }
+.ed-stage.ed-v { width: min(470px, 56vh); }
+.ed-stage.ed-o { width: min(720px, calc(100vw - 460px), 98vh); }
+.ed-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 20; }
+.ed-box { position: absolute; border: 1.5px solid #4fa3ff; box-shadow: 0 0 0 1px rgba(0,0,0,.5); pointer-events: none; }
+.ed-box.ed-tratt { border-style: dashed; }
+.ed-h { position: absolute; width: 11px; height: 11px; background: #fff; border: 1.5px solid #4fa3ff; border-radius: 2px; pointer-events: auto; touch-action: none; transform: translate(-50%, -50%); }
+.ed-h[data-h="nw"], .ed-h[data-h="se"] { cursor: nwse-resize; } .ed-h[data-h="ne"], .ed-h[data-h="sw"] { cursor: nesw-resize; }
+.ed-h[data-h="n"], .ed-h[data-h="s"] { cursor: ns-resize; } .ed-h[data-h="e"], .ed-h[data-h="w"] { cursor: ew-resize; }
+.ed-guida { z-index: 21; position: absolute; background: #ff4d8d; pointer-events: none; display: none; }
+.ed-guida.v { top: -10px; bottom: -10px; width: 1px; left: 50%; } .ed-guida.h { left: -10px; right: -10px; height: 1px; top: 50%; }
+.ed-pannello { width: 340px; flex: none; border-left: 1px solid #3a2626; background: #140d0d; overflow: auto; padding: 12px; }
+.ed-pannello h3 { margin: 14px 0 6px; font-size: 12px; letter-spacing: .6px; text-transform: uppercase; color: #a89488; }
+.ed-pannello h3:first-child { margin-top: 0; }
+.ed-liv { list-style: none; margin: 0; padding: 0; }
+.ed-liv li { display: flex; align-items: center; gap: 4px; padding: 3px 4px; border-radius: 6px; border: 1px solid transparent; }
+.ed-liv li.sel { background: #241818; border-color: #4fa3ff; }
+.ed-liv li .ed-nome { flex: 1; text-align: left; background: none; border: none; padding: 3px 4px; }
+.ed-liv li button.ed-mini { padding: 1px 6px; font-size: 12px; }
+.ed-riga { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 13px; }
+.ed-riga > span:first-child { width: 96px; flex: none; color: #a89488; }
+.ed-riga input[type=range] { flex: 1; min-width: 0; accent-color: #c0392b; }
+.ed-riga output { width: 48px; text-align: right; font-variant-numeric: tabular-nums; color: #a89488; }
+.ed-riga textarea { flex: 1; min-height: 56px; resize: vertical; }
+.ed-riga select { flex: 1; }
+.ed-riga input[type=color] { width: 44px; height: 28px; padding: 0; border: 1px solid #3a2626; background: none; }
+.ed-sl { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+.ed-sugg { color: #a89488; font-size: 12px; margin-top: 10px; }
+@media (max-width: 900px) { .ed-corpo { flex-direction: column; } .ed-pannello { width: auto; max-height: 42vh; border-left: none; border-top: 1px solid #3a2626; }
+  .ed-stage-outer { padding: 16px; } .ed-stage.ed-v { width: min(470px, 28vh); } .ed-stage.ed-o { width: min(720px, 80vw, 60vh); } }

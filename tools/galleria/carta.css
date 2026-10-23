@@ -1,0 +1,12 @@
+/* Rendering condiviso delle carte (galleria + editor). Tutto scala con la larghezza della carta (unità cqw). */
+.cx-wrap { container-type: inline-size; width: 100%; }
+.cx-carta { position: relative; isolation: isolate; overflow: hidden; background: #000; border-radius: 4.2cqw; box-shadow: 0 8px 22px rgba(0,0,0,.65); user-select: none; }
+.cx-vert .cx-carta { aspect-ratio: 3 / 4; }
+.cx-orizz .cx-carta { aspect-ratio: 3 / 2; }
+.cx-el { position: absolute; }
+.cx-immagine { transform: translate(-50%, -50%); }
+.cx-immagine img { display: block; width: 100%; height: auto; -webkit-user-drag: none; pointer-events: none; }
+.cx-sfumatura { inset: 0; pointer-events: none; }
+.cx-cornice { pointer-events: none; }
+.cx-testo { white-space: nowrap; line-height: 1; }
+.cx-modifica .cx-immagine, .cx-modifica .cx-testo { cursor: move; touch-action: none; }
