@@ -1,5 +1,7 @@
 /* Rendering condiviso delle carte (galleria + editor). Tutto scala con la larghezza della carta (unità cqw). */
-.cx-wrap { container-type: inline-size; width: 100%; }
+.cx-wrap { container-type: inline-size; width: 100%; position: relative; }
+/* strato sopra la carta e NON ritagliato dal suo bordo: ci stanno gli elementi che possono sporgere (statistiche, solo versione digitale) */
+.cx-fuori { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
 .cx-carta { position: relative; isolation: isolate; overflow: hidden; background: #000; border-radius: 4.2cqw; box-shadow: 0 8px 22px rgba(0,0,0,.65); user-select: none; }
 .cx-vert .cx-carta { aspect-ratio: 3 / 4; }
 .cx-orizz .cx-carta { aspect-ratio: 3 / 2; }
@@ -10,3 +12,48 @@
 .cx-cornice { pointer-events: none; }
 .cx-testo { white-space: nowrap; line-height: 1; }
 .cx-modifica .cx-immagine, .cx-modifica .cx-testo { cursor: move; touch-action: none; }
+.cx-modifica .cx-stat, .cx-modifica .cx-st-pannello { pointer-events: auto; cursor: move; touch-action: none; }
+
+/* ---------- statistiche (icona + numero) ---------- */
+.cx-stats { inset: 0; pointer-events: none; }
+.cx-st-pannello { position: absolute; background: rgba(8, 5, 5, .58); border: .3cqw solid rgba(255, 255, 255, .1); border-radius: 3cqw; box-shadow: 0 .6cqw 2cqw rgba(0,0,0,.6); }
+.cx-stat { position: absolute; width: var(--u); height: var(--u); transform: translate(-50%, -50%); }
+.cx-ico { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+.cx-ico svg { width: 66%; height: 66%; overflow: visible; }
+.cx-num { position: absolute; line-height: 1; text-align: center; }
+/* colori di base dei glifi: f = forme, l = linee di dettaglio */
+.cx-ico svg .f { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.cx-ico svg .l { fill: none; stroke: var(--ln, currentColor); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* 1. INCISIONE: icone a linea crema su medaglione scuro con anello rosso, numero in un bollino */
+.cx-st-incisione .cx-ico { border-radius: 50%; color: #eadfcf; background: radial-gradient(circle at 35% 30%, #2b1a19, #0c0707 72%);
+  box-shadow: 0 0 0 calc(var(--u) * .045) #a52a1f, 0 0 0 calc(var(--u) * .085) #140b0a, 0 .7cqw 1.4cqw rgba(0,0,0,.75); }
+.cx-st-incisione .cx-ico svg { filter: url(#cx-ruvido); }
+.cx-st-incisione .cx-num { right: -9%; bottom: -9%; width: calc(var(--u) * .48); height: calc(var(--u) * .48); display: grid; place-items: center; border-radius: 50%;
+  background: #a52a1f; border: calc(var(--u) * .035) solid #140b0a; color: #fff; font: 400 calc(var(--u) * .36) / 1 "Bebas Neue", sans-serif; }
+
+/* 2. SIGILLO: simboli rossi pieni in un rombo bordato di crema, numero su targhetta */
+.cx-st-sigillo .cx-ico { color: #d6281c; --ln: #120b0b; background: #d8c8a2; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.cx-st-sigillo .cx-ico::before { content: ""; position: absolute; inset: 7%; background: radial-gradient(circle at 50% 35%, #2a1514, #0d0707 75%); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.cx-st-sigillo .cx-ico svg { position: relative; width: 54%; height: 54%; filter: url(#cx-ruvido); }
+.cx-st-sigillo .cx-ico svg .f { fill: currentColor; stroke: currentColor; stroke-width: .6; }
+.cx-st-sigillo .cx-num { left: 50%; bottom: -22%; transform: translateX(-50%); min-width: calc(var(--u) * .62); padding: calc(var(--u) * .05) calc(var(--u) * .1);
+  background: #120b0b; border: calc(var(--u) * .03) solid #d8c8a2; color: #ecd9b4; font: 700 calc(var(--u) * .3) / 1 "Cinzel", serif; letter-spacing: .04em; }
+
+/* 3. FUMETTO: contorno nero spesso, medaglione color carta con retino e ombra netta, numero con bordo */
+.cx-st-fumetto .cx-ico { border-radius: 50%; color: #c9281d; --ln: #120b0b; border: calc(var(--u) * .06) solid #120b0b; background: #eee1c1;
+  background-image: radial-gradient(rgba(18,11,11,.28) 22%, transparent 24%); background-size: calc(var(--u) * .14) calc(var(--u) * .14);
+  box-shadow: calc(var(--u) * .09) calc(var(--u) * .09) 0 #120b0b; }
+.cx-st-fumetto .cx-ico svg { filter: url(#cx-ruvido); }
+.cx-st-fumetto .cx-ico svg .f { fill: currentColor; stroke: #120b0b; stroke-width: 1.9; paint-order: stroke; }
+.cx-st-fumetto .cx-ico svg .l { stroke-width: 1.7; }
+.cx-st-fumetto .cx-num { right: -16%; bottom: -20%; color: #f6efe0; font: 400 calc(var(--u) * .66) / 1 "Bebas Neue", sans-serif; -webkit-text-stroke: calc(var(--u) * .1) #120b0b; paint-order: stroke fill;
+  text-shadow: calc(var(--u) * .05) calc(var(--u) * .06) 0 #c9281d; }
+
+/* 4. OSD / VHS: icona pixel e numero in stile display, affiancati */
+.cx-st-osd .cx-stat { width: auto; height: var(--u); display: flex; align-items: center; gap: calc(var(--u) * .12); white-space: nowrap; }
+.cx-st-osd .cx-ico { width: var(--u); height: var(--u); color: #f2f2f2; }
+.cx-st-osd .cx-ico svg { width: 100%; height: 100%; filter: drop-shadow(calc(var(--u) * .06) 0 0 rgba(255, 30, 60, .75)) drop-shadow(0 .4cqw .6cqw rgba(0,0,0,.8)); }
+.cx-st-osd .cx-ico svg rect { fill: currentColor; }
+.cx-st-osd .cx-num { position: static; color: #f2f2f2; font: 400 calc(var(--u) * 1) / 1 "VT323", monospace; min-width: 1ch; text-align: left;
+  text-shadow: calc(var(--u) * .06) 0 rgba(255, 30, 60, .75), 0 .4cqw .6cqw rgba(0,0,0,.9); }

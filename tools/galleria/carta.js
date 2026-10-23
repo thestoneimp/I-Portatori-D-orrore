@@ -19,15 +19,22 @@ const Carta = (() => {
 
   function predefiniti(c) {
     const vert = c.formato !== "orizzontale";
-    return [
+    const els = [
       { id: "immagine", tipo: "immagine", nome: "Immagine", visibile: true },
       { id: "sfumatura", tipo: "sfumatura", nome: "Sfumatura", visibile: true, altezza: 48, intensita: 1 },
       { id: "cornice", tipo: "cornice", nome: "Cornice", visibile: true, inset: 2.6, spessore: 0.3, colore: "#ffffff", opacita: 0.22, raggio: 2.4 },
       { id: "nome", tipo: "testo", nome: "Nome", visibile: true, testo: null, x: 50, y: vert ? 88 : 86, dim: vert ? 13 : 11,
         font: "Bebas Neue", colore: "#d6281c", spaziatura: 0.6, maiuscolo: true, alone: true, rot: 0 },
     ];
+    if (c.tipo === "personaggio" && typeof Statistiche !== "undefined") els.push(clona(Statistiche.PREDEFINITO));   // le carte personaggio hanno le statistiche
+    return els;
   }
-  const elementi = c => clona((c.layout && c.layout.elementi) || predefiniti(c));
+  const elementi = c => {
+    const els = clona((c.layout && c.layout.elementi) || predefiniti(c));
+    // layout salvati prima dell'introduzione delle statistiche: le aggiunge (in cima) per i personaggi
+    if (c.tipo === "personaggio" && typeof Statistiche !== "undefined" && !els.some(e => e.tipo === "statistiche")) els.push(clona(Statistiche.PREDEFINITO));
+    return els;
+  };
   const imm = v => ({ ...IMM_DEF, ...((v && v.imm) || {}) });
 
   function nodo(c, v, e, im, o) {
@@ -61,6 +68,7 @@ const Carta = (() => {
       n.style.borderRadius = e.raggio + "cqw";
       return n;
     }
+    if (e.tipo === "statistiche") return Statistiche.crea(e, c);   // vedi statistiche.js
     // testo
     const n = div("cx-el cx-testo");
     n.textContent = e.testo == null ? c.nome : e.testo;
@@ -80,10 +88,11 @@ const Carta = (() => {
   function render(c, v, o = {}) {
     const els = o.elementi || elementi(c), im = o.imm || imm(v);
     const wrap = div(`cx-wrap ${c.formato === "orizzontale" ? "cx-orizz" : "cx-vert"}` + (o.modifica ? " cx-modifica" : ""));
-    const carta = div("cx-carta"); wrap.append(carta);
+    const carta = div("cx-carta"), fuori = div("cx-fuori"); wrap.append(carta, fuori);
     els.forEach((e, i) => {
       if (!e.visibile || (o.soloImmagine && e.tipo !== "immagine")) return;
-      const n = nodo(c, v, e, im, o); n.dataset.id = e.id; n.style.zIndex = i + 1; carta.append(n);
+      const n = nodo(c, v, e, im, o); n.dataset.id = e.id; n.style.zIndex = i + 1;
+      (e.tipo === "statistiche" ? fuori : carta).append(n);   // le statistiche stanno sullo strato che può sporgere dal bordo
     });
     return wrap;
   }

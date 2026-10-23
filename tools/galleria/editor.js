@@ -61,20 +61,30 @@ const Editor = (() => {
     const wrap = Carta.render(ctx.carta, ctx.variante, { elementi: st.elementi, imm: st.imm, src: "/media/" + ctx.variante.file, soloImmagine: soloImg, modifica: true, cacheImg });
     stage.prepend(wrap);
     wrap.querySelectorAll(".cx-immagine, .cx-testo").forEach(n => n.addEventListener("pointerdown", e => inizioTrascina(e, n.dataset.id)));
+    wrap.querySelectorAll(".cx-stat, .cx-st-pannello").forEach(n => n.addEventListener("pointerdown", e => inizioTrascina(e, "statistiche")));
     wrap.querySelectorAll("img").forEach(i => i.addEventListener("load", overlay));
     overlay();
+  }
+  function rettangolo(e, n) {
+    const r = n.getBoundingClientRect();
+    if (e.tipo !== "statistiche") return r;
+    const parti = [...n.querySelectorAll(".cx-stat, .cx-st-pannello")].map(x => x.getBoundingClientRect());
+    if (!parti.length) return r;
+    const l = Math.min(...parti.map(p => p.left)), t = Math.min(...parti.map(p => p.top)), rr = Math.max(...parti.map(p => p.right)), b = Math.max(...parti.map(p => p.bottom));
+    return { left: l, top: t, right: rr, bottom: b, width: rr - l, height: b - t };
   }
   function overlay() {
     const ov = $("#edOverlay"); if (!ov) return; ov.replaceChildren();
     const e = cerca(sel); if (!e || !e.visibile || soloImg) return;
     const stage = $("#edStage"), n = stage.querySelector(`[data-id="${CSS.escape(sel)}"]`); if (!n) return;
-    const sr = stage.getBoundingClientRect(), r = n.getBoundingClientRect();
+    const sr = stage.getBoundingClientRect(), r = rettangolo(e, n);
     const box = el("div", "ed-box" + (e.tipo === "sfumatura" ? " ed-tratt" : ""));
     Object.assign(box.style, { left: r.left - sr.left + "px", top: r.top - sr.top + "px", width: r.width + "px", height: r.height + "px" });
     ov.append(box);
     if (e.tipo === "sfumatura") return;
     const pos = { nw: [0, 0], n: [50, 0], ne: [100, 0], e: [100, 50], se: [100, 100], s: [50, 100], sw: [0, 100], w: [0, 50] };
     for (const [h, [px, py]] of Object.entries(pos)) {
+      if (e.tipo === "statistiche" && h.length === 1) continue;   // le statistiche si scalano solo dagli angoli
       const m = el("div", "ed-h"); m.dataset.h = h;
       Object.assign(m.style, { left: r.left - sr.left + (r.width * px) / 100 + "px", top: r.top - sr.top + (r.height * py) / 100 + "px" });
       m.addEventListener("pointerdown", ev => inizioRidimensiona(ev, h)); ov.append(m);
@@ -115,15 +125,16 @@ const Editor = (() => {
   function inizioTrascina(ev, id) {
     if (soloImg) return;
     ev.preventDefault(); selez(id);
-    const e = cerca(id), sr = $("#edStage").getBoundingClientRect(), img = e.tipo === "immagine";
-    const o = img ? st.imm : e, x0 = o.x, y0 = o.y, p0 = { x: ev.clientX, y: ev.clientY }; let mosso = false;
+    const e = cerca(id), sr = $("#edStage").getBoundingClientRect(), img = e.tipo === "immagine", gruppo = e.tipo === "statistiche";
+    const o = img ? st.imm : e, kx = gruppo ? "dx" : "x", ky = gruppo ? "dy" : "y";
+    const x0 = o[kx] || 0, y0 = o[ky] || 0, p0 = { x: ev.clientX, y: ev.clientY }; let mosso = false;
     const mv = m => {
       let nx = x0 + ((m.clientX - p0.x) / sr.width) * 100, ny = y0 + ((m.clientY - p0.y) / sr.height) * 100;
-      const centro = img ? 0 : 50;   // l'immagine è centrata a 0, i testi a 50
+      const centro = img || gruppo ? 0 : 50;   // immagine e gruppo statistiche: 0 = posizione originale; i testi: 50 = centro della carta
       const sx = Math.abs(nx - centro) < 1.2, sy = Math.abs(ny - centro) < 1.2;
       if (sx) nx = centro; if (sy) ny = centro;
       if (m.shiftKey) { if (Math.abs(nx - x0) > Math.abs(ny - y0)) ny = y0; else nx = x0; }
-      o.x = arr(nx); o.y = arr(ny); mosso = true; guide(sx, sy); cambiato(); panelloValori();
+      o[kx] = arr(nx); o[ky] = arr(ny); mosso = true; guide(sx, sy); cambiato(); panelloValori();
     };
     const su = () => { window.removeEventListener("pointermove", mv); guide(false, false); if (mosso) spingi(); };
     window.addEventListener("pointermove", mv); window.addEventListener("pointerup", su, { once: true });
@@ -132,7 +143,7 @@ const Editor = (() => {
   function inizioRidimensiona(ev, h) {
     ev.preventDefault(); ev.stopPropagation();
     const e = cerca(sel), stage = $("#edStage"), sr = stage.getBoundingClientRect();
-    const n = stage.querySelector(`[data-id="${CSS.escape(sel)}"]`), r = n.getBoundingClientRect();
+    const n = stage.querySelector(`[data-id="${CSS.escape(sel)}"]`), r = rettangolo(e, n);
     const c = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     let mv;
     if (e.tipo === "immagine") {
@@ -172,6 +183,9 @@ const Editor = (() => {
         if (h.includes("s")) dx.push(((sr.bottom - m.clientY) / w) * 100);
         e.inset = arr(lim(dx.reduce((a, b) => a + b, 0) / dx.length, 0, 25), 1); cambiato(); panelloValori();
       };
+    } else if (e.tipo === "statistiche") {   // gruppo di icone: scala dal centro del gruppo
+      const d0 = Math.hypot(ev.clientX - c.x, ev.clientY - c.y) || 1, v0 = e.scala || 1;
+      mv = m => { e.scala = arr(lim(v0 * (Math.hypot(m.clientX - c.x, m.clientY - c.y) / d0), 0.4, 2.5), 3); cambiato(); panelloValori(); };
     } else {                       // testo: scala dal centro, in proporzione alla distanza del puntatore
       const d0 = Math.hypot(ev.clientX - c.x, ev.clientY - c.y) || 1, v0 = e.dim;
       mv = m => {
@@ -196,8 +210,9 @@ const Editor = (() => {
     if (inCampo) return;
     const e = cerca(sel); if (!e) return;
     const passo = ev.shiftKey ? 1 : 0.2, d = { ArrowLeft: [-passo, 0], ArrowRight: [passo, 0], ArrowUp: [0, -passo], ArrowDown: [0, passo] }[k];
-    if (d && (e.tipo === "immagine" || e.tipo === "testo")) {
-      ev.preventDefault(); const o = e.tipo === "immagine" ? st.imm : e; o.x = arr(o.x + d[0]); o.y = arr(o.y + d[1]); cambiato(); panelloValori();
+    if (d && (e.tipo === "immagine" || e.tipo === "testo" || e.tipo === "statistiche")) {
+      ev.preventDefault(); const o = e.tipo === "immagine" ? st.imm : e, kx = e.tipo === "statistiche" ? "dx" : "x", ky = e.tipo === "statistiche" ? "dy" : "y";
+      o[kx] = arr((o[kx] || 0) + d[0]); o[ky] = arr((o[ky] || 0) + d[1]); cambiato(); panelloValori();
     } else if (k === "Delete") { ev.preventDefault(); e.visibile = false; cambiato(); livelli(); pannello(); }
   }
 
@@ -275,6 +290,30 @@ const Editor = (() => {
       const op = slider(0, 1, 0.01, e.opacita, v => (e.opacita = v), v => Math.round(v * 100) + "%"), ra = slider(0, 15, 0.1, e.raggio, v => (e.raggio = v), v => v.toFixed(1));
       p.append(riga("Margine", ins), riga("Spessore", sp), riga("Colore", col), riga("Opacità", op), riga("Angoli tondi", ra));
       aggiornaValori = () => ins.set(e.inset);
+    } else if (e.tipo === "statistiche") {
+      const sd = document.createElement("select"); Statistiche.DISPOSIZIONI.forEach(([i, n]) => sd.append(new Option(n, i, false, i === e.disposizione)));
+      sd.onchange = () => { e.disposizione = sd.value; cambiato(); };
+      const ss = document.createElement("select"); Statistiche.STILI.forEach(([i, n]) => ss.append(new Option(n, i, false, i === e.stile)));
+      ss.onchange = () => { e.stile = ss.value; cambiato(); };
+      const sc = slider(40, 250, 1, Math.round((e.scala || 1) * 100), v => (e.scala = v / 100), v => v + "%");
+      const dx = slider(-40, 40, 0.1, e.dx || 0, v => (e.dx = v), v => v.toFixed(1)), dy = slider(-40, 40, 0.1, e.dy || 0, v => (e.dy = v), v => v.toFixed(1));
+      p.append(riga("Disposizione", sd), riga("Stile icone", ss), riga("Grandezza", sc), riga("Spostamento X", dx), riga("Spostamento Y", dy));
+      const valori = el("div", "ed-sugg", "Valori (d'esempio finché non sono collegati ai dati del personaggio):");
+      p.append(valori);
+      const griglia = el("div", "ed-riga"); griglia.style.flexWrap = "wrap"; griglia.style.gap = "6px 12px";
+      Statistiche.STAT.forEach(([id, nome]) => {
+        const l = el("label"); l.title = nome; l.style.cssText = "display:flex;gap:5px;align-items:center;color:#a89488;font-size:12px";
+        const i = Object.assign(document.createElement("input"), { type: "number", min: 0, max: 99, value: (e.valori && e.valori[id] != null) ? e.valori[id] : Statistiche.VALORI_ESEMPIO[id] });
+        i.style.cssText = "width:52px;background:#241818;color:#e9dfd6;border:1px solid #3a2626;border-radius:6px;padding:3px 5px";
+        i.oninput = () => { e.valori = Object.assign({}, e.valori || Statistiche.VALORI_ESEMPIO, { [id]: Number(i.value) }); cambiato(); };
+        l.append(id.toUpperCase(), i); griglia.append(l);
+      });
+      p.append(griglia);
+      const bz = el("button", null, "Valori d'esempio"); bz.onclick = () => { e.valori = null; cambiato(); pannello(); };
+      const bp = el("button", null, "Posizione originale"); bp.onclick = () => { e.dx = 0; e.dy = 0; cambiato(); pannello(); };
+      const bw = el("div", "ed-riga"); bw.append(bz, bp); p.append(bw);
+      p.append(el("div", "ed-sugg", "Le icone possono sporgere dal bordo: nella carta fisica non compaiono. Trascina il gruppo per spostarlo, angoli per ingrandirlo."));
+      aggiornaValori = () => { sc.set(Math.round((e.scala || 1) * 100)); dx.set(e.dx || 0); dy.set(e.dy || 0); };
     } else if (e.tipo === "sfumatura") {
       p.append(riga("Altezza in basso", slider(5, 100, 1, e.altezza, v => (e.altezza = v), v => v + "%")), riga("Intensità", slider(0, 1.5, 0.05, e.intensita, v => (e.intensita = v), v => Math.round(v * 100) + "%")));
     }

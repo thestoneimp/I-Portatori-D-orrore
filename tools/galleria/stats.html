@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anteprima statistiche</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@600;700&family=Oswald:wght@500;700&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/s/carta.css">
+<style>
+  :root { --bg:#0f0a0a; --bordo:#3a2626; --testo:#e9dfd6; --tenue:#a89488; --rosso:#c0392b; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--testo); font:15px/1.4 "Segoe UI", system-ui, sans-serif; }
+  header { padding:12px 20px; border-bottom:1px solid var(--bordo); position:sticky; top:0; background:rgba(15,10,10,.97); z-index:5; display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; }
+  h1 { margin:0; font-size:18px; }
+  label { color:var(--tenue); font-size:13px; display:flex; gap:6px; align-items:center; }
+  select, input[type=number] { background:#241818; color:var(--testo); border:1px solid var(--bordo); border-radius:6px; padding:4px 8px; font:inherit; }
+  input[type=number] { width:56px; }
+  a { color:var(--tenue); font-size:13px; }
+  main { padding:6px 20px 60px; max-width:1500px; margin:0 auto; }
+  h2 { font-size:14px; letter-spacing:.5px; text-transform:uppercase; color:var(--tenue); margin:26px 0 4px; }
+  .nota { color:var(--tenue); font-size:13px; margin:0 0 12px; max-width:900px; }
+  .fila { display:flex; flex-wrap:wrap; gap:22px 24px; align-items:flex-start; }
+  figure { margin:0; } figcaption { color:var(--tenue); font-size:12px; margin-top:8px; text-align:center; } figcaption b { color:var(--testo); }
+  .matrice { display:grid; grid-template-columns: 90px repeat(6, 1fr); gap:10px; align-items:start; }
+  .matrice .tit { font-size:12px; color:var(--tenue); text-align:center; } .matrice .rig { font-size:13px; color:var(--testo); align-self:center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Anteprima statistiche</h1>
+  <label>Personaggio <select id="selPers"></select></label>
+  <label>Stile icone <select id="selStile"></select></label>
+  <label>Disposizione <select id="selDisp"></select></label>
+  <label>Grandezza <input type="range" id="scala" min="70" max="140" value="100"> <output id="scalaO">100%</output></label>
+  <span id="valori" style="display:flex;gap:8px"></span>
+  <a href="/">← Galleria</a>
+</header>
+<main>
+  <h2>Disposizioni (con lo stile icone scelto)</h2>
+  <p class="nota">Valori d'esempio, modificabili in alto. Il nome in basso è quello della carta con il layout Locandina.</p>
+  <div class="fila" id="filaDisp"></div>
+  <h2>Stili delle icone (con la disposizione scelta)</h2>
+  <div class="fila" id="filaStili"></div>
+  <h2>Le icone da vicino</h2>
+  <div id="vicino"></div>
+  <h2>Tutte le combinazioni</h2>
+  <div class="matrice" id="matrice"></div>
+</main>
+<script src="/s/statistiche.js"></script>
+<script src="/s/carta.js"></script>
+<script>
+let dati = { carte: [] };
+const $ = id => document.getElementById(id);
+const val = {}; Statistiche.STAT.forEach(([id]) => (val[id] = Statistiche.VALORI_ESEMPIO[id]));
+
+function carta(c, stile, disp, larghezza) {
+  const els = Carta.elementi(c);
+  els.push({ id: "statistiche", tipo: "statistiche", nome: "Statistiche", visibile: true, disposizione: disp, stile, scala: $("scala").value / 100, valori: { ...val } });
+  const v = c.varianti.find(x => x.id === c.approvata) || c.varianti.find(x => !x.scartata) || c.varianti[0];
+  const w = Carta.render(c, v, { elementi: els, src: "/media/" + v.file });
+  w.style.width = larghezza + "px"; return w;
+}
+function fig(c, stile, disp, nome, sotto, larghezza) {
+  const f = document.createElement("figure"); f.append(carta(c, stile, disp, larghezza));
+  const cap = document.createElement("figcaption"); cap.innerHTML = `<b>${nome}</b>${sotto ? "<br>" + sotto : ""}`; cap.style.maxWidth = larghezza + "px"; f.append(cap); return f;
+}
+function disegna() {
+  const c = dati.carte.find(x => x.id === $("selPers").value); if (!c) return;
+  const stile = $("selStile").value, disp = $("selDisp").value;
+  $("scalaO").textContent = $("scala").value + "%";
+  $("filaDisp").replaceChildren(...Statistiche.DISPOSIZIONI.map(([d, n]) => fig(c, stile, d, n, "", 230)));
+  $("filaStili").replaceChildren(...Statistiche.STILI.map(([s, n]) => fig(c, s, disp, n, "", 300)));
+  $("vicino").replaceChildren(...Statistiche.STILI.map(([s, n]) => {
+    const w = document.createElement("div"); w.className = "cx-wrap"; w.style.cssText = "width:860px;margin:8px 0 16px";
+    const c2 = document.createElement("div"); c2.className = "cx-carta"; c2.style.cssText = "aspect-ratio:860/120;border-radius:8px;background:radial-gradient(circle at 30% 40%,#3a1a18,#150c0c 70%)";
+    c2.append(Statistiche.crea({ stile: s, disposizione: "riga", scala: 0.62, valori: { ...val } }, c)); w.append(c2);
+    const t = document.createElement("div"); t.className = "nota"; t.textContent = n; return Object.assign(document.createElement("div"), {}).appendChild(w) && (() => { const r = document.createElement("div"); r.append(t, w); return r; })();
+  }));
+  const m = $("matrice"); m.replaceChildren(document.createElement("div"));
+  Statistiche.DISPOSIZIONI.forEach(([, n]) => { const t = document.createElement("div"); t.className = "tit"; t.textContent = n; m.append(t); });
+  Statistiche.STILI.forEach(([s, ns]) => {
+    const r = document.createElement("div"); r.className = "rig"; r.textContent = ns; m.append(r);
+    Statistiche.DISPOSIZIONI.forEach(([d]) => { const cell = document.createElement("div"); cell.append(carta(c, s, d, 150)); cell.firstChild.style.width = "100%"; m.append(cell); });
+  });
+}
+function init() {
+  const pers = dati.carte.filter(c => c.tipo === "personaggio" && c.varianti.length);
+  $("selPers").replaceChildren(...pers.map(c => new Option(c.nome, c.id)));
+  $("selStile").replaceChildren(...Statistiche.STILI.map(([s, n]) => new Option(n, s)));
+  $("selDisp").replaceChildren(...Statistiche.DISPOSIZIONI.map(([s, n]) => new Option(n, s)));
+  $("valori").replaceChildren(...Statistiche.STAT.map(([id, nome]) => {
+    const l = document.createElement("label"); l.title = nome; const i = Object.assign(document.createElement("input"), { type: "number", min: 0, max: 99, value: val[id] });
+    i.oninput = () => { val[id] = Number(i.value); disegna(); }; l.append(id.toUpperCase(), i); return l; }));
+  const p = new URLSearchParams(location.search);
+  [["pers", "selPers"], ["stile", "selStile"], ["disp", "selDisp"]].forEach(([k, id]) => { if (p.get(k)) $(id).value = p.get(k); });
+  ["selPers", "selStile", "selDisp", "scala"].forEach(id => ($(id).oninput = disegna));
+  disegna();
+}
+fetch("/api/galleria").then(r => r.json()).then(d => { dati = d; init(); });
+</script>
+</body>
+</html>

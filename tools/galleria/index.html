@@ -40,7 +40,7 @@
   .descr { color: var(--tenue); font-size: 13px; margin-bottom: 10px; }
   .varianti { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
   .carta.orizz .varianti { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-  .var { background: var(--pannello2); border: 2px solid transparent; border-radius: 8px; overflow: hidden; position: relative; }
+  .var { background: var(--pannello2); border: 2px solid transparent; border-radius: 8px; position: relative; }   /* niente overflow:hidden: le icone delle statistiche possono sporgere dalla carta */
   .var.sel { border-color: var(--ambra); }
   .var.appr { border-color: var(--verde); }
   .var.scartata { opacity: .35; }
@@ -78,6 +78,7 @@
 <div class="modale" id="modale"><img id="modaleImg" alt=""><div class="did" id="modaleDid"></div><button id="modaleChiudi">Chiudi (Esc)</button></div>
 <div class="toast" id="toast"></div>
 
+<script src="/s/statistiche.js"></script>
 <script src="/s/carta.js"></script>
 <script src="/s/editor.js"></script>
 <script>
