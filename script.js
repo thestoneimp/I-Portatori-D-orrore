@@ -6217,6 +6217,9 @@ function creaMinaccia(definizioneOCodice, codiceCartaIniziale, opts = {}) {
     tempra: opts.tempra ?? definizione.tempra ?? 0,
     forza: opts.forza ?? definizione.forza ?? 0,
     agilita: opts.agilita ?? definizione.agilita ?? 0,
+    // Regola specifica: false = non sa aprire porte/finestre chiuse (es. il
+    // Cane Rabbioso), anche con intelligenza 1+. Se manca, vale true.
+    apreSbarramenti: opts.apreSbarramenti ?? definizione.apreSbarramenti ?? true,
     visibile: opts.visibile !== false,
     // Memoria per vittima: { [idVittima]: { vista, ultimaPosizioneNota, motivoScomparsa } }
     memoriaVittime: {},
@@ -6769,6 +6772,13 @@ function aggiornaPercezioneTutteLeMinacce() {
 // conta ciò che QUELLA minaccia sa (minaccia.sbarramentiNoti): uno
 // sbarramento mai visto da vicino non la ferma, e quelli che sa aprire
 // senza condizioni (intelligenza 1+) sono "raggiungibili dopo l'apertura".
+// Vero se la minaccia sa aprire porte/finestre chiuse non a chiave:
+// intelligenza 1+ E nessuna regola specifica che glielo vieti (campo
+// "apreSbarramenti": false nel catalogo, es. il Cane Rabbioso).
+function minacciaApreSbarramenti(minaccia) {
+  return (minaccia.intelligenza ?? 0) >= 1 && minaccia.apreSbarramenti !== false;
+}
+
 function bloccaMovimentoTraCarte(cartaA, cartaB, minaccia = null) {
   if (!cartaA.posizione || !cartaB.posizione) return false;
 
@@ -6793,7 +6803,7 @@ function bloccaMovimentoTraCarte(cartaA, cartaB, minaccia = null) {
       nomeNoto = minaccia.sbarramentiNoti?.[chiaveSbarramento(struttura)];
       if (!nomeNoto) return false; // mai visto da vicino: lo ignora
       if (
-        (minaccia.intelligenza ?? 0) >= 1 &&
+        minacciaApreSbarramenti(minaccia) &&
         condizioniAperturaDi(nomeNoto).includes("Nessuna")
       ) {
         return false; // raggiungibile dopo l'apertura
@@ -7619,7 +7629,7 @@ function prossimoPassoMinaccia(minaccia, luogoObiettivo) {
 // stato non esplora nulla (solo i PG esplorano) e lascia lo sbarramento
 // visibile/nascosto ai giocatori com'era.
 async function apriSbarramentoSeServe(minaccia, da, a) {
-  if ((minaccia.intelligenza ?? 0) < 1) return false;
+  if (!minacciaApreSbarramenti(minaccia)) return false;
   const tab = gameData.tabelloneAttivo || [];
   const trovato = trovaSbarramentoTra(
     tab.find((c) => c.codice === da),

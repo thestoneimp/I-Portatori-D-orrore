@@ -22,6 +22,7 @@
     "nome": "Cane Rabbioso",
     "movimento": 4,
     "intelligenza": 1,
+    "apreSbarramenti": false,
     "tempra": 1,
     "forza": 2,
     "agilita": 4
