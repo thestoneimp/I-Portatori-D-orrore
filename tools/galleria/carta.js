@@ -22,7 +22,7 @@ const Carta = (() => {
     const els = [
       { id: "immagine", tipo: "immagine", nome: "Immagine", visibile: true },
       { id: "sfumatura", tipo: "sfumatura", nome: "Sfumatura", visibile: true, altezza: 48, intensita: 1 },
-      { id: "cornice", tipo: "cornice", nome: "Cornice", visibile: true, inset: 2.6, spessore: 0.6, colore: "#ffffff", opacita: 1, raggio: 2.4 },
+      { id: "cornice", tipo: "cornice", nome: "Cornice", visibile: true, inset: 0, spessore: 5, colore: "#ffffff", opacita: 1, raggio: 4.2 },
       { id: "nome", tipo: "testo", nome: "Nome", visibile: true, testo: null, x: 50, y: vert ? 88 : 86, dim: vert ? 13 : 11,
         font: "Bebas Neue", colore: "#d6281c", spaziatura: 0.6, maiuscolo: true, alone: true, rot: 0 },
     ];

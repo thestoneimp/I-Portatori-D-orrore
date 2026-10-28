@@ -286,7 +286,7 @@ const Editor = (() => {
       aggiornaValori = () => { dim.set(e.dim); x.set(e.x); y.set(e.y); };
     } else if (e.tipo === "cornice") {
       const col = Object.assign(document.createElement("input"), { type: "color", value: e.colore }); col.oninput = () => { e.colore = col.value; cambiato(); };
-      const ins = slider(0, 25, 0.1, e.inset, v => (e.inset = v), v => v.toFixed(1)), sp = slider(0.05, 3, 0.05, e.spessore, v => (e.spessore = v), v => v.toFixed(2));
+      const ins = slider(0, 25, 0.1, e.inset, v => (e.inset = v), v => v.toFixed(1)), sp = slider(0.05, 12, 0.05, e.spessore, v => (e.spessore = v), v => v.toFixed(2));
       const op = slider(0, 1, 0.01, e.opacita, v => (e.opacita = v), v => Math.round(v * 100) + "%"), ra = slider(0, 15, 0.1, e.raggio, v => (e.raggio = v), v => v.toFixed(1));
       p.append(riga("Margine", ins), riga("Spessore", sp), riga("Colore", col), riga("Opacità", op), riga("Angoli tondi", ra));
       aggiornaValori = () => ins.set(e.inset);
