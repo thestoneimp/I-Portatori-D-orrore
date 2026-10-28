@@ -18,5 +18,13 @@ FORMATO_LUOGO = (1152, 768)  # 3:2, come le carte luogo del tabellone (.carta-ta
 FORMATO_VERTICALE = (768, 1024)
 
 
-def prompt(soggetto):
-    return f"{soggetto} {STILE}"
+# Variante per la casa "abitata/curata" (stato della casa nel gioco): stesso tratto a matita e acquarello, ma ambienti ordinati e
+# curati, luce calda e accogliente; la palette resta rosso/verde/blu, con un velo d'inquietudine.
+STILE_ABITATA = ("1980s horror movie poster painting, soft chiaroscuro with warm lamplight, palette of muted crimson red, olive green, warm amber and cold blue shadows, "
+                 "quiet cozy and slightly uneasy atmosphere. traditional hand-drawn illustration, loose pencil and ink sketch lines visible under hand-colored watercolor and colored pencil, "
+                 "uneven hand-applied color washes, visible pencil hatching, textured watercolor paper, rough imperfect handmade look, "
+                 "colored by hand, 1980s horror concept art")
+
+
+def prompt(soggetto, stile=STILE):
+    return f"{soggetto} {stile}"
