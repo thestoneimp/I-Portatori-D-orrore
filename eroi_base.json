@@ -25,7 +25,16 @@
       "Bibbia"
     ],
     "movimento": 2,
-    "genere": "maschio"
+    "genere": "maschio",
+    "caratteristiche": {
+      "pf": 4,
+      "pa": 3,
+      "forza": 2,
+      "intelletto": 3,
+      "rapidita": 1,
+      "carisma": 3
+    },
+    "immagine": "assets/carte/personaggi/P02.webp"
   },
   {
     "id": "P03",
@@ -39,7 +48,16 @@
       "Grimorio"
     ],
     "movimento": 3,
-    "genere": "femmina"
+    "genere": "femmina",
+    "caratteristiche": {
+      "pf": 3,
+      "pa": 3,
+      "forza": 1,
+      "intelletto": 4,
+      "rapidita": 2,
+      "carisma": 2
+    },
+    "immagine": "assets/carte/personaggi/P03.webp"
   },
   {
     "id": "P04",

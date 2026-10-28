@@ -579,6 +579,13 @@ fetch("eroi_base.json")
     });
   });
 
+fetch("assets/carte/indice.json")
+  .then((res) => res.json())
+  .then((data) => {
+    gameData.immaginiLuoghi = data.luoghi || [];
+  })
+  .catch((err) => console.error("Errore caricamento indice immagini:", err));
+
 window.addEventListener("load", () => {
   caricaScenari(); // Carica gli scenari all'avvio dell'app
 });
@@ -736,7 +743,7 @@ function mostraSelezionePersonaggi() {
     card.className = "pg-card";
     card.dataset.pg = nome;
     card.innerHTML = `
-      <div class="avatar-placeholder">[Avatar]</div>
+      ${htmlRitrattoEroe(nome)}
       <div class="pg-name">${nome}</div>
       <button class="pg-toggle-btn" type="button">Seleziona Personaggio</button>
     `;
@@ -839,7 +846,7 @@ function mostraCarteInizialiDopoSelezione() {
     card.dataset.pg = pg;
 
     card.innerHTML = `
-      <div class="avatar-placeholder">[Avatar]</div>
+      ${htmlRitrattoEroe(pg)}
       <div class="pg-name" style="text-align:center">Giocatore ${
         i + 1
       } — ${pg}</div>
@@ -856,6 +863,22 @@ function mostraCarteInizialiDopoSelezione() {
 
     grid.appendChild(card);
   });
+}
+
+// 🔹 Immagine della carta di un eroe (campo "immagine" di eroi_base.json, esportata dalla galleria con
+// tools/galleria/esporta.py: illustrazione + nome + statistiche). Gli eroi senza carta approvata restano col segnaposto.
+function immagineEroe(nome) {
+  return (gameData.eroiDisponibili || []).find((e) => e.nome === nome)?.immagine || "";
+}
+
+// Riquadro del ritratto di un eroe: la carta intera se esiste ("contain", perché ha un margine trasparente per le icone
+// che sporgono dal bordo), altrimenti il vecchio segnaposto testuale.
+function htmlRitrattoEroe(nome, classiExtra = "", testo = "[Avatar]") {
+  const img = immagineEroe(nome);
+  const classi = ("avatar-placeholder " + classiExtra).trim();
+  return img
+    ? `<div class="${classi} con-carta" style="background-image:url('${img}')" role="img" aria-label="${nome}"></div>`
+    : `<div class="${classi}">${testo}</div>`;
 }
 
 function getCarteIniziali(nomeEroe) {
@@ -1183,6 +1206,7 @@ function generaGrigliaTabelloneNascosto() {
     const cella = document.createElement("div");
     cella.className = "carta-tabellone";
     cella.innerText = carta.codice;
+    applicaImmagineLuogo(cella, carta.codice);
 
     cella.style.gridColumnStart = carta.posizione.x + 1;
     cella.style.gridRowStart = carta.posizione.y + 1;
@@ -1191,6 +1215,15 @@ function generaGrigliaTabelloneNascosto() {
   }
 
   container.appendChild(griglia);
+}
+
+// 🔹 Illustrazione di un luogo: solo i luoghi "abbandonati" approvati nella galleria (elenco in assets/carte/indice.json,
+// scritto da tools/galleria/esporta.py). Quelli della casa abitata non sono ancora usati; i luoghi senza immagine restano
+// com'erano (solo il codice). Il codice resta visibile, ma come etichetta piccola sopra l'illustrazione.
+function applicaImmagineLuogo(el, codice) {
+  if (!(gameData.immaginiLuoghi || []).includes(codice)) return;
+  el.classList.add("con-immagine");
+  el.style.backgroundImage = `url("assets/carte/luoghi/${codice}.webp")`;
 }
 
 function generaPreviewTabellone() {
@@ -4066,6 +4099,7 @@ function generaGrigliaTabellone() {
     cartaLuogo.className = "carta-tabellone";
     cartaLuogo.innerText = carta.codice;
     cartaLuogo.dataset.codice = carta.codice;
+    applicaImmagineLuogo(cartaLuogo, carta.codice);
 
     if (carta.esplorata) {
       cartaLuogo.classList.add("esplorata");
@@ -4765,7 +4799,7 @@ function aggiornaListaPersonaggiMenu() {
     .map(
       (pg, index) => `
       <div class="personaggio-card">
-        <div class="avatar-placeholder">[Avatar]</div>
+        ${htmlRitrattoEroe(pg)}
         <p><strong>${pg}</strong></p>
         <button onclick="mostraDettagliPersonaggio(${index})">Dettagli Personaggio</button>
       </div>
@@ -4803,7 +4837,7 @@ function mostraMenuTurniGiocatori(personaggiDisponibili) {
   personaggiDisponibili.forEach((pg) => {
     html += `
       <div class="personaggio-card">
-        <div class="avatar-placeholder">[Avatar]</div>
+        ${htmlRitrattoEroe(pg)}
         <p><strong>${pg}</strong></p>
         <button onclick="avviaTurnoPer('${pg}')">Avvia Turno</button>
       </div>
@@ -8113,6 +8147,12 @@ function aggiornaPersonaggiNelleCelle(
           cartaPG.className = "carta-personaggio";
           cartaPG.dataset.tipo = "pg";
           cartaPG.innerText = nome.split(" ")[0];
+          const imgPG = immagineEroe(nome);
+          if (imgPG) {
+            cartaPG.classList.add("con-carta");
+            cartaPG.style.backgroundImage = `url("${imgPG}")`;
+            cartaPG.innerText = ""; // il nome è già sulla carta
+          }
         }
 
         cartaPG.style.left = coords.x + "px";
@@ -10478,7 +10518,7 @@ function mostraInterazionePersonaggio(nomePG) {
   mostraPopupGenerico({
     titolo: nomePG,
     messaggio: `
-      <div class="avatar-placeholder avatar-carta">[Avatar PG]</div>
+      ${htmlRitrattoEroe(nomePG, "avatar-carta", "[Avatar PG]")}
       <div style="text-align:center;margin-top:6px">Scegli un'azione:</div>
     `,
     pulsanti,

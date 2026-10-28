@@ -2410,3 +2410,30 @@ button.casuale:hover {
   transform: translate(-50%, -50%);
 }
 /* === FINE BLOCCO DEBUG === */
+
+/* ---------- Immagini delle carte (esportate dalla galleria, vedi tools/galleria/esporta.py) ---------- */
+/* Carta personaggio: ha un margine trasparente per le icone che sporgono dal bordo, quindi "contain" e niente colore di fondo */
+.avatar-placeholder.con-carta {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+.carta-personaggio.con-carta {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  border: none;
+}
+/* Luogo con illustrazione: il codice diventa una piccola etichetta in basso */
+.carta-tabellone.con-immagine {
+  background-size: cover;
+  background-position: center;
+  align-items: flex-end;
+  font-size: 0.75rem;
+  text-shadow: 0 1px 3px #000, 0 0 6px #000;
+}
+.carta-tabellone.con-immagine:hover {
+  background-color: transparent;
+}
