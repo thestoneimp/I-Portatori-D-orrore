@@ -22,7 +22,7 @@ const Carta = (() => {
     const els = [
       { id: "immagine", tipo: "immagine", nome: "Immagine", visibile: true },
       { id: "sfumatura", tipo: "sfumatura", nome: "Sfumatura", visibile: true, altezza: 48, intensita: 1 },
-      { id: "cornice", tipo: "cornice", nome: "Cornice", visibile: true, inset: 2.6, spessore: 0.3, colore: "#ffffff", opacita: 0.22, raggio: 2.4 },
+      { id: "cornice", tipo: "cornice", nome: "Cornice", visibile: true, inset: 2.6, spessore: 0.6, colore: "#ffffff", opacita: 1, raggio: 2.4 },
       { id: "nome", tipo: "testo", nome: "Nome", visibile: true, testo: null, x: 50, y: vert ? 88 : 86, dim: vert ? 13 : 11,
         font: "Bebas Neue", colore: "#d6281c", spaziatura: 0.6, maiuscolo: true, alone: true, rot: 0 },
     ];
@@ -57,7 +57,6 @@ const Carta = (() => {
     if (e.tipo === "sfumatura") {
       const n = div("cx-el cx-sfumatura"), k = e.intensita;
       n.style.background = `linear-gradient(180deg, rgba(0,0,0,${0.28 * k}) 0%, transparent 22%, transparent ${100 - e.altezza}%, rgba(0,0,0,${Math.min(1, 0.88 * k)}) 100%)`;
-      n.style.boxShadow = `inset 0 0 0 .5cqw rgba(0,0,0,${0.6 * k}), inset 0 0 14cqw rgba(0,0,0,${0.55 * k})`;
       return n;
     }
     if (e.tipo === "cornice") {
