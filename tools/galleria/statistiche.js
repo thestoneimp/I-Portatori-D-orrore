@@ -1,13 +1,13 @@
 /* Elemento "statistiche" delle carte personaggio: 6 valori come icona + numero.
- *   pf = Punti ferita · mov = Movimento · for = Forza · int = Intelletto · rap = Rapidità · car = Carisma
+ *   pf = Punti ferita · pa = Punti azione (clessidra) · for = Forza · int = Intelletto · rap = Rapidità · car = Carisma
  * Elemento: { tipo:"statistiche", disposizione, stile, scala, valori: {pf:8,...} | null }
  *   disposizione: dove stanno le icone sulla carta (vedi DISPOSIZIONI)
  *   stile:        come sono disegnate le icone (vedi STILI)
  * I valori reali verranno dai dati del personaggio; finché non ci sono si usano quelli d'esempio.
  * Usato da Carta.render (carta.js). Le icone sono SVG: nitide a qualsiasi dimensione. */
 const Statistiche = (() => {
-  const STAT = [["pf", "Punti ferita"], ["mov", "Movimento"], ["for", "Forza"], ["int", "Intelletto"], ["rap", "Rapidità"], ["car", "Carisma"]];
-  const VALORI_ESEMPIO = { pf: 8, mov: 3, for: 4, int: 6, rap: 5, car: 7 };
+  const STAT = [["pf", "Punti ferita"], ["pa", "Punti azione"], ["for", "Forza"], ["int", "Intelletto"], ["rap", "Rapidità"], ["car", "Carisma"]];
+  const VALORI_ESEMPIO = { pf: 8, pa: 3, for: 4, int: 6, rap: 5, car: 7 };
   const STILI = [["incisione", "Incisione"], ["sigillo", "Sigillo"], ["fumetto", "Fumetto"], ["osd", "OSD / VHS"]];
   const DISPOSIZIONI = [["colonna", "Colonna laterale"], ["barra", "Barra in basso"], ["ali", "Ali"], ["pf", "PF in evidenza"], ["medaglioni", "Medaglioni"], ["griglia", "Griglia in alto"]];
 
@@ -15,8 +15,8 @@ const Statistiche = (() => {
   const GLIFI = {
     pf: { f: `<path d="M12 20.5S3.2 15.4 3.2 9.4A4.6 4.6 0 0 1 12 7.6a4.6 4.6 0 0 1 8.8 1.8c0 6-8.8 11.1-8.8 11.1z"/>`,
           l: `<path d="M6.6 9.6c.4-1.2 1.4-1.9 2.6-1.8"/>` },
-    mov: { f: `<ellipse cx="8.2" cy="16.2" rx="2.7" ry="4.1" transform="rotate(-10 8.2 16.2)"/><circle cx="5.6" cy="10.8" r="1.15"/><circle cx="8" cy="9.9" r="1.15"/><circle cx="10.4" cy="10.5" r="1.15"/>
-                <ellipse cx="16.2" cy="8.8" rx="2.7" ry="4.1" transform="rotate(10 16.2 8.8)"/><circle cx="13.6" cy="3.7" r="1.15"/><circle cx="16" cy="2.9" r="1.15"/><circle cx="18.4" cy="3.5" r="1.15"/>`, l: "" },
+    pa: { f: `<path d="M6.2 3h11.6v2.4c0 3-3.1 4.9-4.1 6.6 1 1.7 4.1 3.6 4.1 6.6V21H6.2v-2.4c0-3 3.1-4.9 4.1-6.6-1-1.7-4.1-3.6-4.1-6.6V3z"/>`,
+          l: `<path d="M8.8 5.6h6.4M12 14.6v3M9.4 19h5.2"/>` },
     for: { f: `<path d="M6.5 11.5V9a1.6 1.6 0 0 1 3.2 0 1.6 1.6 0 0 1 3.2 0 1.6 1.6 0 0 1 3.2 0 1.6 1.6 0 0 1 3.2 0v6.2A5.3 5.3 0 0 1 14 20.5h-1.7a5.8 5.8 0 0 1-5.8-5.8v-3.2z"/>`,
            l: `<path d="M9.7 9v3.4M12.9 9v3.4M16.1 9v3.4M6.6 13.6c2 .3 3.3 1.5 3.5 3.1"/>` },
     int: { f: `<path d="M10.5 4.2A3.3 3.3 0 0 0 7 5.6a3.2 3.2 0 0 0-1.7 4 3.3 3.3 0 0 0 .5 6.3 3.3 3.3 0 0 0 4.7 3.6V4.2z"/><path d="M13.5 4.2A3.3 3.3 0 0 1 17 5.6a3.2 3.2 0 0 1 1.7 4 3.3 3.3 0 0 1-.5 6.3 3.3 3.3 0 0 1-4.7 3.6V4.2z"/>`,
@@ -29,7 +29,7 @@ const Statistiche = (() => {
   /* ---- versione pixel (12 colonne) per lo stile OSD ---- */
   const PIXEL = {
     pf: ["............", ".XXX....XXX.", "XXXXX..XXXXX", "XXXXXXXXXXXX", "XXXXXXXXXXXX", "XXXXXXXXXXXX", ".XXXXXXXXXX.", "..XXXXXXXX..", "...XXXXXX...", "....XXXX....", ".....XX.....", "............"],
-    mov: ["............", "..XX........", ".XXXX.......", ".XXXX...XX..", ".XXXX..XXXX.", "..XX...XXXX.", ".......XXXX.", "..XX....XX..", ".XXXX.......", ".XXXX.......", "..XX........", "............"],
+    pa: ["............", ".XXXXXXXXXX.", ".X........X.", "..XX....XX..", "...XX..XX...", "....XXXX....", "....XXXX....", "...XX..XX...", "..XX.XX.XX..", ".X..XXXX..X.", ".XXXXXXXXXX.", "............"],
     for: ["............", "..X.X.X.X...", ".XXXXXXXXX..", ".XXXXXXXXX..", ".XXXXXXXXX..", ".XXXXXXXXXX.", "XXXXXXXXXXX.", "XXXXXXXXXX..", ".XXXXXXXXX..", "..XXXXXXX...", "...XXXXX....", "............"],
     int: ["............", "...XXXXXX...", "..XXXXXXXX..", ".XX.XX.XXXX.", ".XXXXXXXX.X.", ".XX.XXXXXXX.", ".XXXXX.XXXX.", "..XXXXXXXX..", "...XXXXXX...", "....X..X....", "............", "............"],
     rap: ["......XXX...", ".....XXX....", "....XXX.....", "...XXX......", "..XXXXXXX...", "....XXXXX...", "....XXX.....", "...XXX......", "..XXX.......", "..XX........", "............", "............"],
@@ -45,16 +45,25 @@ const Statistiche = (() => {
     return `<svg viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
   }
 
-  /* ---- disposizioni: posizione del centro di ogni icona (x, y in % della carta, ordine pf mov for int rap car),
+  /* ---- disposizioni: posizione del centro di ogni icona (x, y in % della carta, ordine pf pa for int rap car),
    *      fattore di grandezza k e un'eventuale tavoletta scura dietro (l, t, w, h in % della carta) ---- */
-  function disposizione(id) {
+  function disposizione(id, u0, H) {   // u0 = lato base dell'icona (cqw), H = altezza della carta in cqw
     const S = (xs, ys, k = 1) => xs.map((x, i) => ({ x, y: ys[i], k: Array.isArray(k) ? k[i] : k }));
     switch (id) {
       case "colonna": return { punti: S(Array(6).fill(11.5), [14, 26, 38, 50, 62, 74]), pannello: { l: 2, t: 7, w: 19, h: 75 } };
       case "barra": return { punti: S([8.33, 25, 41.67, 58.33, 75, 91.67], Array(6).fill(75)), pannello: { l: 3, t: 68, w: 94, h: 14 } };
       case "ali": return { punti: S([11, 11, 11, 89, 89, 89], [30, 47, 64, 30, 47, 64]) };
-      // PF in evidenza: il PF (grande) e la colonna di destra sporgono leggermente dal bordo: nella carta fisica non compaiono
-      case "pf": return { punti: S([10, 94.5, 94.5, 94.5, 94.5, 94.5], [8, 22, 34, 46, 58, 70], [1.55, 1, 1, 1, 1, 1]) };
+      // PF in evidenza: PF (grande, in alto a sinistra) e Punti azione (clessidra, stessa grandezza, nell'angolo opposto);
+      // forza, intelletto, rapidità e carisma in orizzontale sotto il nome. Ogni icona sporge dal bordo del 10% del proprio lato
+      // (le due d'angolo da due lati, quelle in basso solo dal basso): nella carta fisica non compaiono oltre il bordo.
+      case "pf": {
+        const k = [1.55, 1.55, 0.72, 0.72, 0.72, 0.72], u = k.map(x => u0 * x), pc = v => v / H * 100;   // cqw verticali -> % dell'altezza
+        return { punti: [
+          { x: 0.4 * u[0], y: pc(0.4 * u[0]), k: k[0] },
+          { x: 100 - 0.4 * u[1], y: pc(0.4 * u[1]), k: k[1] },
+          ...[20, 40, 60, 80].map((x, j) => ({ x, y: 100 - pc(0.4 * u[j + 2]), k: k[j + 2] })),
+        ] };
+      }
       case "medaglioni": return { punti: S([12, 88, 8, 92, 12, 88], [8, 8, 40, 40, 74, 74], 1.05) };
       case "riga": return { punti: S([8.33, 25, 41.67, 58.33, 75, 91.67], Array(6).fill(50)) };   // solo per l'anteprima da vicino (non è nel menu)
       case "griglia": return { punti: S([28, 50, 72, 28, 50, 72], [8, 8, 8, 19, 19, 19], 0.95), pannello: { l: 14, t: 3, w: 72, h: 23 } };
@@ -76,7 +85,7 @@ const Statistiche = (() => {
     assicuraFiltro();
     const host = document.createElement("div"); host.className = `cx-el cx-stats cx-st-${e.stile}`;
     const val = Object.assign({}, VALORI_ESEMPIO, c.stat || {}, e.valori || {});
-    const d = disposizione(e.disposizione), u0 = 15 * (e.scala || 1), dx = e.dx || 0, dy = e.dy || 0;   // dx, dy: scostamento di tutto il gruppo (% della carta)
+    const u0 = 15 * (e.scala || 1), d = disposizione(e.disposizione, u0, c.formato === "orizzontale" ? 100 / 1.5 : 100 / 0.75), dx = e.dx || 0, dy = e.dy || 0;   // dx, dy: scostamento di tutto il gruppo (% della carta)
     if (d.pannello) {
       const p = document.createElement("div"); p.className = "cx-st-pannello";
       Object.assign(p.style, { left: d.pannello.l + dx + "%", top: d.pannello.t + dy + "%", width: d.pannello.w + "%", height: d.pannello.h + "%" });
