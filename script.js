@@ -1206,7 +1206,6 @@ function generaGrigliaTabelloneNascosto() {
     const cella = document.createElement("div");
     cella.className = "carta-tabellone";
     cella.innerText = carta.codice;
-    applicaImmagineLuogo(cella, carta.codice);
 
     cella.style.gridColumnStart = carta.posizione.x + 1;
     cella.style.gridRowStart = carta.posizione.y + 1;
@@ -4099,7 +4098,8 @@ function generaGrigliaTabellone() {
     cartaLuogo.className = "carta-tabellone";
     cartaLuogo.innerText = carta.codice;
     cartaLuogo.dataset.codice = carta.codice;
-    applicaImmagineLuogo(cartaLuogo, carta.codice);
+    // L'illustrazione si vede solo a luogo esplorato (completaEsplorazione ridisegna la griglia)
+    if (carta.esplorata) applicaImmagineLuogo(cartaLuogo, carta.codice);
 
     if (carta.esplorata) {
       cartaLuogo.classList.add("esplorata");

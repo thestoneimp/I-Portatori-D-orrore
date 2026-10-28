@@ -558,7 +558,8 @@ button.btn-primary:hover {
    profondità). */
 .game-screen-camera {
   transform-origin: top left;
-  will-change: transform;
+  /* niente will-change: transform: terrebbe l'immagine rasterizzata alla scala iniziale e con lo zoom le illustrazioni
+     (e i testi) risulterebbero sfocate; così il browser le ridisegna nitide alla scala finale */
   position: relative;
   transition: transform 0.4s ease;
   width: 100%;
