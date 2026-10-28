@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Esporta carta</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@600;700&family=Oswald:wght@500;700&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/s/carta.css">
+<style>
+  html, body { margin: 0; background: #000; }
+  .cx-carta { box-shadow: none !important; }
+  .quadra .cx-carta { border-radius: 0; }
+</style>
+</head>
+<body>
+<div id="scena"></div>
+<script src="/s/statistiche.js"></script>
+<script src="/s/carta.js"></script>
+<script>
+/* Pagina usata da esporta.py (Edge headless) per disegnare una carta approvata come verrebbe vista nella galleria.
+ * Parametri: carta=<id>  larghezza=<px della carta>  margine=<px attorno, per le icone che sporgono>  solo=1 (solo illustrazione) */
+(async () => {
+  const q = new URLSearchParams(location.search); document.body.style.background = q.get("sfondo") || "#000";
+  const larghezza = +q.get("larghezza") || 768, margine = +q.get("margine") || 0;
+  const dati = await (await fetch("/api/galleria")).json();
+  const c = dati.carte.find(x => x.id === q.get("carta")), v = c.varianti.find(x => x.id === c.approvata);
+  const scena = document.getElementById("scena");
+  scena.style.cssText = `padding:${margine}px;width:${larghezza}px`;
+  const w = Carta.render(c, v, { src: "/arte/" + v.file, soloImmagine: q.get("solo") === "1" });
+  if (q.get("solo") === "1") w.classList.add("quadra");
+  scena.append(w);
+  await document.fonts.ready;
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+  document.title = "pronto";
+})();
+</script>
+</body>
+</html>

@@ -13,6 +13,26 @@ const PRECACHE_URLS = [
   "./elementi_interagibili_base.json",
   "./eventi_generici.json",
   "./minacce_base.json",
+  // <carte> generato da tools/galleria/esporta.py: non modificare a mano
+  "./assets/carte/indice.json",
+  "./assets/carte/luoghi/A01.webp",
+  "./assets/carte/luoghi/A02.webp",
+  "./assets/carte/luoghi/A03.webp",
+  "./assets/carte/luoghi/A04.webp",
+  "./assets/carte/luoghi/A06.webp",
+  "./assets/carte/luoghi/A07.webp",
+  "./assets/carte/luoghi/A08.webp",
+  "./assets/carte/luoghi/A09.webp",
+  "./assets/carte/luoghi/A10.webp",
+  "./assets/carte/luoghi/A11.webp",
+  "./assets/carte/luoghi/A12.webp",
+  "./assets/carte/luoghi/A13.webp",
+  "./assets/carte/luoghi/A15.webp",
+  "./assets/carte/luoghi/A16.webp",
+  "./assets/carte/luoghi/A17.webp",
+  "./assets/carte/personaggi/P02.webp",
+  "./assets/carte/personaggi/P03.webp",
+  // </carte>
   "./icons/icon-192.png",
   "./icons/icon-512.png"
 ];

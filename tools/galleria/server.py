@@ -69,6 +69,9 @@ class Gestore(BaseHTTPRequestHandler):
         if percorso == "/stats":
             with open(os.path.join(os.path.dirname(__file__), "stats.html"), "rb") as f:
                 return self._invia(200, f.read(), "text/html; charset=utf-8")
+        if percorso == "/esporta":   # pagina usata da esporta.py
+            with open(os.path.join(os.path.dirname(__file__), "esporta.html"), "rb") as f:
+                return self._invia(200, f.read(), "text/html; charset=utf-8")
         if percorso == "/layout":
             with open(os.path.join(os.path.dirname(__file__), "layout.html"), "rb") as f:
                 return self._invia(200, f.read(), "text/html; charset=utf-8")
