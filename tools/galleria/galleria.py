@@ -25,7 +25,7 @@ import json, os, tempfile, threading, time
 RADICE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 ARTE = os.path.join(RADICE, "arte")
 FILE = os.path.join(ARTE, "galleria.json")
-TIPI = ["personaggio", "luogo", "oggetto", "abilita", "sbarramento"]
+TIPI = ["personaggio", "luogo", "oggetto", "abilita", "sbarramento", "minaccia"]
 
 _lock = threading.RLock()
 

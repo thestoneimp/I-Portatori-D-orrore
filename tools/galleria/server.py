@@ -139,6 +139,13 @@ class Gestore(BaseHTTPRequestHandler):
                             or any(not isinstance(e, dict) or e.get("tipo") not in tipi or not isinstance(e.get("id"), str) for e in elementi)):
                         return self._invia(400, {"errore": "elementi non validi"})
                     carta["layout"] = {"modello": "locandina", "elementi": elementi}
+                car = d.get("caratteristiche")
+                if car is not None:
+                    chiavi = ("pf", "pa", "forza", "intelletto", "rapidita", "carisma")
+                    if (carta["tipo"] != "minaccia" or not isinstance(car, dict) or set(car) - set(chiavi)
+                            or any(car[k] is not None and (not isinstance(car[k], int) or isinstance(car[k], bool) or not 0 <= car[k] <= 99) for k in car)):
+                        return self._invia(400, {"errore": "caratteristiche non valide"})
+                    carta["caratteristiche"] = car
                 if im is not None:
                     var = next((x for x in carta["varianti"] if x["id"] == d.get("variante")), None)
                     if var is None:

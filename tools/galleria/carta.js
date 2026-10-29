@@ -15,6 +15,7 @@ const Carta = (() => {
 
   // colore (chiaro, per dare contrasto sull'illustrazione) con cui si tinge la cornice di ogni personaggio
   const TINTE_PG = { P01: "#9cc26b", P02: "#f2bb4d", P03: "#c98fd6", P04: "#76aee0", P05: "#ec7f6f", P06: "#62c9bf" };
+  const TINTA_MINACCE = "#e0463a";   // le minacce hanno la stessa cornice a marmo dei personaggi, ma sempre rossa
   const MATERIALI = [["", "Nessuno (filo colorato)"], ["marmo_venato", "Marmo venato"]];   // texture in tools/galleria/texture/<id>.png (+ _r = ruotata di 90 gradi)
 
   const rapporto = c => (c.formato === "orizzontale" ? 3 / 2 : 3 / 4);
@@ -22,15 +23,15 @@ const Carta = (() => {
   const clona = o => JSON.parse(JSON.stringify(o));
 
   function predefiniti(c) {
-    const vert = c.formato !== "orizzontale", pg = c.tipo === "personaggio";
+    const vert = c.formato !== "orizzontale", pg = c.tipo === "personaggio", min = c.tipo === "minaccia";
     const els = [
       { id: "immagine", tipo: "immagine", nome: "Immagine", visibile: true },
       { id: "sfumatura", tipo: "sfumatura", nome: "Sfumatura", visibile: true, altezza: 48, intensita: 1 },
-      pg ? { id: "cornice", tipo: "cornice", nome: "Cornice", visibile: true, inset: 0, spessore: 6, colore: TINTE_PG[c.id.split("_")[0]] || "#c8c8c8", opacita: 1, raggio: 4.2, materiale: "marmo_venato" }
+      pg || min ? { id: "cornice", tipo: "cornice", nome: "Cornice", visibile: true, inset: 0, spessore: 6, colore: min ? TINTA_MINACCE : TINTE_PG[c.id.split("_")[0]] || "#c8c8c8", opacita: 1, raggio: 4.2, materiale: "marmo_venato" }
          : { id: "cornice", tipo: "cornice", nome: "Cornice", visibile: true, inset: 0, spessore: 5, colore: "#ffffff", opacita: 1, raggio: 4.2 },
       // nei personaggi il nome sta più in alto per lasciare posto alla fila di icone grandi che sporge dal bordo inferiore
-      { id: "nome", tipo: "testo", nome: "Nome", visibile: true, testo: null, x: 50, y: pg ? 83 : vert ? 88 : 86, dim: vert ? 13 : 11,
-        font: "Bebas Neue", colore: "#d6281c", spaziatura: 0.6, maiuscolo: true, alone: true, rot: 0 },
+      { id: "nome", tipo: "testo", nome: "Nome", visibile: true, testo: null, x: 50, y: pg ? 83 : vert ? 88 : 86, dim: min ? 9 : vert ? 13 : 11,
+        font: "Bebas Neue", colore: min ? "#f4e6d3" : "#d6281c", spaziatura: 0.6, maiuscolo: true, alone: true, rot: 0 },
     ];
     if (c.tipo === "personaggio" && typeof Statistiche !== "undefined") els.push(clona(Statistiche.PREDEFINITO));   // le carte personaggio hanno le statistiche
     return els;

@@ -12,6 +12,10 @@ const Editor = (() => {
   const el = (tag, cl, txt) => { const e = document.createElement(tag); if (cl) e.className = cl; if (txt != null) e.textContent = txt; return e; };
   const lim = (v, a, b) => Math.min(b, Math.max(a, v));
   const arr = (v, d = 2) => Math.round(v * 10 ** d) / 10 ** d;
+  // caratteristiche di gioco delle minacce (stesse dei personaggi, chiavi di `caratteristiche` in eroi_base.json): si modificano qui e non vengono disegnate sulla carta.
+  // Vuote finché non vengono inserite a mano: il gioco usa dei valori provvisori per quelle mancanti.
+  const CAR_MINACCIA = [["pf", "PF"], ["pa", "PA"], ["forza", "Forza"], ["intelletto", "Intelletto"], ["rapidita", "Rapidità"], ["carisma", "Carisma"]];
+  const CAR_MINACCIA_VUOTE = { pf: null, pa: null, forza: null, intelletto: null, rapidita: null, carisma: null };
   const cerca = id => st.elementi.find(e => e.id === id);
   const sporco = () => JSON.stringify(st) !== salvato;
 
@@ -20,6 +24,7 @@ const Editor = (() => {
     if (ctx) rimuovi();
     ctx = { carta, variante, opz };
     st = { elementi: Carta.elementi(carta), imm: Carta.imm(variante) };
+    if (carta.tipo === "minaccia") st.caratteristiche = { ...CAR_MINACCIA_VUOTE, ...(carta.caratteristiche || {}) };   // valori di gioco: non compaiono sulla carta
     salvato = JSON.stringify(st); storia = [salvato]; hi = 0; sel = "nome"; soloImg = false;
     costruisci(); tutto();
     document.addEventListener("keydown", tasti, true);
@@ -27,7 +32,7 @@ const Editor = (() => {
   }
   function rimuovi() { clearTimeout(timer); document.removeEventListener("keydown", tasti, true); const m = $("#edModale"); if (m) m.remove(); ctx = null; }
   function chiudi() { if (sporco() && !confirm("Ci sono modifiche non salvate. Chiudere comunque?")) return; rimuovi(); }
-  const tutto = () => { ridisegna(); livelli(); pannello(); barra(); };
+  const tutto = () => { ridisegna(); livelli(); pannello(); caratteristiche(); barra(); };
 
   function costruisci() {
     const m = el("div", "ed-modale"); m.id = "edModale";
@@ -50,6 +55,7 @@ const Editor = (() => {
     p.append(el("h3", null, "Livelli"), Object.assign(el("ul", "ed-liv"), { id: "edLivelli" }));
     const add = el("button", null, "+ Aggiungi testo"); add.onclick = aggiungiTesto; p.append(add);
     p.append(el("h3", null, "Proprietà"), Object.assign(el("div"), { id: "edProp" }));
+    if (ctx.carta.tipo === "minaccia") p.append(Object.assign(el("div"), { id: "edCar" }));
     p.append(el("div", "ed-sugg", "Trascina per spostare · maniglie per ridimensionare (immagine: lati = stira, angoli = scala) · frecce per rifinire (Maiusc = più veloce) · Ctrl+Z annulla."));
     corpo.append(so, p); m.append(t, corpo); document.body.append(m);
     stage.addEventListener("pointerdown", e => { if (e.target === stage || e.target === ov) { /* click a vuoto: nessuna azione */ } });
@@ -105,7 +111,7 @@ const Editor = (() => {
   const annulla = () => vai(hi - 1), ripeti = () => vai(hi + 1);
   function reimposta() {
     if (!confirm("Riportare tutti gli elementi e la posizione dell'immagine ai valori predefiniti?")) return;
-    st = { elementi: Carta.predefiniti(ctx.carta), imm: { ...Carta.IMM_DEF } }; sel = "nome"; spingi(); tutto();
+    st = { elementi: Carta.predefiniti(ctx.carta), imm: { ...Carta.IMM_DEF }, ...(st.caratteristiche ? { caratteristiche: st.caratteristiche } : {}) }; sel = "nome"; spingi(); tutto();
   }
   function barra() {
     const a = $("#edAnnulla"); if (!a) return;
@@ -114,8 +120,8 @@ const Editor = (() => {
   }
   async function salva() {
     spingi();
-    const ok = await ctx.opz.salva({ carta: ctx.carta.id, variante: ctx.variante.id, elementi: st.elementi, imm: st.imm });
-    if (ok) { salvato = JSON.stringify(st); barra(); ctx.opz.avviso && ctx.opz.avviso("Carta salvata"); }
+    const ok = await ctx.opz.salva({ carta: ctx.carta.id, variante: ctx.variante.id, elementi: st.elementi, imm: st.imm, caratteristiche: st.caratteristiche });
+    if (ok) { ctx.carta.caratteristiche = st.caratteristiche; { salvato = JSON.stringify(st); barra(); ctx.opz.avviso && ctx.opz.avviso("Carta salvata"); } }
   }
 
   /* ---------- trascinamento / ridimensionamento ---------- */
@@ -319,6 +325,21 @@ const Editor = (() => {
     } else if (e.tipo === "sfumatura") {
       p.append(riga("Altezza in basso", slider(5, 100, 1, e.altezza, v => (e.altezza = v), v => v + "%")), riga("Intensità", slider(0, 1.5, 0.05, e.intensita, v => (e.intensita = v), v => Math.round(v * 100) + "%")));
     }
+  }
+
+  /* ---------- caratteristiche della minaccia (solo dati, nessuna icona sulla carta) ---------- */
+  function caratteristiche() {
+    const c = $("#edCar"); if (!c) return; c.replaceChildren();
+    c.append(el("h3", null, "Caratteristiche"));
+    const griglia = el("div", "ed-riga"); griglia.style.flexWrap = "wrap"; griglia.style.gap = "6px 12px";
+    CAR_MINACCIA.forEach(([id, nome]) => {
+      const l = el("label"); l.style.cssText = "display:flex;gap:5px;align-items:center;color:#a89488;font-size:12px";
+      const i = Object.assign(document.createElement("input"), { type: "number", min: 0, max: 99, value: st.caratteristiche[id] == null ? "" : st.caratteristiche[id] });
+      i.style.cssText = "width:52px;background:#241818;color:#e9dfd6;border:1px solid #3a2626;border-radius:6px;padding:3px 5px";
+      i.oninput = () => { st.caratteristiche[id] = i.value === "" ? null : Math.max(0, Math.min(99, Math.round(Number(i.value) || 0))); cambiato(); };
+      l.append(nome, i); griglia.append(l);
+    });
+    c.append(griglia, el("div", "ed-sugg", "Valori di gioco della minaccia: non compaiono sulla carta. Salva e dimmi di applicarli al gioco (minacce_base.json)."));
   }
 
   return { apri };
