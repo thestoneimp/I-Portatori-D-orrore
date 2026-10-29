@@ -3280,10 +3280,99 @@ function rivelaLuogoAdiacenteSbloccato(luoghi) {
 
 // Sostituisce uno sbarramento con la sua variante "nuovoNome" (es. "Porta
 // Aperta") nella stessa posizione logica (stessa carta base + direzione).
+// ============================================================
+// RESISTENZA DEGLI SBARRAMENTI
+// ============================================================
+// Ogni sbarramento abbattibile a mani nude ha una resistenza (come dei punti
+// ferita) estratta a caso nel proprio intervallo (`resistenza: {min, max}` in
+// carte_struttura_base.json) quando viene piazzato: così da una partita
+// all'altra la stessa porta può cedere con colpi diversi. Ogni colpo di
+// "Abbatti"/"Rompi" toglie una quantità di resistenza pari al CONTRIBUTO che il
+// giocatore dichiara (precompilato con la Forza del personaggio: oggetti e
+// abilità che la aumentano li gestiscono i giocatori al tavolo, sull'onestà);
+// a zero lo sbarramento cede. Il danno resta quando lo sbarramento cambia stato
+// (apri/chiudi...). Gli sbarramenti di ferro (`indistruttibile`) non si abbattono
+// a mani nude: serviranno degli oggetti.
+const FORZA_PREDEFINITA = 2; // provvisoria per gli eroi senza `caratteristiche.forza`
+
+function forzaDi(nomePG) {
+  const eroe = (gameData.eroiDisponibili || []).find((e) => e.nome === nomePG);
+  const f = eroe?.caratteristiche?.forza;
+  return Number.isFinite(f) ? f : FORZA_PREDEFINITA;
+}
+
+function tiraResistenzaSbarramento(def) {
+  const r = def?.resistenza;
+  if (!r || !Number.isFinite(r.min) || !Number.isFinite(r.max)) return null;
+  return r.min + Math.floor(Math.random() * (r.max - r.min + 1));
+}
+
+// Assegna la resistenza a una struttura che non l'ha ancora (es. salvataggi precedenti).
+function assicuraResistenza(strutt) {
+  if (Number.isFinite(strutt.resistenza)) return;
+  const def = (gameData.catalogoStrutture || []).find((s) => s.nome === strutt.nome);
+  const r = tiraResistenzaSbarramento(def);
+  if (r != null) {
+    strutt.resistenza = r;
+    strutt.resistenzaMax = r;
+  }
+}
+
+// Un nuovo sbarramento (stesso punto, stato diverso) eredita il danno già subito:
+// la resistenza appena estratta cala della stessa quantità (ma resta almeno 1).
+function applicaDannoEreditato(strutt, danno) {
+  if (!danno) return;
+  strutt.danno = danno;
+  if (Number.isFinite(strutt.resistenza)) strutt.resistenza = Math.max(1, strutt.resistenza - danno);
+}
+
+// Un colpo del personaggio attivo con il contributo dichiarato dal giocatore.
+// Ai giocatori NON si mostra mai il valore di resistenza, solo una sensazione.
+function colpisciSbarramento(def, inter, codiceIstanza, contributo) {
+  const pg = gameData.pgAttivo;
+  const strutt = (gameData.tabelloneStrutture || []).find((s) => s.codice === codiceIstanza);
+  if (!strutt) {
+    console.warn("[colpisciSbarramento] struttura non trovata:", codiceIstanza);
+    return;
+  }
+  assicuraResistenza(strutt);
+  if (!Number.isFinite(strutt.resistenza)) return;
+
+  strutt.resistenza -= contributo;
+  strutt.danno = (strutt.danno || 0) + contributo;
+  if (strutt.resistenza <= 0) {
+    completaProvaAbilita({
+      nomeStruttura: def.nome,
+      codiceStruttura: def.codice,
+      codiceIstanza,
+      idInterazione: inter.id,
+      testoCompletamento: inter.testoCompletamento,
+      azioneCompletamento: inter.azioneCompletamento,
+    });
+    return;
+  }
+
+  const finestra = /finestr/i.test(def.nome);
+  const oggetto = finestra ? "La finestra" : "La porta";
+  const parte = finestra ? "il vetro" : "il legno";
+  const stato = strutt.resistenza / (strutt.resistenzaMax || strutt.resistenza);
+  const testo =
+    stato > 0.66
+      ? `${oggetto} regge: sembra non aver sentito il colpo.`
+      : stato > 0.33
+      ? `${oggetto} traballa e ${parte} scricchiola: qualche altro colpo e potrebbe cedere.`
+      : `${oggetto} è ormai allo stremo: ancora poco e cederà.`;
+  mostraPopupGenerico({
+    titolo: finestra ? "Rompi" : "Abbatti",
+    messaggio: `<b>${pg}</b> si scaglia contro ${oggetto.toLowerCase()}. ${testo}`,
+  });
+}
+
 function ripiazzaSbarramento(strutt, nuovoNome, opts = {}) {
   // Salvo i riferimenti necessari PRIMA di rimuovere
   const base = Array.isArray(strutt.luoghi) ? strutt.luoghi[0] : null; // carta A
   const dir = strutt.direzione || null;
+  const danno = strutt.danno || 0; // il danno subito passa al nuovo stato
 
   rimuoviStruttura(strutt.codice, strutt.codiceCarta, strutt.luoghi);
 
@@ -3294,7 +3383,7 @@ function ripiazzaSbarramento(strutt, nuovoNome, opts = {}) {
     );
     return false;
   }
-  aggiungiSbarramentoSpecifico(base, dir, nuovoNome, opts);
+  aggiungiSbarramentoSpecifico(base, dir, nuovoNome, { ...opts, danno });
   return true;
 }
 
@@ -3307,7 +3396,11 @@ function gestisciInterazioneStruttura(
   const inter = def?.interazioni?.find((i) => i.id === idInterazione);
   if (!def || !inter) return;
 
-  if (!spendiPA(gameData.pgAttivo, COSTO_PA.interazione, "interagire")) return;
+  // Le prove costano PA solo quando si avvia davvero il tentativo (vedi
+  // apriProvaAbilita): qui si controlla soltanto che ce ne siano.
+  if (inter.tipo === "prova") {
+    if (!paSufficienti(gameData.pgAttivo, COSTO_PA.interazione, "interagire")) return;
+  } else if (!spendiPA(gameData.pgAttivo, COSTO_PA.interazione, "interagire")) return;
 
   if (inter.tipo === "descrittivo") {
     // Testo da mostrare
@@ -3709,6 +3802,27 @@ function gestisciInterazioneStruttura(
       ],
     });
 
+    return;
+  }
+
+  // Abbattere/rompere: il contributo dichiarato dal giocatore (precompilato con la
+  // Forza del personaggio) diventa il danno inflitto alla resistenza dello sbarramento
+  if (
+    inter.tipo === "prova" &&
+    ["abbattimento", "rottura", "rompi"].includes((inter.azioneCompletamento || "").toLowerCase())
+  ) {
+    apriProvaAbilita({
+      nomeStruttura: def.nome,
+      codiceIstanza,
+      codiceStruttura: def.codice,
+      idInterazione,
+      abilita: inter.abilita,
+      giocatori: inter.giocatori,
+      modo: "danno",
+      contributoIniziale: forzaDi(gameData.pgAttivo),
+      applicaContributo: (contributo) =>
+        colpisciSbarramento(def, inter, codiceIstanza, contributo),
+    });
     return;
   }
 
@@ -8650,6 +8764,8 @@ function aggiungiSbarramentoSpecificoBase(
       direzione,
       visibile: opts.visual !== false, // <- nuovo: false se piazzato solo "logicamente"
     };
+    assicuraResistenza(struttura);
+    applicaDannoEreditato(struttura, opts.danno);
 
     // registra in tabellone e indice Sxx
     gameData.tabelloneStrutture = gameData.tabelloneStrutture || [];
@@ -8725,6 +8841,8 @@ function aggiungiSbarramentoSpecificoBase(
     direzione,
     visibile: opts.visual !== false, // <- nuovo: false se piazzato solo "logicamente"
   };
+  assicuraResistenza(struttura);
+  applicaDannoEreditato(struttura, opts.danno);
 
   gameData.tabelloneStrutture = gameData.tabelloneStrutture || [];
   gameData.tabelloneStrutture.push(struttura);
@@ -9679,6 +9797,8 @@ function apriProvaAbilita({
   modo = "accumulo", // "accumulo" | "diretto"
   testoCompletamento, // opzionali: se non arrivano li recuperiamo noi
   azioneCompletamento,
+  contributoIniziale = 0, // valore da cui parte il contributo (es. la Forza del personaggio)
+  applicaContributo, // solo modo "danno": riceve il contributo invece di confrontarlo con un requisito
 }) {
   console.log("🧪[PROVA] open", {
     nomeStruttura,
@@ -9694,7 +9814,8 @@ function apriProvaAbilita({
   });
 
   const isGruppo = (giocatori || "").toLowerCase() === "gruppo";
-  const isDiretto = (modo || "accumulo").toLowerCase() === "diretto";
+  const isDanno = (modo || "").toLowerCase() === "danno";
+  const isDiretto = isDanno || (modo || "accumulo").toLowerCase() === "diretto";
   const reqNum = Number(requisito);
   console.log("🧪[PROVA] flags", { isGruppo, isDiretto, reqNum });
 
@@ -9741,8 +9862,9 @@ function apriProvaAbilita({
   console.log("🧪[PROVA] overlay appended");
 
   // Stato locale
-  let contributo = 0;
+  let contributo = Math.max(0, Number(contributoIniziale) || 0);
   const contributoEl = overlay.querySelector("#contributoVal");
+  contributoEl.textContent = contributo;
   const totaleEl = overlay.querySelector("#totaleVal");
 
   // Evita bubbling (e log)
@@ -9789,6 +9911,16 @@ function apriProvaAbilita({
             },
           ],
         });
+        return;
+      }
+
+      // Il tentativo costa PA solo ora che parte davvero
+      if (!spendiPA(gameData.pgAttivo, COSTO_PA.interazione, "tentare la prova")) return;
+
+      // Modo "danno" (abbattere/rompere): il contributo è il danno allo sbarramento
+      if (isDanno) {
+        chiudiPopupSelettivo(overlay);
+        applicaContributo?.(contributo);
         return;
       }
 

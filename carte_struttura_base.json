@@ -36,7 +36,11 @@
         "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
         "azioneCompletamento": "scavalcamento"
       }
-    ]
+    ],
+    "resistenza": {
+      "min": 3,
+      "max": 5
+    }
   },
   {
     "codice": "S02",
@@ -95,7 +99,11 @@
         "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
         "azioneCompletamento": "scavalcamento"
       }
-    ]
+    ],
+    "resistenza": {
+      "min": 5,
+      "max": 9
+    }
   },
   {
     "codice": "S04",
@@ -127,7 +135,11 @@
         "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
         "azioneCompletamento": "scavalcamento"
       }
-    ]
+    ],
+    "resistenza": {
+      "min": 4,
+      "max": 7
+    }
   },
   {
     "codice": "S16",
@@ -149,7 +161,8 @@
     "bloccante": "sì",
     "tipo": "sbarramento",
     "descrizione": "Blocca il passaggio ma permette di vedere attraverso, rivelando la stanza adiacente.",
-    "bloccaVista": false
+    "bloccaVista": false,
+    "indistruttibile": true
   },
   {
     "codice": "S06",
@@ -200,7 +213,8 @@
         "azioneCompletamento": "scavalcamento"
       }
     ],
-    "bloccaVista": false
+    "bloccaVista": false,
+    "indistruttibile": true
   },
   {
     "codice": "S10",
@@ -231,7 +245,11 @@
         "testoCompletamento": "Con uno slancio preciso, scavalchi il cancello e atterri dall’altra parte.",
         "azioneCompletamento": "scavalcamento"
       }
-    ]
+    ],
+    "resistenza": {
+      "min": 3,
+      "max": 5
+    }
   },
   {
     "codice": "S11",
@@ -270,13 +288,8 @@
       {
         "id": "rompi",
         "etichetta": "Rompi",
-        "tipo": "prova",
-        "abilita": "forza",
-        "requisito": 2,
-        "giocatori": "gruppo",
-        "modo": "accumulo",
-        "testoCompletamento": "A forza di spallate e di calci ben assestati, la porta si spalanca.",
-        "azioneCompletamento": "abbattimento"
+        "tipo": "descrittivo",
+        "testo": "Le sbarre di ferro sono troppo robuste: a mani nude non c'è modo di piegarle o spezzarle."
       },
       {
         "id": "arrampicati",
@@ -290,7 +303,8 @@
         "azioneCompletamento": "scavalcamento"
       }
     ],
-    "bloccaVista": false
+    "bloccaVista": false,
+    "indistruttibile": true
   },
   {
     "codice": "S13",
@@ -322,7 +336,11 @@
         "azioneCompletamento": "scavalcamento"
       }
     ],
-    "bloccaVista": false
+    "bloccaVista": false,
+    "resistenza": {
+      "min": 3,
+      "max": 5
+    }
   },
   {
     "codice": "S14",
@@ -395,6 +413,10 @@
         "azioneCompletamento": "scavalcamento"
       }
     ],
-    "bloccaVista": false
+    "bloccaVista": false,
+    "resistenza": {
+      "min": 2,
+      "max": 4
+    }
   }
 ]
