@@ -583,8 +583,22 @@ fetch("assets/carte/indice.json")
   .then((res) => res.json())
   .then((data) => {
     gameData.immaginiLuoghi = data.luoghi || [];
+    precaricaImmaginiCarte(data.luoghi || []);
   })
   .catch((err) => console.error("Errore caricamento indice immagini:", err));
+
+// generaGrigliaTabellone() ricrea tutto il DOM a ogni cambiamento (esplorazione, sbarramenti, spostamenti): le illustrazioni dei
+// luoghi sono sfondi CSS, che il browser rilegge e ridecodifica ogni volta, e per qualche istante le carte restano scure o con
+// l'immagine a bassa risoluzione ("sfocata"). Tenendo gli <img> già decodificati in memoria, il ridisegno le trova pronte.
+const cacheImmaginiCarte = [];
+function precaricaImmaginiCarte(codici) {
+  codici.forEach((codice) => {
+    const img = new Image();
+    img.src = `assets/carte/luoghi/${codice}.webp`;
+    img.decode().catch(() => {});
+    cacheImmaginiCarte.push(img);   // il riferimento tiene viva l'immagine decodificata
+  });
+}
 
 window.addEventListener("load", () => {
   caricaScenari(); // Carica gli scenari all'avvio dell'app
