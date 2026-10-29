@@ -43,7 +43,8 @@ body {
      verrebbe tagliato PRIMA che la scala possa farlo rientrare a schermo. */
   overflow: visible;
   transform-origin: top center;
-  will-change: transform;
+  /* niente will-change: transform (vedi nota su .game-screen-camera): rasterizzerebbe tutto alla scala iniziale e popup e immagini
+     apparirebbero sfocati dopo l'adattamento alla finestra */
 }
 
 .home-background {
@@ -531,12 +532,10 @@ button.btn-primary:hover {
   width: 100vw;
   height: 100vh;
   transform-origin: top center;
-  will-change: transform;
 }
 
 .game-screen {
   transform-origin: top left; /* o 0 0 */
-  will-change: transform; /* micro-ottimizzazione */
   position: relative;
   transition: transform 0.4s ease;
   width: 100%;
@@ -788,7 +787,7 @@ button.btn-primary:hover {
      Il minimo lascia libero l'angolo del pulsante "Chiudi tutti". */
   padding: var(--popup-top) 8px 8px;
   z-index: 9999;
-  animation: fadeInPopup 0.25s ease-out forwards;
+  animation: fadeInPopup 0.25s ease-out; /* senza "forwards": a fine animazione niente transform/layer residuo (sfocava il testo) */
   pointer-events: none; /* lo sfondo scuro condiviso blocca i click, non ogni singolo popup */
 }
 
@@ -810,7 +809,7 @@ button.btn-primary:hover {
   font-size: clamp(13px, 2.8vh, 16px);
   text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 16px var(--blood-red-glow);
-  animation: scaleIn 0.25s ease-out forwards;
+  animation: scaleIn 0.25s ease-out; /* senza "forwards": a fine animazione niente transform/layer residuo (sfocava il testo) */
   pointer-events: auto; /* la finestra del popup resta cliccabile */
 }
 
@@ -835,7 +834,7 @@ button.btn-primary:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 0 12px var(--torch-amber-glow);
   font-size: clamp(12px, 2.5vh, 14.5px);
   text-align: left;
-  animation: fadeInPopup 0.15s ease-out forwards;
+  animation: fadeInPopup 0.15s ease-out; /* senza "forwards": a fine animazione niente transform/layer residuo (sfocava il testo) */
 }
 
 .tutorial-flyout-titolo {
@@ -867,7 +866,7 @@ button.btn-primary:hover {
   gap: clamp(10px, 2.5vw, 20px);
   color: var(--text-main);
   cursor: pointer;
-  animation: fadeInPopup 0.2s ease-out forwards;
+  animation: fadeInPopup 0.2s ease-out; /* senza "forwards": a fine animazione niente transform/layer residuo (sfocava il testo) */
 }
 
 .dialogo-png-ritratto {
@@ -1000,7 +999,7 @@ button.btn-primary:hover {
   align-items: center;
   justify-content: center;
   z-index: 9000;
-  animation: fadeInPopup 0.25s ease-out forwards;
+  animation: fadeInPopup 0.25s ease-out; /* senza "forwards": a fine animazione niente transform/layer residuo (sfocava il testo) */
 }
 
 .popup-interazione-stanza .popup-content {
@@ -1016,7 +1015,7 @@ button.btn-primary:hover {
   font-size: clamp(13px, 2.8vh, 16px);
   text-align: center;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-  animation: scaleIn 0.25s ease-out forwards;
+  animation: scaleIn 0.25s ease-out; /* senza "forwards": a fine animazione niente transform/layer residuo (sfocava il testo) */
 }
 
 /* ----------------------------- */
