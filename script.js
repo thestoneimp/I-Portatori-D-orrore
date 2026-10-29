@@ -572,10 +572,14 @@ fetch("eroi_base.json")
   .then((data) => {
     gameData.eroiDisponibili = data;
 
-    // 🔹 Inizializza il movimento attuale per ciascun eroe
+    // 🔹 Inizializza passi per movimento e PA di ciascun eroe: i passi sono dati
+    // dalla Rapidità (`caratteristiche`); per gli eroi che non l'hanno ancora si
+    // usa il vecchio `movimento`.
     gameData.movimentoAttuale = {};
+    gameData.paMassimi = {};
     data.forEach((pg) => {
-      gameData.movimentoAttuale[pg.nome] = pg.movimento; // valore dal JSON
+      gameData.movimentoAttuale[pg.nome] = pg.caratteristiche?.rapidita ?? pg.movimento;
+      if (Number.isFinite(pg.caratteristiche?.pa)) gameData.paMassimi[pg.nome] = pg.caratteristiche.pa;
     });
   });
 
@@ -1045,6 +1049,7 @@ function mostraScenario(scenario, isTutorial = false) {
   gameData.tutorialAttivo = isTutorial;
   gameData.turniCompletati = []; // All'inizio nessuno ha agito
   gameData.movimentoUsato = {}; // Nessuno ha ancora effettuato il proprio movimento
+  gameData.paResidui = {}; // PA residui del turno corrente, per personaggio
   gameData.pngAttivi = []; // Nessun PNG ancora presente in questo scenario
   gameData.minacceAttive = []; // Nessuna minaccia ancora presente in questo scenario
   gameData.flagScenario = {}; // Flag locali di questo scenario (si azzerano ogni scenario)
@@ -2836,13 +2841,77 @@ function aggiornaTestoPulsanteConferma() {
     : "Attiva Messaggi di Conferma";
 }
 
+// ============================================================
+// PUNTI AZIONE (PA)
+// ============================================================
+// Ogni azione di un personaggio costa PA: il turno non è più "un movimento
+// + un'interazione" ma una riserva di PA (caratteristica `pa`, ricaricata a
+// inizio turno; quelli non spesi si perdono) da spendere come si vuole.
+// I passi di un movimento dipendono dalla Rapidità (vedi `movimentoAttuale`).
+// Le scale fanno parte del movimento e non costano nulla a parte.
+const PA_PREDEFINITI = 3; // provvisorio per chi non ha ancora `caratteristiche.pa`
+const COSTO_PA = {
+  movimento: 1, // un movimento = fino a Rapidità passi
+  esplorazione: 1, // esplorare a mano il luogo in cui si è (l'arrivo dopo un movimento è gratis)
+  interazione: 1, // elementi del luogo e strutture/sbarramenti (apri, chiudi, abbatti...)
+  rumore: 1,
+  oggetto: 1,
+  png: 1, // parlare con un PNG
+};
+
+function paMassimi(nome) {
+  const v = gameData.paMassimi?.[nome];
+  return Number.isFinite(v) ? v : PA_PREDEFINITI;
+}
+
+function paResidui(nome) {
+  const v = gameData.paResidui?.[nome];
+  return Number.isFinite(v) ? v : paMassimi(nome);
+}
+
+// Verifica (senza spendere) che il personaggio attivo abbia PA a sufficienza;
+// altrimenti avvisa. Fuori dalla fase giocatori o senza personaggio attivo non limita.
+function paSufficienti(nome, costo, azione = "farlo") {
+  if (!nome || faseCorrente !== "giocatori") return true;
+  const residui = paResidui(nome);
+  if (residui >= costo) return true;
+  mostraPopupGenerico({
+    titolo: "Punti azione insufficienti",
+    messaggio:
+      residui <= 0
+        ? `<b>${nome}</b> ha esaurito i punti azione di questo turno.`
+        : `Per ${azione} servono ${costo} punti azione, ma a <b>${nome}</b> ne rimangono ${residui}.`,
+  });
+  return false;
+}
+
+// Spende i PA (se ci sono) e aggiorna l'indicatore; restituisce false se non bastano.
+function spendiPA(nome, costo, azione) {
+  if (!nome || faseCorrente !== "giocatori") return true;
+  if (!paSufficienti(nome, costo, azione)) return false;
+  gameData.paResidui = gameData.paResidui || {};
+  gameData.paResidui[nome] = paResidui(nome) - costo;
+  aggiornaIndicatorePA();
+  return true;
+}
+
+function aggiornaIndicatorePA() {
+  const el = document.getElementById("phaseIndicatorPA");
+  if (!el) return;
+  const pg = faseCorrente === "giocatori" ? gameData.pgAttivo : null;
+  el.textContent = pg ? `PA ${paResidui(pg)}/${paMassimi(pg)}` : "";
+  el.classList.toggle("vuoto", !pg);
+  el.classList.toggle("esauriti", !!pg && paResidui(pg) <= 0);
+}
+
 // 🔹 Avvia il movimento di un personaggio lungo un percorso, controllando
 // e rivelando eventuali sbarramenti passo-passo lungo la strada.
 // Se un tratto è bloccato, il personaggio si ferma lì (non alla destinazione originale).
 function avviaMovimentoConSbarramenti(nomePersonaggio, percorso) {
-  // Un solo movimento a turno: da qui in poi, finché non ricomincia il turno,
-  // questo personaggio ha già usato il proprio movimento (anche se poi
-  // dovesse fermarsi prima per uno sbarramento).
+  // Ogni movimento costa PA (anche se poi ci si ferma prima per uno sbarramento).
+  // `movimentoUsato` resta come "ha già agito in questo turno" per la memoria
+  // delle minacce (vedi intelligenza 3).
+  if (!spendiPA(nomePersonaggio, COSTO_PA.movimento, "muoversi")) return;
   gameData.movimentoUsato[nomePersonaggio] = true;
 
   const { percorsoValido, idsDaRivelare, bloccato } =
@@ -2906,6 +2975,13 @@ function avviaMovimentoConSbarramenti(nomePersonaggio, percorso) {
   });
 }
 
+// Esplorazione "a mano" del luogo in cui si è: costa PA (a differenza di quella
+// automatica all'arrivo di un movimento).
+function esploraConPA(nomePG, carta) {
+  if (!spendiPA(nomePG, COSTO_PA.esplorazione, "esplorare")) return;
+  completaEsplorazione(carta);
+}
+
 function gestisciClickCartaLuogo(codiceDestinazione) {
   const nomePG = gameData.pgAttivo;
 
@@ -2933,7 +3009,7 @@ function gestisciClickCartaLuogo(codiceDestinazione) {
               testo: "Sì",
               azione: () => {
                 chiudiPopup();
-                completaEsplorazione(cartaDestinazione);
+                esploraConPA(nomePG, cartaDestinazione);
               },
             },
             {
@@ -2950,7 +3026,7 @@ function gestisciClickCartaLuogo(codiceDestinazione) {
           ],
         });
       } else {
-        completaEsplorazione(cartaDestinazione);
+        esploraConPA(nomePG, cartaDestinazione);
       }
     } else {
       mostraInterazioneStanza(codiceDestinazione);
@@ -2959,14 +3035,8 @@ function gestisciClickCartaLuogo(codiceDestinazione) {
   }
 
   // 🔹 Caso: destinazione diversa → controllo accessibilità
-  // Un solo movimento a turno: se questo personaggio lo ha già fatto, si ferma qui
-  if (gameData.movimentoUsato[nomePG]) {
-    mostraPopupGenerico({
-      titolo: "Movimento non consentito",
-      messaggio: "Hai già effettuato il tuo movimento in questo turno.",
-    });
-    return;
-  }
+  // Il movimento costa PA: se non bastano si ferma qui (nessun limite di movimenti per turno)
+  if (!paSufficienti(nomePG, COSTO_PA.movimento, "muoversi")) return;
 
   // Calcoliamo la mappa dei movimenti UNA SOLA VOLTA e la riusiamo per tutti i controlli di questo click
   const mappa = costruisciMappaNavigabile();
@@ -3236,6 +3306,8 @@ function gestisciInterazioneStruttura(
   const def = gameData.catalogoStrutture?.find((s) => s.nome === nomeStruttura);
   const inter = def?.interazioni?.find((i) => i.id === idInterazione);
   if (!def || !inter) return;
+
+  if (!spendiPA(gameData.pgAttivo, COSTO_PA.interazione, "interagire")) return;
 
   if (inter.tipo === "descrittivo") {
     // Testo da mostrare
@@ -3705,6 +3777,8 @@ function interagisciConElemento(nomeElemento) {
     console.warn("⚠️ Nessuna carta associata al PG attivo.");
     return;
   }
+
+  if (!spendiPA(gameData.pgAttivo, COSTO_PA.interazione, "interagire con l'elemento")) return;
 
   if (!gameData.interazioniUsate[codiceCarta]) {
     gameData.interazioniUsate[codiceCarta] = {};
@@ -4626,6 +4700,7 @@ function aggiornaIndicatoreFase() {
     : "Fase Minacce";
 
   testoEl.textContent = label;
+  aggiornaIndicatorePA();
   el.classList.toggle("giocatori", isGiocatori);
   el.classList.toggle("minacce", !isGiocatori);
   // 🔹 Sostituisce il vecchio trucco CSS ":empty" (non più applicabile: il
@@ -4871,7 +4946,9 @@ function avviaTurnoPer(nomePG) {
   chiudiPopup(); // Chiude il menu turni
   impostaBloccoPulsantiOverlayGioco(false);
   gameData.pgAttivo = nomePG;
-  gameData.movimentoUsato[nomePG] = false; // Nuovo turno: movimento di nuovo disponibile
+  gameData.movimentoUsato[nomePG] = false; // Nuovo turno: segnato come "non ancora agito"
+  gameData.paResidui = gameData.paResidui || {};
+  gameData.paResidui[nomePG] = paMassimi(nomePG); // i PA si ricaricano a inizio turno
 
   mostraPopupGenerico({
     titolo: `${nomePG}`,
@@ -6259,12 +6336,19 @@ function creaMinaccia(definizioneOCodice, codiceCartaIniziale, opts = {}) {
     id,
     codice: definizione.codice || null,
     nome: opts.nome || definizione.nome,
-    // Punteggi caratteristica di base — differiscono da minaccia a minaccia
-    movimento: opts.movimento ?? definizione.movimento ?? 0,
-    intelligenza: opts.intelligenza ?? definizione.intelligenza ?? 0,
-    tempra: opts.tempra ?? definizione.tempra ?? 0,
-    forza: opts.forza ?? definizione.forza ?? 0,
-    agilita: opts.agilita ?? definizione.agilita ?? 0,
+    // Punteggi caratteristica di base — differiscono da minaccia a minaccia.
+    // Ora sono le stesse dei personaggi (`caratteristiche` in minacce_base.json):
+    // `movimento` = passi di un movimento = Rapidità, `intelligenza` (livello della
+    // IA, 0-3) = Intelletto, `carisma` ha preso il posto della vecchia tempra.
+    // Finché una caratteristica non è compilata si usano i vecchi campi.
+    movimento: opts.movimento ?? definizione.caratteristiche?.rapidita ?? definizione.movimento ?? 0,
+    intelligenza: opts.intelligenza ?? definizione.caratteristiche?.intelletto ?? definizione.intelligenza ?? 0,
+    forza: opts.forza ?? definizione.caratteristiche?.forza ?? definizione.forza ?? 0,
+    carisma: opts.carisma ?? definizione.caratteristiche?.carisma ?? definizione.tempra ?? 0,
+    pf: opts.pf ?? definizione.caratteristiche?.pf ?? null,
+    // PA per turno: se non definiti (null) la minaccia segue il comportamento
+    // precedente (un movimento per turno, aprire porte/finestre gratis).
+    pa: opts.pa ?? definizione.caratteristiche?.pa ?? null,
     // Regola specifica: false = non sa aprire porte/finestre chiuse (es. il
     // Cane Rabbioso), anche con intelligenza 1+. Se manca, vale true.
     apreSbarramenti: opts.apreSbarramenti ?? definizione.apreSbarramenti ?? true,
@@ -7676,16 +7760,23 @@ function prossimoPassoMinaccia(minaccia, luogoObiettivo) {
 // mostra il messaggio. Restituisce true se ha aperto qualcosa. Il cambio di
 // stato non esplora nulla (solo i PG esplorano) e lascia lo sbarramento
 // visibile/nascosto ai giocatori com'era.
-async function apriSbarramentoSeServe(minaccia, da, a) {
-  if (!minacciaApreSbarramenti(minaccia)) return false;
+// Sbarramento chiuso che la minaccia sa e può aprire tra due luoghi (null se non c'è).
+function sbarramentoApribileDaMinaccia(minaccia, da, a) {
+  if (!minacciaApreSbarramenti(minaccia)) return null;
   const tab = gameData.tabelloneAttivo || [];
   const trovato = trovaSbarramentoTra(
     tab.find((c) => c.codice === da),
     tab.find((c) => c.codice === a)
   );
   const strutt = trovato?.struttura;
-  if (!strutt || !trovato.isBlocking) return false;
-  if (!condizioniAperturaDi(strutt.nome).includes("Nessuna")) return false;
+  if (!strutt || !trovato.isBlocking) return null;
+  if (!condizioniAperturaDi(strutt.nome).includes("Nessuna")) return null;
+  return strutt;
+}
+
+async function apriSbarramentoSeServe(minaccia, da, a) {
+  const strutt = sbarramentoApribileDaMinaccia(minaccia, da, a);
+  if (!strutt) return false;
 
   const finestra = /finestr/i.test(strutt.nome);
   const oggetto = finestra ? "la finestra" : "la porta";
@@ -7718,12 +7809,18 @@ function muoviMinacciaDiUnPasso(minaccia, da, a) {
   });
 }
 
+// Il turno di una minaccia spende i suoi PA: ogni movimento ne costa 1 e le dà fino a
+// Rapidità passi (`movimento`); aprire una porta/finestra ne costa 1. Senza PA
+// definiti (`pa` null) vale il comportamento precedente: un solo movimento per turno
+// e sbarramenti aperti gratis.
 async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
   minaccia.obiettivoScelto = null;
-  let punti = minaccia.movimento ?? 0;
-  let annunciato = false;
+  const classico = !Number.isFinite(minaccia.pa);
+  let pa = classico ? COSTO_PA.movimento : minaccia.pa;
+  const costoSbarramento = classico ? 0 : COSTO_PA.interazione;
+  let passiRimasti = 0; // passi che restano nel movimento in corso
 
-  while (punti > 0) {
+  while (true) {
     if (idSequenza !== sequenzaMinacceId) return;
     const pos = gameData.posizioniPersonaggi[minaccia.id];
     if (vittimaNelLuogo(pos)) break;
@@ -7732,8 +7829,25 @@ async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
     const prossimo = prossimoPassoMinaccia(minaccia, obiettivo.luogo);
     if (!prossimo) break;
 
-    if (!annunciato) {
-      annunciato = true;
+    // Comportamento precedente: finiti i passi del suo unico movimento non apre altro
+    if (classico && passiRimasti <= 0 && pa < COSTO_PA.movimento) break;
+
+    // Si ferma davanti alla porta/finestra, la apre e poi riprende, ricalcolando
+    // l'obiettivo: aprendo potrebbe aver visto qualcuno. Se non ha PA, si ferma.
+    if (sbarramentoApribileDaMinaccia(minaccia, pos, prossimo)) {
+      if (pa < costoSbarramento) break;
+      pa -= costoSbarramento;
+      if (await apriSbarramentoSeServe(minaccia, pos, prossimo)) {
+        if (idSequenza !== sequenzaMinacceId) return;
+        continue;
+      }
+    }
+
+    if (passiRimasti <= 0) {
+      // nuovo movimento: costa PA e dà tanti passi quanti la Rapidità
+      if (pa < COSTO_PA.movimento || (minaccia.movimento ?? 0) <= 0) break;
+      pa -= COSTO_PA.movimento;
+      passiRimasti = minaccia.movimento;
       await messaggioTurnoMinaccia(
         minaccia.nome,
         `<b>${minaccia.nome}</b> compie un movimento.`
@@ -7741,15 +7855,8 @@ async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
       await pausaMs(350);
       if (idSequenza !== sequenzaMinacceId) return;
     }
-    // Si ferma davanti alla porta/finestra, la apre (non costa punti
-    // movimento) e poi riprende, ricalcolando l'obiettivo: aprendo potrebbe
-    // aver visto qualcuno.
-    if (await apriSbarramentoSeServe(minaccia, pos, prossimo)) {
-      if (idSequenza !== sequenzaMinacceId) return;
-      continue;
-    }
     await muoviMinacciaDiUnPasso(minaccia, pos, prossimo);
-    punti--;
+    passiRimasti--;
     segnaLuogoVuoto(minaccia, prossimo);
   }
 }
@@ -10308,6 +10415,7 @@ function interagisciConPng(idPng) {
       testo: "Parla",
       azione: () => {
         chiudiPopup();
+        if (!spendiPA(gameData.pgAttivo, COSTO_PA.png, "parlare")) return;
         const testo =
           png.dialoghi?.default ||
           `${png.nome} non sembra avere nulla da dire, per ora.`;
@@ -10520,6 +10628,7 @@ function mostraInterazionePersonaggio(nomePG) {
       testo: "Usa Oggetto",
       azione: () => {
         chiudiPopup();
+        if (!spendiPA(gameData.pgAttivo, COSTO_PA.oggetto, "usare un oggetto")) return;
         mostraPopupGenerico({
           titolo: "Usa Oggetto",
           messaggio: `${nomePG} usa un oggetto. (placeholder)`,
@@ -10534,6 +10643,7 @@ function mostraInterazionePersonaggio(nomePG) {
             chiudiPopup();
             const faiRumore = (descrizione, potenza, tipo) => {
               chiudiPopup();
+              if (!spendiPA(nomePG, COSTO_PA.rumore, "fare rumore")) return;
               generaRumore(gameData.posizioniPersonaggi?.[nomePG], potenza, {
                 descrizione,
                 tipo,

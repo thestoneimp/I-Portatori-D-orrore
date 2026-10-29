@@ -78,6 +78,16 @@ I JSON sono caricati con `fetch` all'avvio da `script.js` (vedi le chiamate `fet
 
 - **Layout predefinito delle carte personaggio** (senza `layout` salvato in `arte/galleria.json`, valori in `carta.stat`): cornice a materiale "marmo venato" (texture in `tools/galleria/texture/`, tinta chiara per eroe in `Carta.TINTE_PG`, spessore 6 cqw, giunti a 45°), icone `sigillo` scala 1,3 che sporgono del 10% dal bordo (angoli: PF e PA/clessidra; in basso: 4 caratteristiche equidistanti, +50%), nome a y=83. Altre texture generate con `tools/comfyui/genera_texture.py` (in `arte/texture/`, fuori da git).
 
+- **Minacce (carte)**: tipo `minaccia` in galleria (`M01..M04`, immagini in `arte/minacce/`, stile: soggetto con colori normali su strada notturna dipinta solo in rosso con luci; script `tools/comfyui/genera_minacce.py`), cornice a marmo rossa (`TINTA_MINACCE` in carta.js), nome crema. Le **caratteristiche** sono le stesse dei personaggi (pf, pa, forza, intelletto, rapidita, carisma) e si modificano nel pannello "Caratteristiche" dell'editor: stanno in `carta.caratteristiche` di `arte/galleria.json` (non disegnate sulla carta). Quando l'utente le cambia, confrontale con `caratteristiche` di `minacce_base.json` e applica le differenze al gioco. Finché sono `null` valgono i vecchi campi (`movimento`, `intelligenza`, `tempra`).
+
+## Punti Azione (PA)
+
+- Ogni azione di un personaggio costa PA (`COSTO_PA` in script.js, ~riga 2840; tutto 1 per ora, da affinare con le prove). Il turno ricarica `pa` a pieno (`paMassimi`, default provvisorio 3 se `caratteristiche.pa` manca); i PA non spesi si perdono. Funzioni: `paSufficienti`, `spendiPA`, `aggiornaIndicatorePA` (badge "PA x/y" nell'indicatore di fase).
+- Movimento: costa 1 PA e dà fino a **Rapidità** passi (`movimentoAttuale[nome]` = `caratteristiche.rapidita` o, se manca, il vecchio `movimento`); si possono fare più movimenti per turno. Scale = gratis (parte del movimento); esplorazione all'arrivo = gratis, esplorazione manuale del luogo = 1.
+- Costano 1 PA: interazioni con elementi e strutture/sbarramenti (apri, chiudi, abbatti...), fare rumore, "Usa Oggetto", parlare con un PNG.
+- Minacce: `creaMinaccia` legge `caratteristiche` (`movimento`=rapidita, `intelligenza`=intelletto, `carisma`) con fallback ai vecchi campi; `eseguiMovimentoMinaccia` spende PA (movimento 1, aprire sbarramento 1). Con `pa` null mantiene il comportamento precedente (un movimento, sbarramenti gratis).
+- Da decidere: PF delle minacce (eliminarle, stordirle o solo fuggire), costo dell'aggressione, PA dei PNG, costi di abilità/oggetti.
+
 ## Stato attuale
 
 Ultimo lavoro (ott 2026): IA delle minacce (movimento passo-passo, esplorazione piani, memoria sbarramenti, apertura porte/finestre chiuse, attraversamento finestre con effetto "si china") e rifiniture della camera. Aggiorna questa sezione quando cambia il filone di lavoro.

@@ -6,7 +6,15 @@
     "intelligenza": 2,
     "tempra": 2,
     "forza": 2,
-    "agilita": 3
+    "agilita": 3,
+    "caratteristiche": {
+      "pf": null,
+      "pa": null,
+      "forza": null,
+      "intelletto": null,
+      "rapidita": null,
+      "carisma": null
+    }
   },
   {
     "codice": "M02",
@@ -15,7 +23,15 @@
     "intelligenza": 0,
     "tempra": 3,
     "forza": 3,
-    "agilita": 1
+    "agilita": 1,
+    "caratteristiche": {
+      "pf": null,
+      "pa": null,
+      "forza": null,
+      "intelletto": null,
+      "rapidita": null,
+      "carisma": null
+    }
   },
   {
     "codice": "M03",
@@ -25,7 +41,15 @@
     "apreSbarramenti": false,
     "tempra": 1,
     "forza": 2,
-    "agilita": 4
+    "agilita": 4,
+    "caratteristiche": {
+      "pf": null,
+      "pa": null,
+      "forza": null,
+      "intelletto": null,
+      "rapidita": null,
+      "carisma": null
+    }
   },
   {
     "codice": "M04",
@@ -34,6 +58,14 @@
     "intelligenza": 3,
     "tempra": 2,
     "forza": 3,
-    "agilita": 3
+    "agilita": 3,
+    "caratteristiche": {
+      "pf": null,
+      "pa": null,
+      "forza": null,
+      "intelletto": null,
+      "rapidita": null,
+      "carisma": null
+    }
   }
 ]
