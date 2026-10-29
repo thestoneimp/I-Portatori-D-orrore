@@ -9176,6 +9176,53 @@ function impostaCameraLibera(attiva) {
     ?.classList.toggle("nascosto", !attiva);
 }
 
+// 🎞️ Animazione della camera fatta "a mano" (requestAnimationFrame) invece che con `transition: transform`.
+// Una transizione CSS sul transform gira sul compositor: il browser anima la bitmap già rasterizzata alla scala di partenza
+// e la ridisegna nitida solo a fine animazione, quindi per tutto lo zoom testi e illustrazioni risultano sfocati. Impostando
+// il transform a ogni fotogramma dal thread principale, il browser ridisegna i contenuti alla scala corrente (come già avviene
+// con durata 0 nel pinch). Parte dal transform realmente attivo, quindi le chiamate ravvicinate (un passo dopo l'altro) restano fluide.
+const EASING_CAMERA = {
+  linear: (t) => t,
+  ease: cubicBezierCss(0.25, 0.1, 0.25, 1),
+  "ease-in": cubicBezierCss(0.42, 0, 1, 1),
+  "ease-out": cubicBezierCss(0, 0, 0.58, 1),
+  "ease-in-out": cubicBezierCss(0.42, 0, 0.58, 1),
+};
+function cubicBezierCss(x1, y1, x2, y2) {
+  const c = (a1, a2, t) => 3 * a1 * (1 - t) * (1 - t) * t + 3 * a2 * (1 - t) * t * t + t * t * t;
+  return (x) => {
+    let t = x;
+    for (let i = 0; i < 8; i++) {   // Newton sulla coordinata x, poi si legge y
+      const dx = c(x1, x2, t) - x;
+      const d = (c(x1, x2, t + 1e-4) - c(x1, x2, t - 1e-4)) / 2e-4;
+      if (Math.abs(dx) < 1e-5 || !d) break;
+      t = Math.min(1, Math.max(0, t - dx / d));
+    }
+    return c(y1, y2, t);
+  };
+}
+function animaTransformCamera(el, tx, ty, s, durata, easing) {
+  if (el._animCamera) cancelAnimationFrame(el._animCamera);
+  el._animCamera = 0;
+  el.style.transition = "none";
+  const m = getComputedStyle(el).transform;
+  const v = m && m !== "none" ? m.replace(/^matrix\(|\)$/g, "").split(",").map(Number) : [1, 0, 0, 1, 0, 0];
+  const da = { s: v[0], tx: v[4], ty: v[5] };
+  if (!(durata > 0) || (Math.abs(da.s - s) < 1e-4 && Math.abs(da.tx - tx) < 0.01 && Math.abs(da.ty - ty) < 0.01)) {
+    el.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+    return;
+  }
+  const ease = EASING_CAMERA[easing] || EASING_CAMERA.ease;
+  const t0 = performance.now();
+  const passo = (ora) => {
+    const t = Math.min(1, (ora - t0) / durata), k = ease(t);
+    const sc = da.s + (s - da.s) * k, x = da.tx + (tx - da.tx) * k, y = da.ty + (ty - da.ty) * k;
+    el.style.transform = `translate(${x}px, ${y}px) scale(${sc})`;
+    el._animCamera = t < 1 ? requestAnimationFrame(passo) : 0;
+  };
+  el._animCamera = requestAnimationFrame(passo);
+}
+
 function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
   const gameScreen = document.querySelector(".game-screen-camera");
   const griglia = document.getElementById("tabelloneDinamico");
@@ -9310,8 +9357,7 @@ function impostaInquadraturaPersonaggio(nomePG, opts = {}) {
     transformAttuale && transformAttuale !== "none" ? transformAttuale : "none";
   void gameScreen.offsetHeight;
 
-  gameScreen.style.transition = `transform ${durata}ms ${easing}`;
-  gameScreen.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+  animaTransformCamera(gameScreen, tx, ty, s, durata, easing);
 
   cameraCorrente = { cx, cy, s, scalaFit: scalaGameFit };
   impostaCameraLibera(Boolean(opts.centro));
