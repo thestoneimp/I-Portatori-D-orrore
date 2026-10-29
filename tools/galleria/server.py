@@ -63,9 +63,10 @@ class Gestore(BaseHTTPRequestHandler):
         if percorso.startswith("/s/"):
             nome = percorso[3:]
             f = os.path.join(os.path.dirname(__file__), nome)
-            if re.fullmatch(r"[\w.-]+\.(js|css)", nome) and os.path.isfile(f):
+            if re.fullmatch(r"(texture/)?[\w.-]+\.(js|css|png)", nome) and os.path.isfile(f):
                 with open(f, "rb") as fh:
-                    return self._invia(200, fh.read(), "text/javascript; charset=utf-8" if nome.endswith(".js") else "text/css; charset=utf-8")
+                    tipo = {"js": "text/javascript; charset=utf-8", "css": "text/css; charset=utf-8", "png": "image/png"}[nome.rsplit(".", 1)[1]]
+                    return self._invia(200, fh.read(), tipo)
         if percorso == "/stats":
             with open(os.path.join(os.path.dirname(__file__), "stats.html"), "rb") as f:
                 return self._invia(200, f.read(), "text/html; charset=utf-8")

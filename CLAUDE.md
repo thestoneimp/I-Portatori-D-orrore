@@ -76,6 +76,8 @@ I JSON sono caricati con `fetch` all'avvio da `script.js` (vedi le chiamate `fet
 
 - **Immagini nel gioco**: `arte/` è fuori da git, quindi le carte approvate nella galleria vanno esportate con `python tools/galleria/esporta.py` (Edge headless): scrive `assets/carte/personaggi/<Pnn>.webp` (carta completa con nome e statistiche, sfondo trasparente), `assets/carte/luoghi/<Ann>.webp` (solo i luoghi **abbandonati**, non quelli `_abitata`), `assets/carte/indice.json` e il blocco `<carte>` di `service-worker.js`. Il gioco usa `immagine` di `eroi_base.json` (eroi) e `indice.json` (luoghi, `applicaImmagineLuogo`). `eroi_base.json` ha anche `caratteristiche` (pf, pa, forza, intelletto, rapidita, carisma) per gli eroi già definiti (P02, P03); i PA (clessidra) sono la nuova meccanica in arrivo.
 
+- **Layout predefinito delle carte personaggio** (senza `layout` salvato in `arte/galleria.json`, valori in `carta.stat`): cornice a materiale "marmo venato" (texture in `tools/galleria/texture/`, tinta chiara per eroe in `Carta.TINTE_PG`, spessore 6 cqw, giunti a 45°), icone `sigillo` scala 1,3 che sporgono del 10% dal bordo (angoli: PF e PA/clessidra; in basso: 4 caratteristiche equidistanti, +50%), nome a y=83. Altre texture generate con `tools/comfyui/genera_texture.py` (in `arte/texture/`, fuori da git).
+
 ## Stato attuale
 
 Ultimo lavoro (ott 2026): IA delle minacce (movimento passo-passo, esplorazione piani, memoria sbarramenti, apertura porte/finestre chiuse, attraversamento finestre con effetto "si china") e rifiniture della camera. Aggiorna questa sezione quando cambia il filone di lavoro.

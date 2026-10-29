@@ -10,6 +10,14 @@
 .cx-immagine img { display: block; width: 100%; height: auto; -webkit-user-drag: none; pointer-events: none; }
 .cx-sfumatura { inset: 0; pointer-events: none; }
 .cx-cornice { pointer-events: none; }
+/* cornice a materiale: ogni lato e' un trapezio ritagliato (giunti a 45 gradi); la texture e' in grigio chiaro e si tinge col colore del personaggio (multiply) */
+.cx-cornice-mat { inset: 0; }
+.cx-cornice-mat .lato { position: absolute; inset: 0; background-color: var(--c); background-blend-mode: multiply; background-size: 150cqw 150cqw; }
+.cx-cornice-mat .t { background-image: var(--tx); background-position: -10cqw -20cqw; clip-path: polygon(0 0, 100% 0, calc(100% - var(--p)) var(--p), var(--p) var(--p)); filter: brightness(1.1); }
+.cx-cornice-mat .b { background-image: var(--tx); background-position: -50cqw -90cqw; clip-path: polygon(0 100%, 100% 100%, calc(100% - var(--p)) calc(100% - var(--p)), var(--p) calc(100% - var(--p))); filter: brightness(.86); }
+.cx-cornice-mat .l { background-image: var(--txr); background-position: -30cqw -10cqw; clip-path: polygon(0 0, var(--p) var(--p), var(--p) calc(100% - var(--p)), 0 100%); filter: brightness(.98); }
+.cx-cornice-mat .r { background-image: var(--txr); background-position: -100cqw -40cqw; clip-path: polygon(100% 0, calc(100% - var(--p)) var(--p), calc(100% - var(--p)) calc(100% - var(--p)), 100% 100%); filter: brightness(.92); }
+.cx-cornice-mat::after { content: ""; position: absolute; inset: calc(var(--p) - .25cqw); border: .25cqw solid rgba(0, 0, 0, .55); border-radius: 1cqw; }
 .cx-testo { white-space: nowrap; line-height: 1; }
 .cx-modifica .cx-immagine, .cx-modifica .cx-testo { cursor: move; touch-action: none; }
 .cx-modifica .cx-stat, .cx-modifica .cx-st-pannello { pointer-events: auto; cursor: move; touch-action: none; }

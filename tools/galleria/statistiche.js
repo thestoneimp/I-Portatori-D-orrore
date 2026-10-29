@@ -47,7 +47,7 @@ const Statistiche = (() => {
 
   /* ---- disposizioni: posizione del centro di ogni icona (x, y in % della carta, ordine pf pa for int rap car),
    *      fattore di grandezza k e un'eventuale tavoletta scura dietro (l, t, w, h in % della carta) ---- */
-  function disposizione(id, u0, H) {   // u0 = lato base dell'icona (cqw), H = altezza della carta in cqw
+  function disposizione(id, u0, H, m = 0) {   // u0 = lato base dell'icona (cqw), H = altezza della carta in cqw, m = ulteriore sporgenza verso l'esterno (cqw: spessore della cornice)
     const S = (xs, ys, k = 1) => xs.map((x, i) => ({ x, y: ys[i], k: Array.isArray(k) ? k[i] : k }));
     switch (id) {
       case "colonna": return { punti: S(Array(6).fill(11.5), [14, 26, 38, 50, 62, 74]), pannello: { l: 2, t: 7, w: 19, h: 75 } };
@@ -57,11 +57,11 @@ const Statistiche = (() => {
       // forza, intelletto, rapidità e carisma in orizzontale sotto il nome. Ogni icona sporge dal bordo del 10% del proprio lato
       // (le due d'angolo da due lati, quelle in basso solo dal basso): nella carta fisica non compaiono oltre il bordo.
       case "pf": {
-        const k = [1.55, 1.55, 0.72, 0.72, 0.72, 0.72], u = k.map(x => u0 * x), pc = v => v / H * 100;   // cqw verticali -> % dell'altezza
+        const k = [1.55, 1.55, 1.08, 1.08, 1.08, 1.08], u = k.map(x => u0 * x), pc = v => v / H * 100;   // cqw verticali -> % dell'altezza
         return { punti: [
-          { x: 0.4 * u[0], y: pc(0.4 * u[0]), k: k[0] },
-          { x: 100 - 0.4 * u[1], y: pc(0.4 * u[1]), k: k[1] },
-          ...[20, 40, 60, 80].map((x, j) => ({ x, y: 100 - pc(0.4 * u[j + 2]), k: k[j + 2] })),
+          { x: 0.4 * u[0] - m, y: pc(0.4 * u[0] - m), k: k[0] },
+          { x: 100 - 0.4 * u[1] + m, y: pc(0.4 * u[1] - m), k: k[1] },
+          ...[12.5, 37.5, 62.5, 87.5].map((x, j) => ({ x, y: 100 - pc(0.4 * u[j + 2] - m), k: k[j + 2] })),
         ] };
       }
       case "medaglioni": return { punti: S([12, 88, 8, 92, 12, 88], [8, 8, 40, 40, 74, 74], 1.05) };
@@ -85,7 +85,7 @@ const Statistiche = (() => {
     assicuraFiltro();
     const host = document.createElement("div"); host.className = `cx-el cx-stats cx-st-${e.stile}`;
     const val = Object.assign({}, VALORI_ESEMPIO, c.stat || {}, e.valori || {});
-    const u0 = 15 * (e.scala || 1), d = disposizione(e.disposizione, u0, c.formato === "orizzontale" ? 100 / 1.5 : 100 / 0.75), dx = e.dx || 0, dy = e.dy || 0;   // dx, dy: scostamento di tutto il gruppo (% della carta)
+    const u0 = 15 * (e.scala || 1), d = disposizione(e.disposizione, u0, c.formato === "orizzontale" ? 100 / 1.5 : 100 / 0.75, e.margine || 0), dx = e.dx || 0, dy = e.dy || 0;   // dx, dy: scostamento di tutto il gruppo (% della carta)
     if (d.pannello) {
       const p = document.createElement("div"); p.className = "cx-st-pannello";
       Object.assign(p.style, { left: d.pannello.l + dx + "%", top: d.pannello.t + dy + "%", width: d.pannello.w + "%", height: d.pannello.h + "%" });
@@ -102,6 +102,6 @@ const Statistiche = (() => {
     return host;
   }
 
-  const PREDEFINITO = { id: "statistiche", tipo: "statistiche", nome: "Statistiche", visibile: true, disposizione: "pf", stile: "incisione", scala: 1, dx: 0, dy: 0, valori: null };
+  const PREDEFINITO = { id: "statistiche", tipo: "statistiche", nome: "Statistiche", visibile: true, disposizione: "pf", stile: "sigillo", scala: 1.3, margine: 0, dx: 0, dy: 0, valori: null };
   return { STAT, STILI, DISPOSIZIONI, VALORI_ESEMPIO, PREDEFINITO, crea };
 })();
