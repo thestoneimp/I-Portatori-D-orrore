@@ -29,6 +29,7 @@
     "codice": "M03",
     "nome": "Cane Rabbioso",
     "apreSbarramenti": false,
+    "abbattePorte": false,
     "caratteristiche": {
       "pf": 2,
       "pa": 2,

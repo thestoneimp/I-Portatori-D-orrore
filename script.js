@@ -3294,6 +3294,7 @@ function rivelaLuogoAdiacenteSbloccato(luoghi) {
 // (apri/chiudi...). Gli sbarramenti di ferro (`indistruttibile`) non si abbattono
 // a mani nude: serviranno degli oggetti.
 const FORZA_PREDEFINITA = 2; // provvisoria per gli eroi senza `caratteristiche.forza`
+const RUMORE_COLPO_SBARRAMENTO = 2; // propagazione del rumore di ogni colpo (giocatori e minacce)
 
 function forzaDi(nomePG) {
   const eroe = (gameData.eroiDisponibili || []).find((e) => e.nome === nomePG);
@@ -3351,6 +3352,14 @@ function colpisciSbarramento(def, inter, codiceIstanza, contributo) {
     });
     return;
   }
+
+  // Ogni colpo che non basta a farla cedere fa comunque rumore (propagazione 2);
+  // quello decisivo fa il rumore di abbattimento/rottura in completaProvaAbilita.
+  generaRumore(gameData.posizioniPersonaggi?.[pg], RUMORE_COLPO_SBARRAMENTO, {
+    descrizione: "Colpi contro uno sbarramento",
+    luoghiPossibili: (strutt.luoghi || []).filter(Boolean),
+    chi: pg,
+  });
 
   const finestra = /finestr/i.test(def.nome);
   const oggetto = finestra ? "La finestra" : "La porta";
@@ -6468,6 +6477,10 @@ function creaMinaccia(definizioneOCodice, codiceCartaIniziale, opts = {}) {
     // Regola specifica: false = non sa aprire porte/finestre chiuse (es. il
     // Cane Rabbioso), anche con intelligenza 1+. Se manca, vale true.
     apreSbarramenti: opts.apreSbarramenti ?? definizione.apreSbarramenti ?? true,
+    // Regola specifica: false = non riesce ad abbattere le porte (es. il Cane
+    // Rabbioso, troppo piccolo). Se manca, vale true: ogni minaccia con Forza > 0
+    // abbatte le porte abbattibili a mani nude, qualunque sia l'intelligenza.
+    abbattePorte: opts.abbattePorte ?? definizione.abbattePorte ?? true,
     visibile: opts.visibile !== false,
     // Memoria per vittima: { [idVittima]: { vista, ultimaPosizioneNota, motivoScomparsa } }
     memoriaVittime: {},
@@ -7027,6 +7040,18 @@ function minacciaApreSbarramenti(minaccia) {
   return (minaccia.intelligenza ?? 0) >= 1 && minaccia.apreSbarramenti !== false;
 }
 
+// Vero se la minaccia sa abbattere le porte: qualunque intelligenza, ma serve
+// Forza > 0 e nessuna regola specifica che lo vieti (`abbattePorte: false`).
+function minacciaAbbattePorte(minaccia) {
+  return (minaccia.forza ?? 0) > 0 && minaccia.abbattePorte !== false;
+}
+
+// Una PORTA (non una finestra) con una resistenza nel catalogo è abbattibile a
+// mani nude: anche per le minacce vale questo limite (ferro e cancelli no).
+function portaAbbattibileADannoNudo(def) {
+  return !!def?.resistenza && !/finestr/i.test(def.nome || "");
+}
+
 function bloccaMovimentoTraCarte(cartaA, cartaB, minaccia = null) {
   if (!cartaA.posizione || !cartaB.posizione) return false;
 
@@ -7074,6 +7099,11 @@ function bloccaMovimentoTraCarte(cartaA, cartaB, minaccia = null) {
             "no";
     }
     if (!bloccante) return false;
+
+    // 🔨 Una porta abbattibile a mani nude non la ferma se sa abbatterla
+    if (minaccia && minacciaAbbattePorte(minaccia) && portaAbbattibileADannoNudo(def)) {
+      return false; // raggiungibile dopo l'abbattimento
+    }
 
     // 🪟 Le minacce (qualunque intelligenza) attraversano le finestre APERTE
     // o ROTTE che separano l'interno della casa dal giardino (piano terra).
@@ -7925,6 +7955,54 @@ function muoviMinacciaDiUnPasso(minaccia, da, a) {
   });
 }
 
+// Porta chiusa che la minaccia non apre ma può abbattere tra due luoghi (null se non c'è).
+function sbarramentoAbbattibileDaMinaccia(minaccia, da, a) {
+  if (!minacciaAbbattePorte(minaccia)) return null;
+  const tab = gameData.tabelloneAttivo || [];
+  const trovato = trovaSbarramentoTra(
+    tab.find((c) => c.codice === da),
+    tab.find((c) => c.codice === a)
+  );
+  const strutt = trovato?.struttura;
+  if (!strutt || !trovato.isBlocking) return null;
+  const def = (gameData.catalogoStrutture || []).find((s) => s.nome === strutt.nome);
+  return portaAbbattibileADannoNudo(def) ? strutt : null;
+}
+
+// Un colpo della minaccia contro la porta: toglie resistenza pari alla sua Forza.
+// Quando cede, la porta sparisce e fa rumore (come quando la abbattono i giocatori).
+async function colpisciPortaConMinaccia(minaccia, strutt) {
+  assicuraResistenza(strutt);
+  if (!Number.isFinite(strutt.resistenza)) return;
+  const pos = gameData.posizioniPersonaggi[minaccia.id];
+  strutt.resistenza -= minaccia.forza;
+  strutt.danno = (strutt.danno || 0) + minaccia.forza;
+
+  if (strutt.resistenza > 0) {
+    generaRumore(pos, RUMORE_COLPO_SBARRAMENTO, {
+      descrizione: "Colpi contro una porta",
+      luoghiPossibili: (strutt.luoghi || []).filter(Boolean),
+    });
+    await messaggioTurnoMinaccia(
+      minaccia.nome,
+      `<b>${minaccia.nome}</b> si scaglia contro la porta.`
+    );
+    await pausaMs(350);
+    return;
+  }
+
+  const luoghi = (strutt.luoghi || []).filter(Boolean);
+  rimuoviStruttura(strutt.codice, strutt.codiceCarta, strutt.luoghi);
+  generaGrigliaTabellone();
+  aggiornaPercezioneTutteLeMinacce();
+  generaRumore(pos, 2, { descrizione: "Porta abbattuta", luoghiPossibili: luoghi });
+  await messaggioTurnoMinaccia(
+    minaccia.nome,
+    `<b>${minaccia.nome}</b> abbatte la porta.`
+  );
+  await pausaMs(350);
+}
+
 // Il turno di una minaccia spende i suoi PA: ogni movimento ne costa 1 e le dà fino a
 // Rapidità passi (`movimento`); aprire una porta/finestra ne costa 1. Senza PA
 // definiti (`pa` null) vale il comportamento precedente: un solo movimento per turno
@@ -7957,6 +8035,18 @@ async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
         if (idSequenza !== sequenzaMinacceId) return;
         continue;
       }
+    }
+
+    // Se non può aprirla (a chiave, sbarrata...) ma è una porta abbattibile a mani
+    // nude, la prende a spallate: ogni colpo costa PA e toglie resistenza in base
+    // alla sua Forza; finché non cede non va oltre.
+    const daAbbattere = sbarramentoAbbattibileDaMinaccia(minaccia, pos, prossimo);
+    if (daAbbattere) {
+      if (pa < costoSbarramento) break;
+      pa -= costoSbarramento;
+      await colpisciPortaConMinaccia(minaccia, daAbbattere);
+      if (idSequenza !== sequenzaMinacceId) return;
+      continue;
     }
 
     if (passiRimasti <= 0) {
