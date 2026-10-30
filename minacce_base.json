@@ -1,71 +1,55 @@
 [
   {
     "codice": "M01",
-    "nome": "Uomo con impermeabile",
-    "movimento": 2,
-    "intelligenza": 2,
-    "tempra": 2,
-    "forza": 2,
-    "agilita": 3,
+    "nome": "Lo sconosciuto",
     "caratteristiche": {
-      "pf": null,
-      "pa": null,
-      "forza": null,
-      "intelletto": null,
-      "rapidita": null,
-      "carisma": null
-    }
+      "pf": 3,
+      "pa": 2,
+      "forza": 2,
+      "intelletto": 2,
+      "rapidita": 2,
+      "carisma": 2
+    },
+    "immagine": "assets/carte/minacce/M01.webp"
   },
   {
     "codice": "M02",
-    "nome": "Non Morto",
-    "movimento": 1,
-    "intelligenza": 0,
-    "tempra": 3,
-    "forza": 3,
-    "agilita": 1,
+    "nome": "Zombie",
     "caratteristiche": {
-      "pf": null,
-      "pa": null,
-      "forza": null,
-      "intelletto": null,
-      "rapidita": null,
-      "carisma": null
-    }
+      "pf": 1,
+      "pa": 2,
+      "forza": 2,
+      "intelletto": 0,
+      "rapidita": 1,
+      "carisma": 0
+    },
+    "immagine": "assets/carte/minacce/M02.webp"
   },
   {
     "codice": "M03",
     "nome": "Cane Rabbioso",
-    "movimento": 4,
-    "intelligenza": 1,
     "apreSbarramenti": false,
-    "tempra": 1,
-    "forza": 2,
-    "agilita": 4,
     "caratteristiche": {
-      "pf": null,
-      "pa": null,
-      "forza": null,
-      "intelletto": null,
-      "rapidita": null,
-      "carisma": null
-    }
+      "pf": 2,
+      "pa": 2,
+      "forza": 1,
+      "intelletto": 1,
+      "rapidita": 3,
+      "carisma": 0
+    },
+    "immagine": "assets/carte/minacce/M03.webp"
   },
   {
     "codice": "M04",
     "nome": "Il Cacciatore",
-    "movimento": 3,
-    "intelligenza": 3,
-    "tempra": 2,
-    "forza": 3,
-    "agilita": 3,
     "caratteristiche": {
-      "pf": null,
-      "pa": null,
-      "forza": null,
-      "intelletto": null,
-      "rapidita": null,
-      "carisma": null
-    }
+      "pf": 4,
+      "pa": 2,
+      "forza": 2,
+      "intelletto": 3,
+      "rapidita": 2,
+      "carisma": 3
+    },
+    "immagine": "assets/carte/minacce/M04.webp"
   }
 ]

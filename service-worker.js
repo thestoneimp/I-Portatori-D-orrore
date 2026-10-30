@@ -32,6 +32,10 @@ const PRECACHE_URLS = [
   "./assets/carte/luoghi/A17.webp",
   "./assets/carte/personaggi/P02.webp",
   "./assets/carte/personaggi/P03.webp",
+  "./assets/carte/minacce/M01.webp",
+  "./assets/carte/minacce/M02.webp",
+  "./assets/carte/minacce/M03.webp",
+  "./assets/carte/minacce/M04.webp",
   // </carte>
   "./icons/icon-192.png",
   "./icons/icon-512.png"

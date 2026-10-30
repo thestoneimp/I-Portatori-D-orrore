@@ -6459,6 +6459,8 @@ function creaMinaccia(definizioneOCodice, codiceCartaIniziale, opts = {}) {
     intelligenza: opts.intelligenza ?? definizione.caratteristiche?.intelletto ?? definizione.intelligenza ?? 0,
     forza: opts.forza ?? definizione.caratteristiche?.forza ?? definizione.forza ?? 0,
     carisma: opts.carisma ?? definizione.caratteristiche?.carisma ?? definizione.tempra ?? 0,
+    // Carta della minaccia (esportata dalla galleria con tools/galleria/esporta.py)
+    immagine: opts.immagine ?? definizione.immagine ?? "",
     pf: opts.pf ?? definizione.caratteristiche?.pf ?? null,
     // PA per turno: se non definiti (null) la minaccia segue il comportamento
     // precedente (un movimento per turno, aprire porte/finestre gratis).
@@ -8371,6 +8373,11 @@ function aggiornaPersonaggiNelleCelle(
           cartaPG.className = "carta-personaggio minaccia";
           cartaPG.dataset.tipo = "minaccia";
           cartaPG.innerText = minacciaDef.nome.split(" ")[0];
+          if (minacciaDef.immagine) {
+            cartaPG.classList.add("con-carta");
+            cartaPG.style.backgroundImage = `url("${minacciaDef.immagine}")`;
+            cartaPG.innerText = ""; // il nome è già sulla carta
+          }
         } else if (pngDef) {
           cartaPG.className = "carta-personaggio png";
           cartaPG.dataset.tipo = "png";
