@@ -6656,6 +6656,35 @@ function genereDiVittima(idVittima) {
   return null;
 }
 
+// 🧠 Intelletto 1+: quando una vittima esce di vista senza che ci sia un motivo
+// noto (sbarramento, scale, finestra), la minaccia ipotizza che sia in uno
+// qualsiasi dei luoghi raggiungibili entro questi passi dall'ultimo
+// avvistamento, escludendo quelli che vede ora (altrimenti l'avrebbe vista
+// passare). Con intelletto 3 e se conosce i passi che la vittima sa fare
+// (`movimentoAppreso`), l'ipotesi si restringe a quelli raggiungibili con
+// quel numero di passi dall'inizio del movimento osservato.
+const RAGGIO_IPOTESI_VITTIMA = 3;
+
+function ipotizzaPosizioniVittimaPersa(minaccia, idVittima, ultimaPosizione, visibili) {
+  let insieme = Object.keys(
+    calcolaLuoghiRaggiungibili(ultimaPosizione, RAGGIO_IPOTESI_VITTIMA, minaccia)
+  );
+
+  insieme = insieme.filter((codice) => !visibili.has(codice));
+
+  const passiNoti = minaccia.movimentoAppreso?.[idVittima] || 0;
+  if ((minaccia.intelligenza ?? 0) >= 3 && passiNoti > 0) {
+    const origine = minaccia.ultimoInizioVisibile?.[idVittima] || ultimaPosizione;
+    const entroPassiNoti = calcolaLuoghiRaggiungibili(origine, passiNoti, minaccia);
+    const ridotto = insieme.filter((codice) => entroPassiNoti[codice] !== undefined);
+    // `movimentoAppreso` è il massimo osservato finora, non un limite certo: se la
+    // riduzione lasciasse l'ipotesi vuota si tiene quella più ampia.
+    if (ridotto.length > 0) insieme = ridotto;
+  }
+
+  return insieme;
+}
+
 // Aggiorna la memoria di una minaccia confrontando chi vede ORA con chi
 // vedeva l'ultima volta che è stata interrogata: registra il momento esatto
 // in cui una vittima esce dalla linea di vista (posizione + motivo), senza
@@ -6739,12 +6768,22 @@ function aggiornaPercezioneMinaccia(minaccia) {
     }
 
     if (!precedente) return; // mai avvistata: nulla da registrare
-    if (!precedente.vista) return; // già persa in precedenza: non ritoccare
+    if (!precedente.vista) {
+      // Già persa in precedenza: non si ritocca, tranne l'ipotesi ampia (posizioni
+      // entro N passi dall'avvistamento): ogni luogo che ora la minaccia vede e
+      // in cui non c'è la vittima viene escluso dall'ipotesi.
+      if (precedente.ipotesiAmpia && Array.isArray(precedente.posizioniIpotizzate)) {
+        const restanti = precedente.posizioniIpotizzate.filter((l) => !visibili.has(l));
+        precedente.posizioniIpotizzate = restanti.length > 0 ? restanti : null;
+      }
+      return;
+    }
 
     // Transizione vista→persa: determiniamo il motivo proprio ora
     let motivo = "sconosciuta";
     let posizioneIpotizzata = null; // solo se l'intelligenza lo consente
-    let posizioniIpotizzate = null; // insieme esteso, solo intelligenza >= 3
+    let posizioniIpotizzate = null; // insieme esteso (int. >= 3, o ipotesi ampia da int. >= 1)
+    let ipotesiAmpia = false; // true: insieme "entro N passi" dall'ultimo avvistamento
     if (cellaAttuale === precedente.ultimaPosizioneNota) {
       motivo = "Uno sbarramento ha interrotto la linea di vista";
       // 🧠 Qualunque intelligenza (anche 0): la vittima è sparita senza
@@ -6845,11 +6884,31 @@ function aggiornaPercezioneMinaccia(minaccia) {
           });
           posizioniIpotizzate = insieme;
         }
+      } else if (
+        (minaccia.intelligenza ?? 0) >= 1 &&
+        cartaUltima?.posizione &&
+        cartaAttuale?.posizione
+      ) {
+        // Uscita di vista sullo stesso piano, senza una causa nota: ipotizza tutti
+        // i luoghi raggiungibili entro pochi passi dall'ultimo avvistamento che
+        // lei non vede (vedi RAGGIO_IPOTESI_VITTIMA).
+        motivo = "È uscita dalla linea di vista";
+        const insieme = ipotizzaPosizioniVittimaPersa(
+          minaccia,
+          idVittima,
+          precedente.ultimaPosizioneNota,
+          visibili
+        );
+        if (insieme.length > 0) {
+          posizioniIpotizzate = insieme;
+          ipotesiAmpia = true;
+        }
       }
     }
 
     minaccia.memoriaVittime[idVittima] = {
       vista: false,
+      ipotesiAmpia,
       ultimaPosizioneNota: precedente.ultimaPosizioneNota,
       motivoScomparsa: motivo,
       posizioneIpotizzata,
