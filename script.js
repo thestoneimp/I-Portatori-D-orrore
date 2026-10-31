@@ -7159,8 +7159,15 @@ function bloccaMovimentoTraCarte(cartaA, cartaB, minaccia = null) {
     }
     if (!bloccante) return false;
 
-    // 🔨 Una porta abbattibile a mani nude non la ferma se sa abbatterla
-    if (minaccia && minacciaAbbattePorte(minaccia) && portaAbbattibileADannoNudo(def)) {
+    // 🔨 Una porta abbattibile a mani nude non la ferma solo quando la minaccia ha
+    // un motivo per abbatterla (`consideraAbbattimento`, vedi scegliObiettivoMinaccia):
+    // ipotesi o rumore oltre la porta, oppure tutto l'accessibile già esplorato.
+    if (
+      minaccia &&
+      minaccia.consideraAbbattimento &&
+      minacciaAbbattePorte(minaccia) &&
+      portaAbbattibileADannoNudo(def)
+    ) {
       return false; // raggiungibile dopo l'abbattimento
     }
 
@@ -7751,12 +7758,20 @@ function messaggioTurnoMinaccia(titolo, messaggio) {
   });
 }
 
-function distanzeRealiDa(codice, minaccia) {
-  return calcolaLuoghiRaggiungibili(
-    codice,
-    (gameData.tabelloneAttivo || []).length || 1,
-    minaccia
-  );
+// Con `conAbbattimento` le porte abbattibili a mani nude contano come passaggi
+// (solo per le minacce che sanno abbatterle).
+function distanzeRealiDa(codice, minaccia, conAbbattimento = false) {
+  const prima = minaccia?.consideraAbbattimento;
+  if (minaccia) minaccia.consideraAbbattimento = conAbbattimento;
+  try {
+    return calcolaLuoghiRaggiungibili(
+      codice,
+      (gameData.tabelloneAttivo || []).length || 1,
+      minaccia
+    );
+  } finally {
+    if (minaccia) minaccia.consideraAbbattimento = prima;
+  }
 }
 
 function vittimaNelLuogo(codice) {
@@ -7829,19 +7844,23 @@ function scegliObiettivoMinaccia(minaccia) {
   // sostituisce un obiettivo primario o non diventa inaccessibile.
   if (minaccia.obiettivoCasuale === pos) minaccia.obiettivoCasuale = null;
 
+  // `dist`: luoghi raggiungibili senza abbattere nulla; `distAbb`: anche
+  // abbattendo le porte abbattibili. Si abbatte solo con un motivo (ipotesi o
+  // rumore oltre la porta) o quando l'accessibile è tutto esplorato.
   const dist = distanzeRealiDa(pos, minaccia);
+  const distAbb = distanzeRealiDa(pos, minaccia, true);
   aggiornaLuoghiInaccessibili(minaccia, pos, dist);
   const memoria = minaccia.memoriaVittime || {};
 
   // Tra i luoghi raggiungibili, il/i più vicino/i; a parità si sceglie a
   // caso, mantenendo la scelta già fatta se ancora tra i migliori.
-  const piuVicino = (luoghi, tipo) => {
+  const piuVicino = (luoghi, tipo, mappa = dist) => {
     const raggiungibili = [...new Set(luoghi)].filter(
-      (l) => dist[l] !== undefined
+      (l) => mappa[l] !== undefined
     );
     if (raggiungibili.length === 0) return null;
-    const minimo = Math.min(...raggiungibili.map((l) => dist[l]));
-    const migliori = raggiungibili.filter((l) => dist[l] === minimo);
+    const minimo = Math.min(...raggiungibili.map((l) => mappa[l]));
+    const migliori = raggiungibili.filter((l) => mappa[l] === minimo);
     const precedente = minaccia.obiettivoScelto;
     const luogo =
       precedente && precedente.tipo === tipo && migliori.includes(precedente.luogo)
@@ -7849,7 +7868,10 @@ function scegliObiettivoMinaccia(minaccia) {
         : migliori[Math.floor(Math.random() * migliori.length)];
     minaccia.obiettivoScelto = { tipo, luogo };
     if (tipo !== "esplorazione") minaccia.obiettivoCasuale = null;
-    return { tipo, luogo };
+    // Raggiungibile solo abbattendo una porta
+    return dist[luogo] === undefined
+      ? { tipo, luogo, conAbbattimento: true }
+      : { tipo, luogo };
   };
 
   const designata = minaccia.vittimaDesignata;
@@ -7864,18 +7886,18 @@ function scegliObiettivoMinaccia(minaccia) {
   }
   // 2) Ipotesi sulla designata
   if (designata) {
-    const r = piuVicino(luoghiIpotizzatiDa(memoria[designata]), "ipotesi");
+    const r = piuVicino(luoghiIpotizzatiDa(memoria[designata]), "ipotesi", distAbb);
     if (r) return r;
   }
   // 3) Ipotesi su qualunque vittima
   const ipotesi = Object.values(memoria).flatMap(luoghiIpotizzatiDa);
-  const r3 = piuVicino(ipotesi, "ipotesi");
+  const r3 = piuVicino(ipotesi, "ipotesi", distAbb);
   if (r3) return r3;
   // 4) Rumori uditi
   const luoghiRumori = (minaccia.memoriaRumori || []).flatMap((r) =>
     Array.isArray(r.luogo) ? r.luogo : [r.luogo]
   );
-  const r4 = piuVicino(luoghiRumori, "rumore");
+  const r4 = piuVicino(luoghiRumori, "rumore", distAbb);
   if (r4) return r4;
   // 5) Esplorazione del piano: il luogo più vicino del piano in cui si trova
   //    che non ricorda né vuoto né inaccessibile.
@@ -7928,6 +7950,23 @@ function scegliObiettivoMinaccia(minaccia) {
   };
   let celle = cercaPiano();
   if (!celle) {
+    // Tutto ciò che è accessibile è già stato esplorato senza trovare vittime:
+    // ora vale la pena abbattere una porta per raggiungere i luoghi che si
+    // trovano oltre (se ce ne sono, e non sono già noti come vuoti).
+    const oltrePorte = tutti
+      .filter(
+        (c) =>
+          c.posizione &&
+          c.codice !== pos &&
+          dist[c.codice] === undefined &&
+          distAbb[c.codice] !== undefined &&
+          !vuoti.has(c.codice)
+      )
+      .map((c) => c.codice);
+    const r6 = piuVicino(oltrePorte, "abbattimento", distAbb);
+    if (r6) return r6;
+  }
+  if (!celle) {
     // Nessun piano ha più luoghi da esplorare: dimentica i luoghi vuoti di
     // tutti i piani tranne quello in cui si trova (appena esplorato) e riprova.
     minaccia.luoghiVuoti = (minaccia.luoghiVuoti || []).filter(
@@ -7947,17 +7986,28 @@ function scegliObiettivoMinaccia(minaccia) {
 
 // Prossima carta lungo un percorso minimo verso l'obiettivo (stesse regole
 // di raggiungibilità di calcolaLuoghiRaggiungibili), oppure null.
-function prossimoPassoMinaccia(minaccia, luogoObiettivo) {
+// Con `conAbbattimento` (obiettivo oltre una porta abbattibile) il percorso può
+// attraversarla, ma solo se non ne esiste uno che la eviti.
+function prossimoPassoMinaccia(minaccia, luogoObiettivo, conAbbattimento = false) {
   const pos = gameData.posizioniPersonaggi[minaccia.id];
-  const dallObiettivo = distanzeRealiDa(luogoObiettivo, minaccia);
-  const dPos = dallObiettivo[pos];
-  if (dPos === undefined || dPos === 0) return null;
-  const vicini = calcolaLuoghiRaggiungibili(pos, 1, minaccia);
-  return (
-    Object.keys(vicini).find(
-      (c) => vicini[c] === 1 && dallObiettivo[c] === dPos - 1
-    ) || null
-  );
+  const passo = (abbatte) => {
+    const dallObiettivo = distanzeRealiDa(luogoObiettivo, minaccia, abbatte);
+    const dPos = dallObiettivo[pos];
+    if (dPos === undefined || dPos === 0) return null;
+    const prima = minaccia.consideraAbbattimento;
+    minaccia.consideraAbbattimento = abbatte;
+    try {
+      const vicini = calcolaLuoghiRaggiungibili(pos, 1, minaccia);
+      return (
+        Object.keys(vicini).find(
+          (c) => vicini[c] === 1 && dallObiettivo[c] === dPos - 1
+        ) || null
+      );
+    } finally {
+      minaccia.consideraAbbattimento = prima;
+    }
+  };
+  return passo(false) || (conAbbattimento ? passo(true) : null);
 }
 
 // 🚪 Intelligenza 1+: se tra "da" e "a" c'è uno sbarramento che la
@@ -8079,7 +8129,11 @@ async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
     if (vittimaNelLuogo(pos)) break;
     const obiettivo = scegliObiettivoMinaccia(minaccia);
     if (!obiettivo) break;
-    const prossimo = prossimoPassoMinaccia(minaccia, obiettivo.luogo);
+    const prossimo = prossimoPassoMinaccia(
+      minaccia,
+      obiettivo.luogo,
+      !!obiettivo.conAbbattimento
+    );
     if (!prossimo) break;
 
     // Comportamento precedente: finiti i passi del suo unico movimento non apre altro
@@ -8099,7 +8153,9 @@ async function eseguiMovimentoMinaccia(minaccia, idSequenza) {
     // Se non può aprirla (a chiave, sbarrata...) ma è una porta abbattibile a mani
     // nude, la prende a spallate: ogni colpo costa PA e toglie resistenza in base
     // alla sua Forza; finché non cede non va oltre.
-    const daAbbattere = sbarramentoAbbattibileDaMinaccia(minaccia, pos, prossimo);
+    const daAbbattere = obiettivo.conAbbattimento
+      ? sbarramentoAbbattibileDaMinaccia(minaccia, pos, prossimo)
+      : null;
     if (daAbbattere) {
       if (pa < costoSbarramento) break;
       pa -= costoSbarramento;
