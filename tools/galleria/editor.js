@@ -7,6 +7,9 @@
  */
 const Editor = (() => {
   let ctx = null, st = null, sel = null, storia = [], hi = -1, timer = null, salvato = "", soloImg = false;
+  // zone cliccabili degli elementi (solo luoghi): poligoni in % dell'immagine esportata, salvati in assets/carte/zone.json
+  let modoZone = false, soloImgPrima = false, zonaSel = null, puntoSel = null, nomiCat = [], zoneOk = false;
+  const chiaveZone = c => c.id.split("_")[0] + (c.id.endsWith("_abitata") ? "_abitata" : "");
   const cacheImg = new Map();
   const $ = s => document.querySelector(s);
   const el = (tag, cl, txt) => { const e = document.createElement(tag); if (cl) e.className = cl; if (txt != null) e.textContent = txt; return e; };
@@ -25,14 +28,17 @@ const Editor = (() => {
     ctx = { carta, variante, opz };
     st = { elementi: Carta.elementi(carta), imm: Carta.imm(variante) };
     if (carta.tipo === "minaccia") st.caratteristiche = { ...CAR_MINACCIA_VUOTE, ...(carta.caratteristiche || {}) };   // valori di gioco: non compaiono sulla carta
+    modoZone = false; zonaSel = null; puntoSel = null; zoneOk = false; nomiCat = [];
+    if (carta.tipo === "luogo") st.zone = {};   // riempito da caricaZone()
     salvato = JSON.stringify(st); storia = [salvato]; hi = 0; sel = "nome"; soloImg = false;
     costruisci(); tutto();
+    if (carta.tipo === "luogo") caricaZone();
     document.addEventListener("keydown", tasti, true);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => ctx && overlay());   // i font cambiano la larghezza del testo
   }
   function rimuovi() { clearTimeout(timer); document.removeEventListener("keydown", tasti, true); const m = $("#edModale"); if (m) m.remove(); ctx = null; }
   function chiudi() { if (sporco() && !confirm("Ci sono modifiche non salvate. Chiudere comunque?")) return; rimuovi(); }
-  const tutto = () => { ridisegna(); livelli(); pannello(); caratteristiche(); barra(); };
+  const tutto = () => { ridisegna(); livelli(); pannello(); caratteristiche(); pannelloZone(); barra(); };
 
   function costruisci() {
     const m = el("div", "ed-modale"); m.id = "edModale";
@@ -50,12 +56,14 @@ const Editor = (() => {
     const so = el("div", "ed-stage-outer"), stage = el("div", "ed-stage " + (ctx.carta.formato === "orizzontale" ? "ed-o" : "ed-v")); stage.id = "edStage";
     const ov = el("div", "ed-overlay"); ov.id = "edOverlay";
     const gv = el("div", "ed-guida v"), gh = el("div", "ed-guida h"); gv.id = "edGv"; gh.id = "edGh";
-    stage.append(ov, gv, gh); so.append(stage);
+    const zl = el("div", "ed-zone"); zl.id = "edZone";
+    stage.append(ov, zl, gv, gh); so.append(stage);
     const p = el("aside", "ed-pannello");
     p.append(el("h3", null, "Livelli"), Object.assign(el("ul", "ed-liv"), { id: "edLivelli" }));
     const add = el("button", null, "+ Aggiungi testo"); add.onclick = aggiungiTesto; p.append(add);
     p.append(el("h3", null, "Proprietà"), Object.assign(el("div"), { id: "edProp" }));
     if (ctx.carta.tipo === "minaccia") p.append(Object.assign(el("div"), { id: "edCar" }));
+    if (ctx.carta.tipo === "luogo") p.append(Object.assign(el("div"), { id: "edZoneP" }));
     p.append(el("div", "ed-sugg", "Trascina per spostare · maniglie per ridimensionare (immagine: lati = stira, angoli = scala) · frecce per rifinire (Maiusc = più veloce) · Ctrl+Z annulla."));
     corpo.append(so, p); m.append(t, corpo); document.body.append(m);
     stage.addEventListener("pointerdown", e => { if (e.target === stage || e.target === ov) { /* click a vuoto: nessuna azione */ } });
@@ -69,7 +77,7 @@ const Editor = (() => {
     wrap.querySelectorAll(".cx-immagine, .cx-testo").forEach(n => n.addEventListener("pointerdown", e => inizioTrascina(e, n.dataset.id)));
     wrap.querySelectorAll(".cx-stat, .cx-st-pannello").forEach(n => n.addEventListener("pointerdown", e => inizioTrascina(e, "statistiche")));
     wrap.querySelectorAll("img").forEach(i => i.addEventListener("load", overlay));
-    overlay();
+    overlay(); zoneDisegna();
   }
   function rettangolo(e, n) {
     const r = n.getBoundingClientRect();
@@ -111,7 +119,7 @@ const Editor = (() => {
   const annulla = () => vai(hi - 1), ripeti = () => vai(hi + 1);
   function reimposta() {
     if (!confirm("Riportare tutti gli elementi e la posizione dell'immagine ai valori predefiniti?")) return;
-    st = { elementi: Carta.predefiniti(ctx.carta), imm: { ...Carta.IMM_DEF }, ...(st.caratteristiche ? { caratteristiche: st.caratteristiche } : {}) }; sel = "nome"; spingi(); tutto();
+    st = { elementi: Carta.predefiniti(ctx.carta), imm: { ...Carta.IMM_DEF }, ...(st.caratteristiche ? { caratteristiche: st.caratteristiche } : {}), ...(st.zone ? { zone: st.zone } : {}) }; sel = "nome"; spingi(); tutto();
   }
   function barra() {
     const a = $("#edAnnulla"); if (!a) return;
@@ -120,7 +128,8 @@ const Editor = (() => {
   }
   async function salva() {
     spingi();
-    const ok = await ctx.opz.salva({ carta: ctx.carta.id, variante: ctx.variante.id, elementi: st.elementi, imm: st.imm, caratteristiche: st.caratteristiche });
+    let ok = await ctx.opz.salva({ carta: ctx.carta.id, variante: ctx.variante.id, elementi: st.elementi, imm: st.imm, caratteristiche: st.caratteristiche });
+    if (ok && ctx.carta.tipo === "luogo" && zoneOk) ok = await salvaZone();
     if (ok) { ctx.carta.caratteristiche = st.caratteristiche; { salvato = JSON.stringify(st); barra(); ctx.opz.avviso && ctx.opz.avviso("Carta salvata"); } }
   }
 
@@ -214,6 +223,12 @@ const Editor = (() => {
       if (k === "y" || k === "Y") { ev.preventDefault(); ripeti(); return; }
     }
     if (inCampo) return;
+    if (modoZone && zonaSel && puntoSel !== null && st.zone[zonaSel]) {
+      const p = st.zone[zonaSel].poligono[puntoSel], pas = ev.shiftKey ? 0.5 : 0.1;
+      const dz = { ArrowLeft: [-pas, 0], ArrowRight: [pas, 0], ArrowUp: [0, -pas], ArrowDown: [0, pas] }[k];
+      if (dz && p) { ev.preventDefault(); p[0] = arr(lim(p[0] + dz[0], 0, 100), 1); p[1] = arr(lim(p[1] + dz[1], 0, 100), 1); cambiatoZone(); return; }
+      if (k === "Delete" || k === "Backspace") { ev.preventDefault(); rimuoviPunto(zonaSel, puntoSel); return; }
+    }
     const e = cerca(sel); if (!e) return;
     const passo = ev.shiftKey ? 1 : 0.2, d = { ArrowLeft: [-passo, 0], ArrowRight: [passo, 0], ArrowUp: [0, -passo], ArrowDown: [0, passo] }[k];
     if (d && (e.tipo === "immagine" || e.tipo === "testo" || e.tipo === "statistiche")) {
@@ -340,6 +355,132 @@ const Editor = (() => {
       l.append(nome, i); griglia.append(l);
     });
     c.append(griglia, el("div", "ed-sugg", "Valori di gioco della minaccia: non compaiono sulla carta. Salva e dimmi di applicarli al gioco (minacce_base.json)."));
+  }
+
+  /* ---------- zone cliccabili (solo luoghi) ---------- */
+  function caricaZone() {
+    const c = ctx;
+    Promise.all([fetch("/api/zone").then(r => r.json()), fetch("/api/elementi").then(r => r.json())]).then(([z, n]) => {
+      if (ctx !== c) return;
+      nomiCat = n; zoneOk = true;
+      if (!sporco() && storia.length === 1) {   // nessuna modifica nel frattempo: le zone salvate diventano lo stato di partenza
+        st.zone = JSON.parse(JSON.stringify(z[chiaveZone(c.carta)] || {})); salvato = JSON.stringify(st); storia = [salvato]; hi = 0;
+      }
+      pannelloZone(); zoneDisegna(); barra();
+    }).catch(() => { if (ctx === c) alert("Non riesco a leggere le zone salvate: non le modifico (riapri l'editor)."); });
+  }
+  async function salvaZone() {
+    try {
+      const r = await fetch("/api/zone", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ carta: ctx.carta.id, chiave: chiaveZone(ctx.carta), zone: st.zone }) });
+      if (!r.ok) { alert("Zone non salvate: " + ((await r.json().catch(() => ({}))).errore || r.status)); return false; }
+      return true;
+    } catch (e) { alert("Zone non salvate: " + e); return false; }
+  }
+  function cambiatoZone() { zoneDisegna(); barra(); clearTimeout(timer); timer = setTimeout(spingi, 350); }
+  function selZona(nome, punto) { zonaSel = nome; puntoSel = punto; zoneDisegna(); pannelloZone(); }
+
+  function puntoDa(ev) {
+    const r = $("#edStage").getBoundingClientRect();
+    return [arr(lim(((ev.clientX - r.left) / r.width) * 100, 0, 100), 1), arr(lim(((ev.clientY - r.top) / r.height) * 100, 0, 100), 1)];
+  }
+  function trascinaPunto(ev, nome, i) {
+    ev.preventDefault(); ev.stopPropagation(); selZona(nome, i); let mosso = false;
+    const mv = m => { const p = st.zone[nome] && st.zone[nome].poligono[i]; if (!p) return; [p[0], p[1]] = puntoDa(m); mosso = true; cambiatoZone(); };
+    const su = () => { window.removeEventListener("pointermove", mv); if (mosso) spingi(); };
+    window.addEventListener("pointermove", mv); window.addEventListener("pointerup", su, { once: true });
+  }
+  function trascinaZona(ev, nome) {
+    ev.preventDefault(); ev.stopPropagation(); selZona(nome, null);
+    const r = $("#edStage").getBoundingClientRect(), orig = st.zone[nome].poligono.map(p => [...p]); let mosso = false;
+    const mv = m => {
+      let dx = ((m.clientX - ev.clientX) / r.width) * 100, dy = ((m.clientY - ev.clientY) / r.height) * 100;
+      dx = lim(dx, -Math.min(...orig.map(p => p[0])), 100 - Math.max(...orig.map(p => p[0])));   // l'intera zona resta dentro l'immagine
+      dy = lim(dy, -Math.min(...orig.map(p => p[1])), 100 - Math.max(...orig.map(p => p[1])));
+      st.zone[nome].poligono = orig.map(p => [arr(p[0] + dx, 1), arr(p[1] + dy, 1)]); mosso = true; cambiatoZone();
+    };
+    const su = () => { window.removeEventListener("pointermove", mv); if (mosso) spingi(); };
+    window.addEventListener("pointermove", mv); window.addEventListener("pointerup", su, { once: true });
+  }
+  function aggiungiPunto(ev, nome, dopo) {   // clic su un lato: nuovo vertice proprio lì, poi si può trascinare subito
+    ev.preventDefault(); ev.stopPropagation();
+    st.zone[nome].poligono.splice(dopo + 1, 0, puntoDa(ev));
+    trascinaPunto(ev, nome, dopo + 1); pannelloZone();
+  }
+  function rimuoviPunto(nome, i) {
+    const p = st.zone[nome].poligono; if (p.length <= 3) return;   // un poligono ha almeno 3 vertici
+    p.splice(i, 1); puntoSel = null; cambiatoZone(); spingi(); pannelloZone();
+  }
+
+  function zoneDisegna() {
+    const zl = $("#edZone"); if (!zl) return; zl.replaceChildren();
+    if (!modoZone || !st.zone) return;
+    const NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("class", "ed-zone-svg"); svg.setAttribute("viewBox", "0 0 100 100"); svg.setAttribute("preserveAspectRatio", "none");
+    const entries = Object.entries(st.zone).sort(([a], [b]) => (a === zonaSel) - (b === zonaSel));   // la selezionata sta sopra le altre
+    for (const [nome, z] of entries) {
+      const p = z.poligono, sl = nome === zonaSel;
+      const pol = document.createElementNS(NS, "polygon");
+      pol.setAttribute("class", "ed-zona" + (sl ? " sel" : "")); pol.setAttribute("points", p.map(q => q.join(",")).join(" "));
+      pol.addEventListener("pointerdown", ev => trascinaZona(ev, nome)); svg.append(pol);
+      if (sl) p.forEach((q, i) => {
+        const l = document.createElementNS(NS, "line"), n = p[(i + 1) % p.length];
+        l.setAttribute("class", "ed-lato"); l.setAttribute("x1", q[0]); l.setAttribute("y1", q[1]); l.setAttribute("x2", n[0]); l.setAttribute("y2", n[1]);
+        l.addEventListener("pointerdown", ev => aggiungiPunto(ev, nome, i)); svg.append(l);
+      });
+    }
+    zl.append(svg);
+    for (const [nome, z] of entries) {
+      const p = z.poligono, sl = nome === zonaSel;
+      const et = el("div", "ed-zona-nome", nome);
+      et.style.left = (p.reduce((s, q) => s + q[0], 0) / p.length) + "%"; et.style.top = (p.reduce((s, q) => s + q[1], 0) / p.length) + "%"; zl.append(et);
+      if (sl) p.forEach((q, i) => {
+        const m = el("div", "ed-pt" + (i === puntoSel ? " sel" : "")); m.style.left = q[0] + "%"; m.style.top = q[1] + "%";
+        m.title = "Trascina per spostare · doppio clic (o Canc) per togliere il punto";
+        m.addEventListener("pointerdown", ev => trascinaPunto(ev, nome, i));
+        m.addEventListener("dblclick", ev => { ev.preventDefault(); rimuoviPunto(nome, i); });
+        m.addEventListener("contextmenu", ev => { ev.preventDefault(); rimuoviPunto(nome, i); });
+        zl.append(m);
+      });
+    }
+  }
+
+  function pannelloZone() {
+    const c = $("#edZoneP"); if (!c) return; c.replaceChildren();
+    c.append(el("h3", null, "Zone cliccabili"));
+    const cb = Object.assign(document.createElement("input"), { type: "checkbox", checked: modoZone });
+    cb.onchange = () => {
+      modoZone = cb.checked;
+      if (modoZone) { soloImgPrima = soloImg; soloImg = true; } else { soloImg = soloImgPrima; zonaSel = null; puntoSel = null; }
+      const s = $("#edSoloImg"); if (s) { s.checked = soloImg; s.disabled = modoZone; }
+      ridisegna(); pannelloZone();
+    };
+    c.append(riga("Modifica zone", cb));
+    if (!modoZone) { c.append(el("div", "ed-sugg", "Contorni cliccabili degli elementi dentro l'illustrazione: li usa il gioco (assets/carte/zone.json).")); return; }
+    const nomi = Object.keys(st.zone || {});
+    if (!zoneOk) c.append(el("div", "ed-avviso", "Caricamento delle zone salvate…"));
+    const ul = el("ul", "ed-liv");
+    nomi.forEach(nome => {
+      const li = el("li", nome === zonaSel ? "sel" : ""), b = el("button", "ed-nome ed-nome-zona", `${nome} · ${st.zone[nome].poligono.length} punti`);
+      b.onclick = () => selZona(nome, null);
+      const x = el("button", "ed-mini", "🗑"); x.title = "Elimina la zona";
+      x.onclick = () => { if (!confirm(`Eliminare la zona "${nome}"?`)) return; delete st.zone[nome]; if (zonaSel === nome) { zonaSel = null; puntoSel = null; } cambiatoZone(); spingi(); pannelloZone(); };
+      li.append(b, x); ul.append(li);
+    });
+    c.append(ul);
+    const inp = Object.assign(document.createElement("input"), { type: "text", placeholder: "nome dell'elemento", className: "ed-zona-input" }), dl = document.createElement("datalist");
+    dl.id = "edElementiCat"; nomiCat.forEach(n => dl.append(new Option(n))); inp.setAttribute("list", "edElementiCat"); inp.style.cssText = "flex:1;min-width:0";
+    const nuova = el("button", null, "+ Zona");
+    const aggiungi = () => {
+      const nome = inp.value.trim(); if (!nome) return;
+      if (st.zone[nome]) { selZona(nome, null); return; }
+      st.zone[nome] = { poligono: [[40, 40], [60, 40], [60, 60], [40, 60]] };
+      zonaSel = nome; puntoSel = null; cambiatoZone(); spingi(); pannelloZone();
+    };
+    nuova.onclick = aggiungi; inp.onkeydown = ev => { if (ev.key === "Enter") aggiungi(); };
+    const r = el("div", "ed-riga"); r.append(inp, dl, nuova); c.append(r);
+    if (zonaSel && !nomiCat.includes(zonaSel)) c.append(el("div", "ed-avviso", `"${zonaSel}" non è nel catalogo degli elementi del gioco: va aggiunto (con le sue risposte) perché funzioni.`));
+    c.append(el("div", "ed-sugg", "Trascina un punto per spostarlo · clic su un lato per aggiungere un punto · doppio clic (o clic destro, o Canc) su un punto per toglierlo · trascina dentro la zona per spostarla tutta · con un punto selezionato le frecce lo muovono di poco (Maiusc = di più). Ricorda di premere Salva."));
   }
 
   return { apri };

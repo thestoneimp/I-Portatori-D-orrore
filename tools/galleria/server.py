@@ -11,6 +11,50 @@ sys.path.insert(0, os.path.dirname(__file__))
 import galleria as G
 
 PAGINA = os.path.join(os.path.dirname(__file__), "index.html")
+RADICE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+ZONE = os.path.join(RADICE, "assets", "carte", "zone.json")                       # zone cliccabili degli elementi (lette dal gioco)
+ELEMENTI = os.path.join(RADICE, "elementi_interagibili_base.json")                # catalogo degli elementi interagibili
+
+
+def leggi_zone():
+    try:
+        with open(ZONE, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def scrivi_zone(zone):
+    """Stesso formato scritto a mano: un poligono per riga."""
+    righe = ["{"]
+    luoghi = []
+    for chiave, elementi in zone.items():
+        zz = []
+        for nome, z in elementi.items():
+            pts = ",".join("[" + ",".join(("%g" % round(v, 1)) for v in p) + "]" for p in z["poligono"])
+            zz.append(f'    {json.dumps(nome, ensure_ascii=False)}: {{\n      "poligono": [{pts}]\n    }}')
+        luoghi.append(f'  {json.dumps(chiave)}: {{\n' + ",\n".join(zz) + "\n  }")
+    righe.append(",\n".join(luoghi))
+    righe.append("}")
+    with open(ZONE, "w", encoding="utf-8", newline="") as f:
+        f.write("\n".join(righe) + "\n")
+
+
+def zone_valide(zone):
+    """Elementi -> {poligono: [[x, y], ...]} con coordinate in % (0-100): controllo prima di scrivere sul file del gioco."""
+    if not isinstance(zone, dict) or len(zone) > 40:
+        return False
+    for nome, z in zone.items():
+        if not isinstance(nome, str) or not 1 <= len(nome) <= 60 or not isinstance(z, dict):
+            return False
+        p = z.get("poligono")
+        if not isinstance(p, list) or not 3 <= len(p) <= 80:
+            return False
+        for q in p:
+            if (not isinstance(q, list) or len(q) != 2
+                    or any(isinstance(v, bool) or not isinstance(v, (int, float)) or not 0 <= v <= 100 for v in q)):
+                return False
+    return True
 
 
 MINIATURE = os.path.join(G.ARTE, ".miniature")
@@ -78,6 +122,14 @@ class Gestore(BaseHTTPRequestHandler):
                 return self._invia(200, f.read(), "text/html; charset=utf-8")
         if percorso == "/api/galleria":
             return self._invia(200, G.carica())
+        if percorso == "/api/zone":
+            return self._invia(200, leggi_zone())
+        if percorso == "/api/elementi":   # nomi degli elementi interagibili del gioco (per dare un nome alle zone)
+            try:
+                with open(ELEMENTI, encoding="utf-8") as f:
+                    return self._invia(200, sorted({e["nome"] for e in json.load(f)}))
+            except (OSError, ValueError, KeyError):
+                return self._invia(200, [])
         if percorso.startswith("/mini/"):
             mini = miniatura(percorso[len("/mini/"):])
             if mini:
@@ -155,6 +207,17 @@ class Gestore(BaseHTTPRequestHandler):
                                       "s": max(0.05, min(8, float(im["s"]))), "st": max(0.1, min(8, float(im.get("st", 1))))}
                     except (KeyError, TypeError, ValueError):
                         return self._invia(400, {"errore": "imm non valida"})
+            elif p == "/api/zone":
+                chiave, zone = d.get("chiave"), d.get("zone")
+                if not isinstance(chiave, str) or not re.fullmatch(r"\w{1,40}", chiave) or not zone_valide(zone):
+                    return self._invia(400, {"errore": "zone non valide"})
+                tutte = leggi_zone()
+                if zone:
+                    tutte[chiave] = zone
+                else:
+                    tutte.pop(chiave, None)
+                scrivi_zone(tutte)
+                return self._invia(200, {"ok": True})
             elif p == "/api/richiesta/annulla":
                 for r in carta["richieste"]:
                     if r["id"] == d.get("id") and r["stato"] == "in_attesa":
