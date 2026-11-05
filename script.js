@@ -3094,54 +3094,85 @@ function gestisciClickCartaLuogo(codiceDestinazione) {
   }
 }
 
+// 🔹 Chiude tutto ciò che è aperto sopra la mappa: popup (anche impilati), finestra
+// di interazione di un altro luogo, pannelli laterali e finestre a comparsa del
+// Tutorial. Serve quando una finestra deve avere lo schermo tutto per sé.
+function chiudiTuttiPopupEMenu() {
+  ID_MENU_LATERALI.forEach((id) => {
+    if (document.getElementById(id)?.classList.contains("open")) {
+      toggleSideMenu(id, _direzioneMenuLaterale(id));
+    }
+  });
+  document.querySelectorAll(".tutorial-flyout").forEach((f) => f.remove());
+  document
+    .querySelectorAll(".popup, .popup-interazione-stanza")
+    .forEach((p) => chiudiPopupSelettivo(p));
+}
+
+// 🔹 Interazione con il luogo in cui si trova il personaggio: chiude ogni popup e
+// menu aperto, mostra la carta del luogo in primo piano al centro dello schermo
+// (illustrazione se approvata, altrimenti una carta con nome e codice) e sotto le
+// interazioni disponibili.
 function mostraInterazioneStanza(codiceCarta) {
   const carta = gameData.tabelloneAttivo.find((c) => c.codice === codiceCarta);
   if (!carta || !carta.esplorata) return;
 
-  const elementi = Array.isArray(carta.elementi) ? carta.elementi : [];
+  chiudiTuttiPopupEMenu();
 
-  // --- Costruzione UI (niente personaggi qui: ora si cliccano direttamente sulla mappa) ---
+  const elementi = Array.isArray(carta.elementi) ? carta.elementi : [];
+  const nome = carta.nome || carta.codice;
+  const conImmagine = (gameData.immaginiLuoghi || []).includes(carta.codice);
+
   const interazione = document.createElement("div");
   interazione.classList.add("popup-interazione-stanza");
   interazione.id = "popupInterazioneStanza";
 
-  let html = `
-    <div class="popup-content">
-      <h2>${carta.nome || carta.codice}</h2>
-  `;
+  const contenuto = document.createElement("div");
+  contenuto.className = "popup-content";
 
-  // Elementi interagibili (solo quelli della carta luogo)
-  if (elementi.length > 0) {
-    html += `
-      <h3>Elementi interazione</h3>
-      <div class="lista-elementi">
-        ${elementi
-          .map(
-            (el) =>
-              `<button class="elemento-btn" onclick="interagisciConElemento('${String(
-                el
-              ).replace(/'/g, "\\'")}')">${el}</button>`
-          )
-          .join("")}
-      </div>
-    `;
+  // La carta in primo piano: l'illustrazione ha già il nome scritto sopra, quindi
+  // il nome resta solo come testo per chi non ha ancora l'immagine del luogo.
+  const cartaEl = document.createElement("div");
+  cartaEl.className = "carta-luogo-grande";
+  cartaEl.setAttribute("role", "img");
+  cartaEl.setAttribute("aria-label", nome);
+  if (conImmagine) {
+    cartaEl.classList.add("con-immagine");
+    cartaEl.style.backgroundImage = `url("assets/carte/luoghi/${carta.codice}.webp")`;
   } else {
-    html += `
-      <p style="opacity:.8;margin:8px 0 12px">
-        In questo luogo non ci sono elementi con cui interagire.
-      </p>
-    `;
+    cartaEl.innerHTML = `<span class="carta-luogo-nome">${nome}</span><span class="carta-luogo-codice">${carta.codice}</span>`;
+  }
+  contenuto.appendChild(cartaEl);
+
+  if (elementi.length > 0) {
+    const titolo = document.createElement("h3");
+    titolo.textContent = "Elementi interazione";
+    contenuto.appendChild(titolo);
+
+    const lista = document.createElement("div");
+    lista.className = "lista-elementi";
+    elementi.forEach((el) => {
+      const btn = document.createElement("button");
+      btn.className = "elemento-btn";
+      btn.textContent = el;
+      btn.addEventListener("click", () => interagisciConElemento(String(el)));
+      lista.appendChild(btn);
+    });
+    contenuto.appendChild(lista);
+  } else {
+    const vuoto = document.createElement("p");
+    vuoto.className = "nessun-elemento";
+    vuoto.textContent = "In questo luogo non ci sono elementi con cui interagire.";
+    contenuto.appendChild(vuoto);
   }
 
-  // Pulsante chiusura
-  html += `
-      <div style="margin-top:12px">
-        <button onclick="chiudiPopupSelettivo('.popup-interazione-stanza')">Chiudi</button>
-      </div>
-    </div>
-  `;
+  const chiudi = document.createElement("button");
+  chiudi.className = "chiudi-interazione-stanza";
+  chiudi.textContent = "Chiudi";
+  chiudi.addEventListener("click", () => chiudiPopupSelettivo(interazione));
+  contenuto.appendChild(chiudi);
 
-  interazione.innerHTML = html;
+  interazione.appendChild(contenuto);
   document.body.appendChild(interazione);
 }
 

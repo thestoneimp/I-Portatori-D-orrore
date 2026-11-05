@@ -994,7 +994,7 @@ button.btn-primary:hover {
   height: 100dvh;
   box-sizing: border-box;
   padding: 8px;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.78);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1002,11 +1002,18 @@ button.btn-primary:hover {
   animation: fadeInPopup 0.25s ease-out; /* senza "forwards": a fine animazione niente transform/layer residuo (sfocava il testo) */
 }
 
+/* Niente riquadro scuro: la carta del luogo è la protagonista e le interazioni
+   le stanno sotto, direttamente sullo sfondo oscurato. */
 .popup-interazione-stanza .popup-content {
-  background-color: #111;
+  background: transparent;
   color: white;
-  padding: clamp(10px, 3vh, 20px) clamp(14px, 4vw, 30px);
-  border-radius: 10px;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(6px, 1.6vh, 14px);
   box-sizing: border-box;
   max-width: 100%;
   max-height: 100%;
@@ -1014,8 +1021,57 @@ button.btn-primary:hover {
   overflow-wrap: anywhere;
   font-size: clamp(13px, 2.8vh, 16px);
   text-align: center;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
   animation: scaleIn 0.25s ease-out; /* senza "forwards": a fine animazione niente transform/layer residuo (sfocava il testo) */
+}
+
+.popup-interazione-stanza h3,
+.popup-interazione-stanza .nessun-elemento {
+  margin: 0;
+}
+
+.popup-interazione-stanza .nessun-elemento {
+  opacity: 0.8;
+}
+
+/* Carta del luogo in primo piano: 3:2 come le carte del tabellone, mai stirata;
+   l'altezza lascia spazio alle interazioni sotto. */
+.carta-luogo-grande {
+  flex: 0 0 auto;
+  height: min(50vh, 44vw);
+  aspect-ratio: 3 / 2;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background-color: #1b1b1b;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 16px var(--blood-red-glow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.carta-luogo-grande:not(.con-immagine) {
+  border: 2px solid var(--bg-panel-border);
+}
+
+.carta-luogo-grande .carta-luogo-nome {
+  font-size: 1.4em;
+  font-weight: bold;
+}
+
+.carta-luogo-grande .carta-luogo-codice {
+  opacity: 0.7;
+}
+
+.popup-interazione-stanza .lista-elementi {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
 }
 
 /* ----------------------------- */
