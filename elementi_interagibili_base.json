@@ -431,6 +431,147 @@
     ]
   },
   {
+    "nome": "albero",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia gronda dai rami spogli e scivola lungo la corteccia annerita del grosso tronco."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nel buio battuto dalla pioggia, i rami nudi dell'albero si agitano come dita contro il cielo."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "L'enorme tronco si staglia nella foschia pallida, i rami secchi immobili sopra la strada."
+      },
+      {
+        "id": "R04",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella notte silenziosa, l'albero è una sagoma nera e contorta contro la nebbia."
+      },
+      {
+        "id": "R05",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "La pioggia scorre lungo il tronco robusto, mentre i rami sgocciolano sul bordo della strada."
+      },
+      {
+        "id": "R06",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "pioggia",
+          "tempesta"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Sotto la pioggia notturna, i rami ondeggiano piano e il tronco scuro si perde nell'ombra."
+      },
+      {
+        "id": "R07",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "giorno"
+        ],
+        "testo": "Il tronco massiccio proietta una lunga ombra sull'erba, ai margini della strada."
+      },
+      {
+        "id": "R08",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "meteo": [
+          "sereno",
+          "nebbia"
+        ],
+        "momento": [
+          "notte"
+        ],
+        "testo": "Nella notte quieta, l'albero ben piantato veglia sulla strada come un guardiano silenzioso."
+      },
+      {
+        "id": "R09",
+        "scenario": "tutti",
+        "testo": "Un albero imponente cresce sul ciglio della strada, il tronco largo e scuro."
+      }
+    ],
+    "tagPiazzamento": [
+      "strada"
+    ]
+  },
+  {
     "nome": "capanno degli attrezzi",
     "risposte": [
       {

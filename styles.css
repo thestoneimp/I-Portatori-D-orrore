@@ -1054,6 +1054,56 @@ button.btn-primary:hover {
   gap: 4px;
 }
 
+/* Contorni cliccabili degli elementi dentro l'illustrazione: un alone che pulsa piano
+   (sempre visibile, serve anche al touch) e si accende al passaggio del mouse. */
+.carta-luogo-grande {
+  position: relative;
+}
+
+.zone-luogo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.zona-elemento {
+  fill: rgba(255, 224, 140, 0.06);
+  stroke: rgba(255, 224, 140, 0.85);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  paint-order: stroke;
+  cursor: pointer;
+  pointer-events: all;
+  outline: none;
+  filter: drop-shadow(0 0 3px rgba(255, 210, 110, 0.9));
+  animation: pulsaZona 2.4s ease-in-out infinite;
+  transition: fill 0.15s, stroke 0.15s;
+}
+
+.zona-elemento:hover,
+.zona-elemento:focus {
+  fill: rgba(255, 224, 140, 0.28);
+  stroke: #fff2c4;
+  stroke-width: 2.5px;
+  animation: none;
+  filter: drop-shadow(0 0 7px rgba(255, 220, 130, 1));
+}
+
+@keyframes pulsaZona {
+  0%, 100% { stroke-opacity: 0.35; fill-opacity: 0.4; }
+  50% { stroke-opacity: 1; fill-opacity: 1; }
+}
+
+.didascalia-luogo {
+  min-height: 1.4em;
+  text-transform: none;
+  opacity: 0.9;
+}
+
 .carta-luogo-grande:not(.con-immagine) {
   border: 2px solid var(--bg-panel-border);
 }

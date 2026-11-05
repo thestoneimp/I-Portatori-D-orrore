@@ -591,6 +591,19 @@ fetch("assets/carte/indice.json")
   })
   .catch((err) => console.error("Errore caricamento indice immagini:", err));
 
+// Zone cliccabili degli elementi dentro le illustrazioni dei luoghi (poligoni in % dell'immagine):
+// { "A01": { "lampione": { poligono: [[x, y], ...] }, ... } }. Un luogo presente qui ha un
+// SUO set di elementi, quelli che si vedono davvero nell'immagine.
+fetch("assets/carte/zone.json")
+  .then((res) => res.json())
+  .then((data) => {
+    gameData.zoneLuoghi = data || {};
+  })
+  .catch((err) => {
+    gameData.zoneLuoghi = {};
+    console.error("Errore caricamento zone dei luoghi:", err);
+  });
+
 // generaGrigliaTabellone() ricrea tutto il DOM a ogni cambiamento (esplorazione, sbarramenti, spostamenti): le illustrazioni dei
 // luoghi sono sfondi CSS, che il browser rilegge e ridecodifica ogni volta, e per qualche istante le carte restano scure o con
 // l'immagine a bassa risoluzione ("sfocata"). Tenendo gli <img> già decodificati in memoria, il ridisegno le trova pronte.
@@ -2530,18 +2543,32 @@ function piazzaElementiCasuali() {
   const eraAttuale = ERA_PER_STATOCASA[gameData.contestoAmbientale?.statoCasa];
 
   const usatiInQuestoScenario = new Set();
+  const zone = gameData.zoneLuoghi || {};
 
-  (gameData.tabelloneAttivo || []).forEach((carta) => {
+  // I luoghi con zone cliccabili vanno per primi: il loro set è fisso (gli elementi
+  // disegnati nell'illustrazione) e non devono ritrovarsi già "presi" da un altro luogo.
+  const ordinate = [...(gameData.tabelloneAttivo || [])].sort(
+    (a, b) => (zone[b.codice] ? 1 : 0) - (zone[a.codice] ? 1 : 0)
+  );
+
+  ordinate.forEach((carta) => {
     const tagAmbiente = carta.tagAmbiente || [];
+    const zoneCarta = zone[carta.codice];
 
-    const candidati = elementiInteragibili.filter(
-      (el) =>
-        Array.isArray(el.tagPiazzamento) &&
-        el.tagPiazzamento.some((t) => tagAmbiente.includes(t)) &&
-        !usatiInQuestoScenario.has(el.nome) &&
-        (!el.tagDatazione || el.tagDatazione === eraAttuale)
+    // Con zone: solo gli elementi che hanno una zona nell'immagine di questo luogo.
+    // Senza: pesca per tag di piazzamento, come prima.
+    const candidati = elementiInteragibili.filter((el) =>
+      zoneCarta
+        ? Object.prototype.hasOwnProperty.call(zoneCarta, el.nome) &&
+          (!el.tagDatazione || el.tagDatazione === eraAttuale)
+        : Array.isArray(el.tagPiazzamento) &&
+          el.tagPiazzamento.some((t) => tagAmbiente.includes(t)) &&
+          !usatiInQuestoScenario.has(el.nome) &&
+          (!el.tagDatazione || el.tagDatazione === eraAttuale)
     );
 
+    // Se il luogo ha più elementi di quanti ne servano, se ne estrae a caso un
+    // numero ridotto (evita decine di interazioni in un solo luogo).
     const quanti =
       MIN_ELEMENTI_PER_LUOGO +
       Math.floor(
@@ -3142,16 +3169,62 @@ function mostraInterazioneStanza(codiceCarta) {
   } else {
     cartaEl.innerHTML = `<span class="carta-luogo-nome">${nome}</span><span class="carta-luogo-codice">${carta.codice}</span>`;
   }
-  contenuto.appendChild(cartaEl);
+  // Elementi con una zona nell'illustrazione: si evidenziano sull'immagine e si
+  // cliccano lì. Gli altri (luoghi senza zone) restano pulsanti sotto la carta.
+  const zoneCarta = (conImmagine && gameData.zoneLuoghi?.[carta.codice]) || {};
+  const elementiConZona = elementi.filter((el) => zoneCarta[el]?.poligono?.length >= 3);
+  const elementiSenzaZona = elementi.filter((el) => !elementiConZona.includes(el));
 
-  if (elementi.length > 0) {
+  let didascalia = null;
+  if (elementiConZona.length > 0) {
+    const NS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("class", "zone-luogo");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.setAttribute("preserveAspectRatio", "none");
+
+    didascalia = document.createElement("div");
+    didascalia.className = "didascalia-luogo";
+    const testoPredefinito = "Clicca su un elemento evidenziato per interagire";
+    didascalia.textContent = testoPredefinito;
+
+    elementiConZona.forEach((el) => {
+      const poligono = document.createElementNS(NS, "polygon");
+      poligono.setAttribute("class", "zona-elemento");
+      poligono.setAttribute("points", zoneCarta[el].poligono.map((p) => p.join(",")).join(" "));
+      poligono.setAttribute("tabindex", "0");
+      poligono.setAttribute("role", "button");
+      poligono.setAttribute("aria-label", String(el));
+      const attiva = () => interagisciConElemento(String(el));
+      poligono.addEventListener("click", attiva);
+      poligono.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          attiva();
+        }
+      });
+      const mostra = () =>
+        (didascalia.textContent = String(el).charAt(0).toUpperCase() + String(el).slice(1));
+      const ripristina = () => (didascalia.textContent = testoPredefinito);
+      poligono.addEventListener("mouseenter", mostra);
+      poligono.addEventListener("focus", mostra);
+      poligono.addEventListener("mouseleave", ripristina);
+      poligono.addEventListener("blur", ripristina);
+      svg.appendChild(poligono);
+    });
+    cartaEl.appendChild(svg);
+  }
+  contenuto.appendChild(cartaEl);
+  if (didascalia) contenuto.appendChild(didascalia);
+
+  if (elementiSenzaZona.length > 0) {
     const titolo = document.createElement("h3");
     titolo.textContent = "Elementi interazione";
     contenuto.appendChild(titolo);
 
     const lista = document.createElement("div");
     lista.className = "lista-elementi";
-    elementi.forEach((el) => {
+    elementiSenzaZona.forEach((el) => {
       const btn = document.createElement("button");
       btn.className = "elemento-btn";
       btn.textContent = el;
@@ -3159,7 +3232,7 @@ function mostraInterazioneStanza(codiceCarta) {
       lista.appendChild(btn);
     });
     contenuto.appendChild(lista);
-  } else {
+  } else if (elementiConZona.length === 0) {
     const vuoto = document.createElement("p");
     vuoto.className = "nessun-elemento";
     vuoto.textContent = "In questo luogo non ci sono elementi con cui interagire.";
