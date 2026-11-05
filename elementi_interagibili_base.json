@@ -572,6 +572,1050 @@
     ]
   },
   {
+    "nome": "albero secco",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "I rami secchi dell'albero graffiano il cielo come dita ossute, la corteccia ridotta a scaglie."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "L'albero spoglio è stato potato di recente: i tagli sui rami sono ancora chiari."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un albero senza foglie si piega sul prato, il tronco sottile e contorto."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "recinzione di ferro",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La recinzione di ferro è corrosa dalla ruggine, le punte a giglio scrostate e storte."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La recinzione di ferro battuto è stata verniciata di recente, ogni punta a giglio al suo posto."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Una recinzione di ferro con punte a forma di giglio corre lungo il bordo del giardino."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "tronco caduto",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Un grosso tronco caduto giace tra l'erba alta, il legno spaccato e coperto di muschio."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Un tronco abbattuto è stato lasciato ai margini del prato, in attesa di essere tagliato."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un enorme tronco giace a terra, ai margini del giardino."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "pozzo",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il pozzo di pietra è coperto di muschio; dal fondo sale un odore di terra umida e acqua stagnante."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il pozzo è ben tenuto: la carrucola gira ancora e le pietre del bordo sono pulite."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un vecchio pozzo di pietra sorge in mezzo al giardino, con il suo piccolo tetto di legno."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "statua",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La statua di pietra è scheggiata e annerita dall'umidità; il suo volto sembra osservarti."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La statua è pulita e ben collocata, il panneggio in pietra levigato dal tempo."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Una statua di pietra raffigura una donna dal volto sereno, il capo leggermente chino."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "roseto",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "I rovi del roseto sono selvatici e intrecciati, le rose rosse spiccano tra le spine."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il roseto è curato con attenzione: le rose sono in piena fioritura e le spine potate."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un roseto con grandi rose rosse cresce lungo il bordo del giardino."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "muretto di pietra",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il muretto di pietra è crepato e ricoperto di muschio, alcuni sassi sono caduti nell'erba."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il muretto di pietra è solido e ordinato, le pietre incastrate con precisione."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un basso muretto di pietra delimita il giardino."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "cipresso",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il cipresso svetta scuro e immobile, i rami bassi secchi e coperti di ragnatele."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il cipresso è alto e dritto, il fogliame fitto e curato."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un cipresso altissimo si staglia contro il cielo, a ridosso del muro del giardino."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "tavolino",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il tavolino ha le gambe tarlate e il piano coperto di polvere e vecchie ragnatele."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il tavolino è lucido e in ordine, con il piano libero da ogni ingombro."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un piccolo tavolino dalle gambe sottili è appoggiato alla parete dell'ingresso."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "lettere sparse",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Lettere e fogli ingialliti sono sparsi sul pavimento, scritti con una grafia sbiadita."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Qualche lettera è caduta sul pavimento: probabilmente la posta di oggi."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Alcune buste e fogli sono sparsi sulle piastrelle dell'ingresso."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "pensile",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le ante del pensile pendono dai cardini, i piatti dentro sono coperti di polvere."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il pensile è ordinato: piatti e tazze sono allineati sui ripiani."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un pensile verde, con le ante aperte, regge piatti e stoviglie."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "piatti",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "I piatti appesi alla parete sono scheggiati e opachi, ricoperti da una patina di polvere."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "I piatti decorativi sono appesi con cura e brillano di pulito."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Alcuni piatti decorativi sono appesi alla parete sopra il piano di lavoro."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "water",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il water è incrostato e macchiato; dall'interno sale un odore sgradevole."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il water è pulito e profuma di detergente, con l'asse abbassata."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un water di ceramica è appoggiato alla parete, con la cassetta in alto."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "asciugamano",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "L'asciugamano è rigido e ingiallito, appeso al portasciugamani da chissà quanto tempo."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "L'asciugamano è morbido e pulito, piegato con cura sul portasciugamani."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un asciugamano è appeso al portasciugamani accanto al lavandino."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "schedario",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "I cassetti dello schedario sono arrugginiti e incastrati, le etichette illeggibili."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Lo schedario è ordinato: ogni cassetto ha la sua etichetta scritta a mano."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Uno schedario di metallo verde con quattro cassetti occupa un angolo dello studio."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "sedia girevole",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La sedia girevole cigola a ogni movimento, l'imbottitura sfilacciata."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La sedia girevole è comoda e ben oliata, gira senza rumore."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Una sedia girevole è spinta indietro dalla scrivania."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "mappa",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La mappa alla parete è ingiallita e macchiata dall'umidità, alcune zone sono cerchiate a penna."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La mappa della zona è incorniciata e ben appesa, con piccoli segni a matita."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Una grande mappa incorniciata copre buona parte della parete."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "fogli sparsi",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Fogli ingialliti coprono il pavimento, qualcuno li ha sparsi in gran fretta."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Qualche foglio è sfuggito dalla scrivania e giace sul pavimento."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Fogli di carta sono sparsi sul pavimento dello studio."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "casa delle bambole",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La casa delle bambole è sporca di polvere e dalla finestrella sembra spiarti una piccola figura."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La casa delle bambole è curata nei minimi dettagli, con tetto e finestre perfettamente dipinti."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Una casa delle bambole poggia su una mensola, con una piccola bambola sulla soglia."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "bambole",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le bambole sono ricoperte di polvere, i vestitini ingialliti e gli occhi vitrei."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le bambole sono allineate con ordine, i vestitini puliti e stirati."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Tre bambole con vestitini colorati sono allineate in cima alla cassettiera."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "cassettiera",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La cassettiera ha i cassetti gonfi d'umidità e le maniglie arrugginite."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La cassettiera è ordinata, con i cassetti che scorrono senza intoppi."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Una cassettiera bassa regge le bambole e altri giochi."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "disegni",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "I disegni appesi sono sbiaditi, le linee dei pastelli quasi cancellate."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "I disegni dei bambini sono appesi con cura, colorati e un po' storti."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Alcuni disegni infantili sono fissati alla parete con le puntine."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "scope",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le scope sono logore e piene di ragnatele, le setole rotte in più punti."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le scope sono appoggiate con ordine alla parete, le setole ancora compatte."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Tre scope sono appoggiate alla parete accanto alla porta."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "scala a pioli",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La scala a pioli scricchiola e un piolo sembra marcio: resta in piedi per miracolo."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La scala a pioli è solida e scorre sul binario senza impuntarsi."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Una lunga scala a pioli è appoggiata agli scaffali più alti."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "libro aperto",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il libro aperto ha le pagine ingiallite e rovinate dall'umidità, la scrittura quasi svanita."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il libro aperto è un vecchio volume ben conservato, segnato da pochi appunti."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un grosso libro aperto è posato sul tavolo accanto alla candela."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "candela",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La candela è consumata fino a un moncone e la cera è colata sul tavolo."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La candela brucia stabile in un candeliere pulito, la fiamma quasi immobile."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Una candela accesa getta una luce tremolante sul tavolo."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "barile",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il barile è fradicio e con i cerchi allentati; dal fondo cola un liquido scuro."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il barile è ben sigillato, con i cerchi di ferro lucidi e il legno chiaro."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un barile di legno è appoggiato tra gli scaffali delle bottiglie."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "bottiglie di vino",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Le bottiglie sono coperte di polvere e muffa, le etichette quasi illeggibili."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le bottiglie di vino sono allineate con cura, con le etichette ben visibili."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Decine di bottiglie di vino riposano sui ripiani di legno."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "mucchio di carbone",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il mucchio di carbone è umido e nero come la pece: sporca le mani solo a sfiorarlo."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il carbone è accatastato con ordine accanto alla stufa, pronto da usare."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un grosso mucchio di carbone occupa l'angolo del locale caldaia."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "pala",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La pala è arrugginita e il manico scheggiato, appoggiata alla parete di mattoni."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La pala è pulita e appoggiata con cura accanto alla stufa."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Una pala dal manico lungo è appoggiata alla parete."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "assi di legno",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Alcune assi di legno, marce e piene di tarli, sono accatastate in un angolo."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Le assi di legno sono ben impilate e asciutte, pronte per i lavori."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Alcune assi di legno sono appoggiate al muro, in un angolo."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "bucato",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "I panni stesi sono stracciati e ingrigiti, appesi da chissà quanto tempo."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il bucato è steso ad asciugare, i panni ancora umidi e profumati."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un filo teso regge lenzuola e camicie appese con le mollette."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "vasca da bucato",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "La vasca da bucato è incrinata e macchiata, il rubinetto di ottone ormai verdastro."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "La vasca da bucato è pulita e il rubinetto lucido."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Una grande vasca di pietra con un rubinetto d'ottone occupa un lato della lavanderia."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "manichino",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il manichino indossa un abito logoro e polveroso, e sembra osservare la stanza."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il manichino indossa un abito d'epoca ben tenuto, ancora pieno di colore."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un manichino da sarta indossa un abito rosato dal taglio d'altri tempi."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "cavallo a dondolo",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Il cavallo a dondolo oscilla appena da solo, e il legno scricchiola."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Il cavallo a dondolo è lucido, con la sella rossa pulita e ben fissata."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Un cavallo a dondolo di legno con una sella rossa aspetta in mezzo alla stanza."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
+    "nome": "abiti appesi",
+    "risposte": [
+      {
+        "id": "R01",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abbandonata",
+          "in_rovina"
+        ],
+        "testo": "Gli abiti appesi sono strappati e ammuffiti, ondeggiano senza che ci sia vento."
+      },
+      {
+        "id": "R02",
+        "scenario": "tutti",
+        "statoCasa": [
+          "abitata",
+          "curata"
+        ],
+        "testo": "Gli abiti appesi sono in ordine, ognuno sulla sua gruccia."
+      },
+      {
+        "id": "R03",
+        "scenario": "tutti",
+        "testo": "Alcuni abiti pendono dalla stanga di un armadio aperto."
+      }
+    ],
+    "tagPiazzamento": []
+  },
+  {
     "nome": "capanno degli attrezzi",
     "risposte": [
       {
