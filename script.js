@@ -198,6 +198,7 @@ let ultimoPersonaggioSelezionato = null;
 let scenariDisponibili = [];
 let elementiInteragibili = []; // array con dati caricati da JSON
 let eventiGenerici = []; // catalogo eventi generici richiamabili per tag (eventi_generici.json)
+let catalogoCarte = []; // carte oggetto e abilità (oggetti_base.json): vedi INVENTARIO VIRTUALE
 let tutorialData = [];
 gameData.proveAbilita = {};
 // Chiave → valore cumulato della prova (somma dei contributi).
@@ -566,6 +567,14 @@ fetch("eventi_generici.json")
     console.log("📦 Eventi generici caricati:", eventiGenerici.length);
   })
   .catch((err) => console.error("Errore caricamento eventi generici:", err));
+
+fetch("oggetti_base.json")
+  .then((res) => res.json())
+  .then((data) => {
+    catalogoCarte = data;
+    console.log("📦 Carte oggetto/abilità caricate:", catalogoCarte.length);
+  })
+  .catch((err) => console.error("Errore caricamento oggetti:", err));
 
 fetch("eroi_base.json")
   .then((response) => response.json())
@@ -1071,6 +1080,8 @@ function mostraScenario(scenario, isTutorial = false) {
   gameData.eventiGenericiUsati = {}; // Eventi generici (es. "Ragno") già capitati in questo scenario, ovunque
   gameData.turnoMinacceAttuale = 0; // Contatore fasi minaccia, azzerato a ogni scenario
   gameData.ricercaGenericaAttivata = {}; // Elementi che hanno già attivato un evento generico via "Cerca" in questo scenario
+  gameData.inventari = {}; // Inventario virtuale: a ogni scenario si riparte dal kit di partenza di ogni eroe
+  gameData.usiElementoEseguiti = {}; // Usi per tag con effetti già scattati (luogo+elemento+tag)
 
   console.log(`🎯 Scenario corrente impostato: ${gameData.scenarioCorrente}`);
 
@@ -4088,18 +4099,7 @@ function interagisciConElemento(nomeElemento) {
   const pulsanti = [
     {
       testo: "Usa Oggetto",
-      azione: () => {
-        mostraPopupGenerico({
-          titolo: "Usa Oggetto",
-          messaggio: "Funzione non ancora implementata.",
-          pulsanti: [
-            {
-              testo: "Ok",
-              azione: (btn) => chiudiPopupSelettivo(btn.closest(".popup")),
-            },
-          ],
-        });
-      },
+      azione: () => mostraUsaOggettoSuElemento(elemento, codiceCarta),
     },
   ];
 
@@ -5546,6 +5546,18 @@ function eseguiEffetto(effetto) {
     case "impostaFlag":
       impostaFlag(effetto.nome, effetto.valore, effetto.ambito);
       break;
+    case "aggiungiCarta": {
+      // Il personaggio attivo ottiene una carta del catalogo (inventario virtuale)
+      const carta = cartaPerId(effetto.id);
+      if (carta && aggiungiCartaA(gameData.pgAttivo, carta.id)) {
+        mostraPopupGenerico({
+          titolo: "Nuova carta",
+          messaggio: `${htmlSicuro(gameData.pgAttivo)} ottiene: <strong>${htmlSicuro(carta.nome)}</strong>.`,
+          pulsanti: [{ testo: "Chiudi", azione: (btn) => chiudiPopupSelettivo(btn.closest(".popup")) }],
+        });
+      }
+      break;
+    }
     case "impostaStatoLuogo":
       if (effetto.stato === "rumore" && typeof generaRumore === "function") {
         generaRumore(
@@ -11065,6 +11077,354 @@ function collassaSpreadPG() {
   gameData._spreadCell = null;
 }
 
+// ============================================================
+// OGGETTI E ABILITÀ — INVENTARIO VIRTUALE (provvisorio)
+// ============================================================
+// Le carte oggetto e abilità sono dei giocatori, al tavolo. Per poterle provare
+// senza stamparle, per ora l'app tiene un "inventario virtuale" per personaggio
+// (`gameData.inventari[nomePG]` = elenco di id di `oggetti_base.json`, con il
+// kit di partenza preso da `abilità` ed `equipaggiamento` dell'eroe). A prodotto
+// finito si potrà togliere l'inventario lasciando ai giocatori la gestione delle
+// carte: per questo l'app NON deduce nulla dall'inventario oltre ai tre usi
+// seguenti, che restano utilizzabili anche dichiarandoli a mano:
+//  1. MODIFICATORI: `modificatori: [{abilita, valore}]` — solo informativi:
+//     sono scritti sulla carta (qui nei badge) e il giocatore li somma a mano
+//     al contributo della prova. L'app non li applica.
+//  2. TAG: `tag: [...]` — icone stampate sulla carta. "Usa Oggetto" su un
+//     elemento mostra tutte le icone (`ICONE_TAG`): il giocatore sceglie quella
+//     della carta che vuole usare e l'app cerca fra gli `usi` dell'elemento
+//     (`elementi_interagibili_base.json`) quello con lo stesso tag, per scenario
+//     (o non succede nulla). L'app non sa che carte ha il giocatore.
+//  3. CODICE: `consulta: {SCxx|"tutti": testo}` — la carta si "legge" (o si
+//     digita il suo codice, che è l'`id`) e il testo dipende dallo scenario:
+//     la stessa carta fisica può così valere cose diverse in scenari diversi.
+// Una carta può avere più usi insieme (es. l'Ascia: +1 Forza e tag "tagliente").
+
+function cartaPerId(id) {
+  return catalogoCarte.find((c) => c.id === id) || null;
+}
+
+function cartaPerNome(nome) {
+  return catalogoCarte.find((c) => c.nome === nome) || null;
+}
+
+// Inventario (elenco di id) di un personaggio; alla prima richiesta si crea dal
+// kit dell'eroe. Se il catalogo non è ancora caricato non si memorizza nulla.
+function inventarioDi(nomePG) {
+  if (!gameData.inventari) gameData.inventari = {};
+  if (!gameData.inventari[nomePG]) {
+    if (catalogoCarte.length === 0) return [];
+    const eroe = (gameData.eroiDisponibili || []).find((e) => e.nome === nomePG);
+    const nomi = [...(eroe?.["abilità"] || []), ...(eroe?.equipaggiamento || [])];
+    gameData.inventari[nomePG] = nomi
+      .map((n) => cartaPerNome(n)?.id)
+      .filter(Boolean);
+  }
+  return gameData.inventari[nomePG];
+}
+
+function carteDi(nomePG) {
+  return inventarioDi(nomePG).map(cartaPerId).filter(Boolean);
+}
+
+function aggiungiCartaA(nomePG, idCarta) {
+  const inv = inventarioDi(nomePG);
+  if (!cartaPerId(idCarta) || inv.includes(idCarta)) return false;
+  inv.push(idCarta);
+  return true;
+}
+
+function rimuoviCartaDa(nomePG, idCarta) {
+  const inv = inventarioDi(nomePG);
+  const i = inv.indexOf(idCarta);
+  if (i < 0) return false;
+  inv.splice(i, 1);
+  return true;
+}
+
+function htmlSicuro(t) {
+  return String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function maiuscolaIniziale(t) {
+  t = String(t || "");
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+// Icone dei tag di uso (stampate sulle carte oggetto): il giocatore sceglie
+// l'icona della carta che vuole usare su un elemento. Nuovi tag: aggiungili qui.
+const ICONE_TAG = {
+  tagliente: { icona: "🔪", nome: "Tagliente" },
+  leva: { icona: "🔧", nome: "Leva" },
+  fuoco: { icona: "🔥", nome: "Fuoco" },
+  luce: { icona: "🔦", nome: "Luce" },
+  chiave: { icona: "🗝️", nome: "Chiave" },
+  sacro: { icona: "✝️", nome: "Sacro" },
+  sparo: { icona: "🔫", nome: "Sparo" },
+};
+
+function datiTag(tag) {
+  return ICONE_TAG[tag] || { icona: "❔", nome: maiuscolaIniziale(tag) };
+}
+
+function etichettaModificatore(m) {
+  return `${maiuscolaIniziale(m.abilita)} ${m.valore >= 0 ? "+" : "−"}${Math.abs(m.valore)}`;
+}
+
+// Testo di consultazione di una carta nello scenario in corso (voce dello scenario,
+// altrimenti "tutti", altrimenti la descrizione).
+function testoConsultazione(carta) {
+  const scenario = gameData.scenarioCorrente || "tutti";
+  const voce = carta.consulta?.[scenario] ?? carta.consulta?.tutti;
+  return voce || carta.descrizione || "Non c'è nulla da leggere.";
+}
+
+function mostraTestoCarta(carta) {
+  mostraPopupGenerico({
+    titolo: carta.nome,
+    messaggio: htmlSicuro(testoConsultazione(carta)),
+    pulsanti: [{ testo: "Chiudi", azione: (btn) => chiudiPopupSelettivo(btn.closest(".popup")) }],
+  });
+}
+
+// Il codice di una carta è il suo `codice` (se c'è) o il suo `id`.
+function consultaPerCodice(codice) {
+  const cod = String(codice || "").trim().toUpperCase();
+  const carta = cod && catalogoCarte.find((c) => String(c.codice || c.id).toUpperCase() === cod);
+  if (!carta) {
+    mostraPopupGenerico({
+      titolo: "Codice sconosciuto",
+      messaggio: "Nessuna carta corrisponde a questo codice.",
+    });
+    return;
+  }
+  mostraTestoCarta(carta);
+}
+
+function htmlBadgeCarta(carta) {
+  const b = [];
+  (carta.modificatori || []).forEach((m) => b.push(`<span class="carta-badge mod">${htmlSicuro(etichettaModificatore(m))}</span>`));
+  (carta.tag || []).forEach((t) => b.push(`<span class="carta-badge tag" title="${htmlSicuro(datiTag(t).nome)}">${datiTag(t).icona}</span>`));
+  if (carta.consulta) b.push(`<span class="carta-badge cod">📖 ${htmlSicuro(carta.codice || carta.id)}</span>`);
+  return b.join(" ");
+}
+
+// Finestra dell'inventario di un personaggio: carte (abilità e oggetti) con
+// leggi/scarta, aggiunta di una carta dal catalogo e consultazione per codice.
+function mostraInventario(nomePG) {
+  document.querySelectorAll(".popup-inventario").forEach((p) => p.remove());
+
+  const overlay = document.createElement("div");
+  overlay.className = "popup popup-inventario";
+  overlay.innerHTML = `
+    <div class="popup-content">
+      <h2>Inventario di ${htmlSicuro(nomePG)}</h2>
+      <div class="inventario-lista"></div>
+      <div class="popup-buttons">
+        <button type="button" data-az="aggiungi">Aggiungi carta</button>
+        <button type="button" data-az="codice">Consulta codice</button>
+        <button type="button" data-az="chiudi">Chiudi</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const lista = overlay.querySelector(".inventario-lista");
+
+  function riga(carta) {
+    return `
+      <div class="carta-riga">
+        <div class="carta-riga-testo">
+          <strong>${htmlSicuro(carta.nome)}</strong> ${htmlBadgeCarta(carta)}
+          <div class="carta-desc">${htmlSicuro(carta.descrizione || "")}</div>
+        </div>
+        <div class="carta-riga-azioni">
+          ${carta.consulta ? `<button type="button" data-leggi="${carta.id}">Leggi</button>` : ""}
+          ${carta.tipo === "oggetto" ? `<button type="button" data-scarta="${carta.id}">Scarta</button>` : ""}
+        </div>
+      </div>`;
+  }
+
+  function disegna() {
+    const carte = carteDi(nomePG);
+    const sezione = (titolo, tipo) => {
+      const c = carte.filter((x) => x.tipo === tipo);
+      return (
+        `<h3 class="inventario-sezione">${titolo}</h3>` +
+        (c.length ? c.map(riga).join("") : `<div class="carta-desc">Nessuna carta.</div>`)
+      );
+    };
+    lista.innerHTML = sezione("Abilità", "abilita") + sezione("Oggetti", "oggetto");
+  }
+  disegna();
+
+  overlay.addEventListener("click", (e) => {
+    const t = e.target.closest("button");
+    if (!t) return;
+    e.stopPropagation();
+    if (t.dataset.leggi) {
+      mostraTestoCarta(cartaPerId(t.dataset.leggi));
+    } else if (t.dataset.scarta) {
+      rimuoviCartaDa(nomePG, t.dataset.scarta);
+      disegna();
+    } else if (t.dataset.az === "aggiungi") {
+      mostraSceltaCartaDaAggiungere(nomePG, disegna);
+    } else if (t.dataset.az === "codice") {
+      mostraInserimentoCodice();
+    } else if (t.dataset.az === "chiudi") {
+      chiudiPopupSelettivo(overlay);
+    }
+  });
+}
+
+// Sceglie una carta del catalogo non ancora posseduta (simula la pesca).
+function mostraSceltaCartaDaAggiungere(nomePG, quandoFatto) {
+  const possedute = new Set(inventarioDi(nomePG));
+  const disponibili = catalogoCarte.filter((c) => !possedute.has(c.id));
+
+  const overlay = document.createElement("div");
+  overlay.className = "popup";
+  overlay.innerHTML = `
+    <div class="popup-content">
+      <h2>Aggiungi carta</h2>
+      <div class="inventario-lista">
+        ${
+          disponibili.length
+            ? disponibili
+                .map(
+                  (c) =>
+                    `<button type="button" class="carta-scelta" data-id="${c.id}">${htmlSicuro(c.nome)} <span class="carta-badge">${c.tipo === "abilita" ? "abilità" : "oggetto"}</span></button>`
+                )
+                .join("")
+            : `<div class="carta-desc">Il personaggio ha già tutte le carte del catalogo.</div>`
+        }
+      </div>
+      <div class="popup-buttons"><button type="button" data-annulla="1">Annulla</button></div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  overlay.addEventListener("click", (e) => {
+    const t = e.target.closest("button");
+    if (!t) return;
+    e.stopPropagation();
+    if (t.dataset.id) {
+      aggiungiCartaA(nomePG, t.dataset.id);
+      chiudiPopupSelettivo(overlay);
+      quandoFatto?.();
+    } else if (t.dataset.annulla) {
+      chiudiPopupSelettivo(overlay);
+    }
+  });
+}
+
+function mostraInserimentoCodice() {
+  const overlay = document.createElement("div");
+  overlay.className = "popup";
+  overlay.innerHTML = `
+    <div class="popup-content">
+      <h2>Consulta codice</h2>
+      <p>Digita il codice scritto sulla carta.</p>
+      <input type="text" class="campo-codice" maxlength="12" autocomplete="off" spellcheck="false">
+      <div class="popup-buttons">
+        <button type="button" data-az="ok">Consulta</button>
+        <button type="button" data-az="annulla">Annulla</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const campo = overlay.querySelector(".campo-codice");
+  const conferma = () => {
+    const valore = campo.value;
+    chiudiPopupSelettivo(overlay);
+    consultaPerCodice(valore);
+  };
+  overlay.addEventListener("click", (e) => {
+    const t = e.target.closest("button");
+    if (!t) return;
+    e.stopPropagation();
+    if (t.dataset.az === "ok") conferma();
+    else chiudiPopupSelettivo(overlay);
+  });
+  campo.addEventListener("keydown", (e) => {
+    e.stopPropagation();
+    if (e.key === "Enter") conferma();
+  });
+  campo.focus();
+}
+
+// "Usa Oggetto" su un elemento del luogo: l'app NON sa che carte ha il giocatore;
+// mostra tutte le icone dei tag e il giocatore sceglie quella stampata sulla
+// carta che vuole usare. L'esito dipende dagli `usi` dell'elemento (tag +
+// scenario + altre variabili da definire), oppure non succede nulla.
+function mostraUsaOggettoSuElemento(elemento, codiceCarta) {
+  const overlay = document.createElement("div");
+  overlay.className = "popup";
+  overlay.innerHTML = `
+    <div class="popup-content">
+      <h2>Usa Oggetto</h2>
+      <p>Che uso fa ${htmlSicuro(gameData.pgAttivo)} su: ${htmlSicuro(elemento.nome)}?</p>
+      <div class="tag-griglia">
+        ${Object.keys(ICONE_TAG)
+          .map((t) => `<button type="button" class="tag-uso" data-tag="${t}"><span class="tag-uso-icona">${ICONE_TAG[t].icona}</span><span>${ICONE_TAG[t].nome}</span></button>`)
+          .join("")}
+      </div>
+      <div class="popup-buttons"><button type="button" data-annulla="1">Annulla</button></div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  overlay.addEventListener("click", (e) => {
+    const t = e.target.closest("button");
+    if (!t) return;
+    e.stopPropagation();
+    if (t.dataset.tag) {
+      chiudiPopupSelettivo(overlay);
+      usaTagSuElemento(t.dataset.tag, elemento, codiceCarta);
+    } else if (t.dataset.annulla) {
+      chiudiPopupSelettivo(overlay);
+    }
+  });
+}
+
+function usaTagSuElemento(tag, elemento, codiceCarta) {
+  if (!spendiPA(gameData.pgAttivo, COSTO_PA.oggetto, "usare un oggetto")) return;
+
+  const scenario = gameData.scenarioCorrente || "tutti";
+  const compatibili = (elemento.usi || []).filter(
+    (u) => u.tag === tag && (!u.scenario || u.scenario === "tutti" || u.scenario === scenario)
+  );
+  // La voce specifica dello scenario ha la precedenza su quella generale
+  const uso = compatibili.find((u) => u.scenario === scenario) || compatibili[0];
+  const titolo = `${datiTag(tag).icona} ${datiTag(tag).nome}`;
+  const chiudi = [{ testo: "Ok", azione: (btn) => chiudiPopupSelettivo(btn.closest(".popup")) }];
+
+  if (!uso) {
+    mostraPopupGenerico({ titolo, messaggio: "Non succede nulla.", pulsanti: chiudi });
+    return;
+  }
+
+  // Le voci con effetti scattano una volta sola per luogo+elemento+tag
+  if (!gameData.usiElementoEseguiti) gameData.usiElementoEseguiti = {};
+  const chiave = `${codiceCarta}::${elemento.nome}::${uso.tag}`;
+  if (uso.effetti?.length && gameData.usiElementoEseguiti[chiave]) {
+    mostraPopupGenerico({ titolo, messaggio: "Non c'è altro da ottenere in questo modo.", pulsanti: chiudi });
+    return;
+  }
+  if (uso.effetti?.length) gameData.usiElementoEseguiti[chiave] = true;
+
+  mostraPopupGenerico({
+    titolo,
+    messaggio: htmlSicuro(uso.testo || ""),
+    pulsanti: [
+      {
+        testo: "Ok",
+        azione: (btn) => {
+          chiudiPopupSelettivo(btn.closest(".popup"));
+          if (uso.effetti) eseguiEffetti(uso.effetti);
+        },
+      },
+    ],
+  });
+}
+
 function mostraInterazionePersonaggio(nomePG) {
   // richiudi eventuale ventaglio
   collassaSpreadPG?.();
@@ -11073,15 +11433,10 @@ function mostraInterazionePersonaggio(nomePG) {
 
   const pulsanti = [
     {
-      testo: "Usa Oggetto",
+      testo: "Inventario",
       azione: () => {
         chiudiPopup();
-        if (!spendiPA(gameData.pgAttivo, COSTO_PA.oggetto, "usare un oggetto")) return;
-        mostraPopupGenerico({
-          titolo: "Usa Oggetto",
-          messaggio: `${nomePG} usa un oggetto. (placeholder)`,
-          pulsanti: [{ testo: "Chiudi", azione: chiudiPopup }],
-        });
+        mostraInventario(nomePG);
       },
     },
     eAttivo

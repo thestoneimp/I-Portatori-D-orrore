@@ -2547,3 +2547,109 @@ button.casuale:hover {
 .carta-tabellone.con-immagine:hover {
   background-color: transparent;
 }
+
+/* ============================================================
+   INVENTARIO VIRTUALE: carte oggetto/abilità (provvisorio)
+   ============================================================ */
+.popup-inventario .popup-content {
+  width: min(640px, 92vw);
+}
+
+.inventario-lista {
+  overflow-x: hidden;
+  max-height: 48vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  text-align: left;
+  margin: 8px 0 12px;
+}
+
+.inventario-sezione {
+  margin: 10px 0 4px;
+  font-family: var(--font-title);
+  letter-spacing: 1px;
+  color: var(--torch-amber);
+  font-size: 1.05em;
+}
+
+.carta-riga {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.carta-riga-azioni {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.carta-desc {
+  opacity: 0.75;
+  font-size: 0.88em;
+}
+
+.carta-badge {
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: 8px;
+  font-size: 0.78em;
+  background: rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+}
+
+.carta-badge.mod {
+  background: rgba(120, 200, 120, 0.25);
+}
+
+.carta-badge.tag {
+  background: rgba(220, 160, 60, 0.25);
+}
+
+.carta-badge.cod {
+  background: rgba(140, 150, 230, 0.25);
+}
+
+.carta-scelta {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 4px 0 !important; /* batte il margine di `.popup-content button`, che sbordava in larghezza */
+  text-align: left;
+}
+
+.campo-codice {
+  width: 80%;
+  margin: 8px 0 12px;
+  padding: 6px 10px;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1.1em;
+  color: inherit;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--bg-panel-border);
+  border-radius: 3px;
+}
+
+.tag-griglia {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+  margin: 10px 0 12px;
+}
+
+.popup-content .tag-uso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+}
+
+.tag-uso-icona {
+  font-size: 2em;
+  line-height: 1;
+}

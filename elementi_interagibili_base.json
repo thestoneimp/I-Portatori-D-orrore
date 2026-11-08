@@ -428,6 +428,19 @@
     ],
     "tagOpzionali": [
       "chiuso"
+    ],
+    "usi": [
+      {
+        "tag": "leva",
+        "scenario": "tutti",
+        "testo": "Fai leva sullo sportello: cede con uno scricchiolio. Dentro c'è un diario con le pagine strappate.",
+        "effetti": [
+          {
+            "tipo": "aggiungiCarta",
+            "id": "OG13"
+          }
+        ]
+      }
     ]
   },
   {
@@ -656,7 +669,14 @@
         "testo": "Un enorme tronco giace a terra, ai margini del giardino."
       }
     ],
-    "tagPiazzamento": []
+    "tagPiazzamento": [],
+    "usi": [
+      {
+        "tag": "tagliente",
+        "scenario": "tutti",
+        "testo": "Ci lavori con la lama: il tronco si spezza e dentro il legno marcio qualcosa tintinna."
+      }
+    ]
   },
   {
     "nome": "pozzo",
@@ -685,7 +705,14 @@
         "testo": "Un vecchio pozzo di pietra sorge in mezzo al giardino, con il suo piccolo tetto di legno."
       }
     ],
-    "tagPiazzamento": []
+    "tagPiazzamento": [],
+    "usi": [
+      {
+        "tag": "luce",
+        "scenario": "tutti",
+        "testo": "Illumini il fondo del pozzo: l'acqua è nera e immobile, ma qualcosa di metallico brilla sul fondo."
+      }
+    ]
   },
   {
     "nome": "statua",
@@ -1352,7 +1379,22 @@
         "testo": "Un barile di legno è appoggiato tra gli scaffali delle bottiglie."
       }
     ],
-    "tagPiazzamento": []
+    "tagPiazzamento": [],
+    "usi": [
+      {
+        "tag": "fuoco",
+        "scenario": "tutti",
+        "testo": "Avvicini la fiamma: dal barile sale un odore acre di olio. Meglio non insistere.",
+        "effetti": [
+          {
+            "tipo": "impostaStatoLuogo",
+            "stato": "rumore",
+            "valore": 2,
+            "descrizione": "Fiammata improvvisa"
+          }
+        ]
+      }
+    ]
   },
   {
     "nome": "bottiglie di vino",

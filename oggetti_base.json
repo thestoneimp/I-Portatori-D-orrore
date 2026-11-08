@@ -1,0 +1,205 @@
+[
+  {
+    "id": "AB01",
+    "nome": "Mira Letale",
+    "tipo": "abilita",
+    "descrizione": "(Effetto da definire.)"
+  },
+  {
+    "id": "AB02",
+    "nome": "Tiro Rapido",
+    "tipo": "abilita",
+    "descrizione": "(Effetto da definire.)"
+  },
+  {
+    "id": "AB03",
+    "nome": "Guarigione",
+    "tipo": "abilita",
+    "descrizione": "(Effetto da definire.)"
+  },
+  {
+    "id": "AB04",
+    "nome": "Esorcismo",
+    "tipo": "abilita",
+    "descrizione": "(Effetto da definire.)"
+  },
+  {
+    "id": "AB05",
+    "nome": "Evocazione",
+    "tipo": "abilita",
+    "descrizione": "(Effetto da definire.)"
+  },
+  {
+    "id": "AB06",
+    "nome": "Sigillo Oscuro",
+    "tipo": "abilita",
+    "descrizione": "(Effetto da definire.)"
+  },
+  {
+    "id": "AB07",
+    "nome": "Scatto",
+    "tipo": "abilita",
+    "descrizione": "Sei più svelto del normale quando c'è da correre o scavalcare.",
+    "modificatori": [
+      {
+        "abilita": "atletica",
+        "valore": 1
+      }
+    ]
+  },
+  {
+    "id": "AB08",
+    "nome": "Sangue Freddo",
+    "tipo": "abilita",
+    "descrizione": "Resti lucido anche quando tutto va storto.",
+    "modificatori": [
+      {
+        "abilita": "tempra",
+        "valore": 1
+      }
+    ]
+  },
+  {
+    "id": "AB09",
+    "nome": "Controllo",
+    "tipo": "abilita",
+    "descrizione": "(Effetto da definire.)"
+  },
+  {
+    "id": "AB10",
+    "nome": "Ordine Tattico",
+    "tipo": "abilita",
+    "descrizione": "(Effetto da definire.)"
+  },
+  {
+    "id": "OG01",
+    "nome": "Balestra",
+    "tipo": "oggetto",
+    "descrizione": "(Effetto da definire.)",
+    "tag": [
+      "sparo"
+    ]
+  },
+  {
+    "id": "OG02",
+    "nome": "Mappa del Bosco",
+    "tipo": "oggetto",
+    "descrizione": "(Effetto da definire.)"
+  },
+  {
+    "id": "OG03",
+    "nome": "Croce Sacra",
+    "tipo": "oggetto",
+    "descrizione": "(Effetto da definire.)",
+    "tag": [
+      "sacro"
+    ]
+  },
+  {
+    "id": "OG04",
+    "nome": "Bibbia",
+    "tipo": "oggetto",
+    "descrizione": "(Effetto da definire.)",
+    "tag": [
+      "sacro"
+    ]
+  },
+  {
+    "id": "OG05",
+    "nome": "Pugnale Rituale",
+    "tipo": "oggetto",
+    "descrizione": "(Effetto da definire.)",
+    "tag": [
+      "tagliente"
+    ]
+  },
+  {
+    "id": "OG06",
+    "nome": "Grimorio",
+    "tipo": "oggetto",
+    "descrizione": "(Effetto da definire.)"
+  },
+  {
+    "id": "OG07",
+    "nome": "Pistola",
+    "tipo": "oggetto",
+    "descrizione": "(Effetto da definire.)",
+    "tag": [
+      "sparo"
+    ]
+  },
+  {
+    "id": "OG08",
+    "nome": "Radio Militare",
+    "tipo": "oggetto",
+    "descrizione": "(Effetto da definire.)"
+  },
+  {
+    "id": "OG09",
+    "nome": "Ascia",
+    "tipo": "oggetto",
+    "descrizione": "Pesante e affilata: aiuta a forzare e a tagliare.",
+    "modificatori": [
+      {
+        "abilita": "forza",
+        "valore": 1
+      }
+    ],
+    "tag": [
+      "tagliente"
+    ]
+  },
+  {
+    "id": "OG10",
+    "nome": "Piede di Porco",
+    "tipo": "oggetto",
+    "descrizione": "Una buona leva per quasi tutto.",
+    "modificatori": [
+      {
+        "abilita": "forza",
+        "valore": 2
+      }
+    ],
+    "tag": [
+      "leva"
+    ]
+  },
+  {
+    "id": "OG11",
+    "nome": "Accendino",
+    "tipo": "oggetto",
+    "descrizione": "Una piccola fiamma, quando serve.",
+    "tag": [
+      "fuoco",
+      "luce"
+    ]
+  },
+  {
+    "id": "OG12",
+    "nome": "Torcia",
+    "tipo": "oggetto",
+    "descrizione": "Fascio di luce stabile.",
+    "tag": [
+      "luce"
+    ]
+  },
+  {
+    "id": "OG13",
+    "nome": "Diario Strappato",
+    "tipo": "oggetto",
+    "descrizione": "Poche pagine rimaste, scritte in fretta.",
+    "consulta": {
+      "SC01": "«Hanno bussato alla porta tutta la notte. Non aprite a nessuno, qualunque cosa dicano.»",
+      "tutti": "«Le pagine successive sono state strappate via. Resta solo una data e un nome illeggibile.»"
+    }
+  },
+  {
+    "id": "OG14",
+    "nome": "Chiave Arrugginita",
+    "tipo": "oggetto",
+    "descrizione": "Vecchia, ma sembra ancora girare.",
+    "tag": [
+      "chiave"
+    ]
+  }
+]

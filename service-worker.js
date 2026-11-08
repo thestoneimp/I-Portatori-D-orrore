@@ -12,6 +12,7 @@ const PRECACHE_URLS = [
   "./scenari_base.json",
   "./elementi_interagibili_base.json",
   "./eventi_generici.json",
+  "./oggetti_base.json",
   "./minacce_base.json",
   "./assets/carte/zone.json",
   // <carte> generato da tools/galleria/esporta.py: non modificare a mano
