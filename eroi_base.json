@@ -8,7 +8,7 @@
     ],
     "equipaggiamento": [
       "Balestra",
-      "Mappa del Bosco"
+      "Mappa"
     ],
     "movimento": 3,
     "genere": "femmina"
@@ -68,7 +68,7 @@
     ],
     "equipaggiamento": [
       "Pistola",
-      "Radio Militare"
+      "Radio"
     ],
     "movimento": 4,
     "genere": "maschio"
@@ -82,7 +82,7 @@
     ],
     "equipaggiamento": [
       "Pistola",
-      "Radio Militare"
+      "Radio"
     ],
     "movimento": 3,
     "genere": "maschio"
@@ -96,7 +96,7 @@
     ],
     "equipaggiamento": [
       "Pistola",
-      "Radio Militare"
+      "Radio"
     ],
     "movimento": 3,
     "genere": "femmina"

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalogo oggetti</title>
+<style>
+  :root { --bg:#0f0a0a; --bordo:#3a2626; --testo:#e9dfd6; --tenue:#a89488; --rosso:#c0392b; --ambra:#e0a63a; --verde:#6cae6c; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--testo); font:14px/1.4 "Segoe UI", system-ui, sans-serif; }
+  header { padding:10px 20px; border-bottom:1px solid var(--bordo); position:sticky; top:0; background:rgba(15,10,10,.97); z-index:5; display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; }
+  h1 { margin:0; font-size:18px; }
+  a { color:var(--tenue); font-size:13px; }
+  main { padding:6px 20px 80px; max-width:1500px; margin:0 auto; }
+  h2 { font-size:14px; letter-spacing:.5px; text-transform:uppercase; color:var(--tenue); margin:24px 0 6px; }
+  .nota { color:var(--tenue); font-size:13px; margin:0 0 10px; max-width:980px; }
+  button { background:#2a1b1b; color:var(--testo); border:1px solid var(--bordo); border-radius:6px; padding:6px 12px; font:inherit; cursor:pointer; }
+  button:hover { background:#3a2626; }
+  button.primario { background:var(--rosso); border-color:var(--rosso); color:#fff; }
+  button:disabled { opacity:.4; cursor:default; }
+  input[type=text], input[type=number], select, textarea { background:#241818; color:var(--testo); border:1px solid var(--bordo); border-radius:6px; padding:5px 8px; font:inherit; width:100%; }
+  textarea { resize:vertical; min-height:52px; }
+  .stato { color:var(--tenue); font-size:13px; }
+  .stato b { color:var(--testo); }
+  .riga { display:grid; grid-template-columns: 70px minmax(150px,1.1fr) minmax(220px,1.8fr) 190px 190px minmax(200px,1.4fr) 92px; gap:10px; align-items:start; padding:10px 8px; border-bottom:1px solid #241818; }
+  .riga.prop { background:rgba(224,166,58,.06); }
+  .riga.elim { opacity:.35; } .riga.elim input, .riga.elim textarea, .riga.elim select { text-decoration:line-through; }
+  .riga.mod { box-shadow: inset 3px 0 0 var(--ambra); }
+  .intest { color:var(--tenue); font-size:11px; text-transform:uppercase; letter-spacing:.5px; padding:4px 8px; }
+  .intest.riga { border-bottom:1px solid var(--bordo); padding-bottom:4px; }
+  .id { font-size:12px; color:var(--tenue); } .id .nuovo { color:var(--ambra); font-weight:700; }
+  .bonus { display:flex; gap:6px; } .bonus input { width:64px; }
+  .tagsel { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+  .tagsel svg { width:24px; height:24px; flex:none; color:#eadfcf; }
+  .tagsel svg .f { fill:none; stroke:currentColor; stroke-width:1.6; stroke-linejoin:round; stroke-linecap:round; }
+  .tagsel svg .l { fill:none; stroke:currentColor; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+  .tagsel .vuoto { width:24px; height:24px; flex:none; }
+  details summary { cursor:pointer; color:var(--tenue); font-size:12px; margin-bottom:4px; }
+  .cons label { display:block; font-size:11px; color:var(--tenue); margin:4px 0 2px; }
+  @media (max-width: 1250px) {
+    .riga { grid-template-columns: 64px 1fr 1.4fr; }
+    .intest.riga { display:none; }
+    .riga > div[data-et]::before { content: attr(data-et); display:block; font-size:11px; color:var(--tenue); text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px; }
+    .riga > div[data-et=""]::before { display:none; }
+  }
+  .msg { position:fixed; right:18px; bottom:18px; background:#1d2a1d; border:1px solid var(--verde); color:#cfe9cf; padding:10px 14px; border-radius:8px; display:none; z-index:10; max-width:380px; }
+  .msg.err { background:#2a1b1b; border-color:var(--rosso); color:#f0c4be; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Catalogo oggetti</h1>
+  <span class="stato" id="stato"></span>
+  <span style="flex:1"></span>
+  <button id="btnAnnulla">Annulla modifiche</button>
+  <button id="btnSalva" class="primario">Salva nel database</button>
+  <a href="/">← Galleria</a>
+</header>
+<main>
+  <p class="nota">Questa pagina legge e scrive <b>oggetti_base.json</b> (il database del gioco). Puoi cambiare nome, descrizione, bonus, tag e testi di consultazione, ed eliminare ciò che non va (<b>Elimina</b> è reversibile fino al salvataggio). Gli oggetti <span style="color:var(--ambra)">proposti</span> entrano nel database solo se li lasci e salvi. Le abilità non si toccano da qui. Il bonus è solo scritto sulla carta (lo somma a mano il giocatore); i tag sono le icone d'uso; il testo di consultazione dipende dallo scenario (<i>tutti</i> = valido sempre, <i>SC01</i> = solo in quello scenario).</p>
+  <h2 id="titPresenti">Oggetti presenti</h2>
+  <div id="presenti"></div>
+  <h2 id="titProposti">Oggetti proposti</h2>
+  <div id="proposti"></div>
+</main>
+<div class="msg" id="msg"></div>
+<script src="/s/oggetto.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const ABILITA = [["forza", "Forza"], ["tempra", "Tempra"], ["atletica", "Atletica"], ["intelletto", "Intelletto"], ["rapidita", "Rapidità"], ["carisma", "Carisma"], ["tutte", "Tutte le prove"]];
+
+/* 20 oggetti proposti: [nome, descrizione, bonus [abilita, valore] | null, tag, consulta {tutti, SC01} | null] */
+const PROPOSTE = [
+  ["Coltello da Cucina", "Lama corta e affilata, ancora macchiata di ruggine.", null, ["tagliente"], null],
+  ["Mazza da Baseball", "Legno massiccio e segnato dai colpi: fa male a chi la riceve e alla porta che la subisce.", ["forza", 1], [], null],
+  ["Cesoie da Giardino", "Tagliano rami, catene sottili e fili di ferro.", null, ["tagliente", "leva"], null],
+  ["Tanica di Benzina", "Mezza piena. Basta una scintilla.", null, ["fuoco"], null],
+  ["Bottiglia Molotov", "Bottiglia, benzina e uno straccio. Si usa una volta sola.", null, ["fuoco"], null],
+  ["Lanterna a Olio", "Luce calda e tremolante che dura più di una torcia.", null, ["luce", "fuoco"], null],
+  ["Scatola di Fiammiferi", "Ne restano pochi. Accendono una candela, o un incendio.", null, ["fuoco", "luce"], null],
+  ["Fucile da Caccia", "Pesante e rumoroso: ogni colpo si sente per tutta la casa.", null, ["sparo"], null],
+  ["Acqua Santa", "Una fiala benedetta, tiepida come se fosse appena stata scaldata.", null, ["sacro"], null],
+  ["Rosario di Legno", "Grani consumati da mani che hanno pregato a lungo.", ["tempra", 1], ["sacro"], null],
+  ["Sale Grosso", "Un sacchetto di sale: si dice tenga lontano ciò che non dovrebbe entrare.", null, ["sacro"], null],
+  ["Set di Grimaldelli", "Ferri sottili per serrature che non vogliono aprirsi.", null, ["chiave"], null],
+  ["Mazzo di Chiavi", "Dieci chiavi, nessuna etichetta. Una potrebbe servire.", null, ["chiave"], null],
+  ["Scarponi Robusti", "Suola spessa e presa sicura: meglio per correre e scavalcare.", ["atletica", 1], [], null],
+  ["Giubbotto Imbottito", "Pesante e rigido: attutisce i colpi e il freddo.", ["tempra", 1], [], null],
+  ["Corda", "Venti metri di corda robusta, buona per calarsi o legare.", ["atletica", 1], [], null],
+  ["Kit di Pronto Soccorso", "Bende, disinfettante e un po' di cotone: per rimettere in piedi qualcuno.", null, [], null],
+  ["Registratore a Cassette", "Un nastro è ancora inserito. Premi play.", null, [],
+    { tutti: "Solo fruscio. Poi, per un istante, un respiro vicinissimo al microfono.", SC01: "Una voce infantile sussurra: «Non guardate dalla finestra. Non fatelo entrare.»" }],
+  ["Lettera Sigillata", "Ceralacca rossa spezzata a metà, carta ingiallita.", null, [],
+    { tutti: "«A chi troverà questa casa: perdonateci. Non avevamo scelta.»", SC01: "«Se leggi questo, sei già dentro. Esci prima di mezzanotte.»" }],
+  ["Fotografia Sbiadita", "Una famiglia davanti alla casa. Qualcuno ha graffiato un volto.", null, [],
+    { tutti: "Sul retro, a matita: «Non c'eravamo tutti.»", SC01: "Sul retro: «Halloween, l'ultimo di tutti.»" }],
+];
+
+let dbOriginale = [], voci = [];   // voci: una per oggetto (presente o proposto), con i campi modificabili
+const clona = o => JSON.parse(JSON.stringify(o));
+const el = (t, cl, html) => Object.assign(document.createElement(t), { className: cl || "", innerHTML: html || "" });
+const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function daCarta(c) {
+  const m = (c.modificatori || [])[0];
+  return { orig: c, id: c.id, proposto: false, eliminato: false, nome: c.nome, descrizione: c.descrizione || "",
+    bonus: m ? { abilita: m.abilita, valore: m.valore } : null, tag: [...(c.tag || [])],
+    tutti: (c.consulta || {}).tutti || "", sc01: (c.consulta || {}).SC01 || "" };
+}
+function daProposta([nome, descrizione, bonus, tag, cons]) {
+  return { orig: null, id: null, proposto: true, eliminato: false, nome, descrizione, bonus: bonus ? { abilita: bonus[0], valore: bonus[1] } : null,
+    tag: [...tag], tutti: cons ? cons.tutti : "", sc01: cons ? cons.SC01 : "" };
+}
+const uguale = (v, o) => JSON.stringify([v.nome, v.descrizione, v.bonus, v.tag, v.tutti, v.sc01]) === JSON.stringify([o.nome, o.descrizione, o.bonus, o.tag, o.tutti, o.sc01]);
+const iniziale = new WeakMap();
+
+async function carica(conProposte) {
+  dbOriginale = await (await fetch("/api/catalogo", { cache: "no-store" })).json();
+  const presenti = dbOriginale.filter(c => c.tipo === "oggetto").map(daCarta);
+  const prop = conProposte ? PROPOSTE.map(daProposta) : voci.filter(v => v.proposto && !v.eliminato);
+  voci = [...presenti, ...(conProposte ? prop : [])];
+  voci.forEach(v => iniziale.set(v, clona({ nome: v.nome, descrizione: v.descrizione, bonus: v.bonus, tag: v.tag, tutti: v.tutti, sc01: v.sc01 })));
+  disegna();
+}
+
+function selTag(v, i) {
+  const w = el("div", "tagsel"), ico = el("span", "vuoto"), s = document.createElement("select");
+  const agg = () => { ico.innerHTML = v.tag[i] ? Oggetto.svg(v.tag[i]) : ""; };
+  s.append(new Option("— nessun tag —", ""));
+  Oggetto.TAG.forEach(([t, n]) => s.append(new Option(n, t, false, v.tag[i] === t)));
+  s.onchange = () => { const a = [v.tag[0] || "", v.tag[1] || ""]; a[i] = s.value; v.tag = a.filter(Boolean); agg(); segna(); };
+  agg(); w.append(ico, s); return w;
+}
+
+const wrap = x => { const d = document.createElement('div'); d.append(x); return d; };   // i campi stanno in un div: l'etichetta sopra (vista stretta) si aggancia al div
+function riga(v) {
+  const r = el("div", "riga" + (v.proposto ? " prop" : ""));
+  const id = el("div", "id", v.proposto ? `<span class="nuovo">NUOVO</span>` : esc(v.id));
+  const nome = Object.assign(document.createElement("input"), { type: "text", value: v.nome }); nome.oninput = () => { v.nome = nome.value; segna(); };
+  const desc = document.createElement("textarea"); desc.value = v.descrizione; desc.oninput = () => { v.descrizione = desc.value; segna(); };
+
+  const b = el("div", "bonus"), sa = document.createElement("select"), nv = Object.assign(document.createElement("input"), { type: "number", min: -9, max: 9, value: v.bonus ? v.bonus.valore : 1 });
+  sa.append(new Option("— nessun bonus —", ""));
+  ABILITA.forEach(([a, n]) => sa.append(new Option(n, a, false, v.bonus && v.bonus.abilita === a)));
+  const aggB = () => { v.bonus = sa.value ? { abilita: sa.value, valore: Math.max(-9, Math.min(9, Math.round(Number(nv.value) || 0))) } : null; nv.style.visibility = sa.value ? "visible" : "hidden"; segna(); };
+  sa.onchange = aggB; nv.oninput = aggB; nv.style.visibility = v.bonus ? "visible" : "hidden"; b.append(sa, nv);
+
+  const tg = el("div"); tg.append(selTag(v, 0), selTag(v, 1));
+  const cons = el("details", "cons"); cons.open = !!(v.tutti || v.sc01);
+  cons.innerHTML = `<summary>Testo di consultazione</summary><label>Tutti gli scenari</label><textarea data-k="tutti"></textarea><label>Solo SC01 (La Notte di Halloween)</label><textarea data-k="sc01"></textarea>`;
+  cons.querySelectorAll("textarea").forEach(t => { t.value = v[t.dataset.k]; t.oninput = () => { v[t.dataset.k] = t.value; segna(); }; });
+  const el2 = el("div"), bt = el("button", null, v.eliminato ? "Ripristina" : "Elimina");
+  bt.onclick = () => { v.eliminato = !v.eliminato; disegna(); };
+  el2.append(bt);
+  if (v.eliminato) r.classList.add("elim");
+  if (!v.proposto && iniziale.has(v) && !uguale(v, iniziale.get(v))) r.classList.add("mod");
+  const campi = [id, wrap(nome), wrap(desc), b, tg, cons, el2], et = ["ID", "Nome", "Descrizione", "Bonus (scritto sulla carta)", "Tag (icone d'uso)", "Consultazione", ""];
+  campi.forEach((c, i) => c.dataset.et = et[i]);
+  r.append(...campi); return r;
+}
+function intestazione() { const r = el("div", "intest riga"); ["ID", "Nome", "Descrizione", "Bonus (scritto sulla carta)", "Tag (icone d'uso)", "Consultazione", ""].forEach(t => r.append(el("div", null, t))); return r; }
+
+function disegna() {
+  const pres = voci.filter(v => !v.proposto), prop = voci.filter(v => v.proposto);
+  $("presenti").replaceChildren(intestazione(), ...pres.map(riga));
+  $("proposti").replaceChildren(...(prop.length ? [intestazione(), ...prop.map(riga)] : [el("p", "nota", "Nessun oggetto proposto in sospeso.")]));
+  $("titPresenti").textContent = `Oggetti presenti (${pres.length})`;
+  $("titProposti").textContent = `Oggetti proposti (${prop.length})`;
+  segna();
+}
+function segna() {
+  const prop = voci.filter(v => v.proposto), pres = voci.filter(v => !v.proposto);
+  const nuovi = prop.filter(v => !v.eliminato).length, elim = pres.filter(v => v.eliminato).length;
+  const mod = pres.filter(v => !v.eliminato && !uguale(v, iniziale.get(v))).length;
+  $("stato").innerHTML = `Da aggiungere: <b>${nuovi}</b> · modificati: <b>${mod}</b> · da eliminare: <b>${elim}</b>`;
+  $("btnSalva").disabled = !(nuovi || mod || elim);
+}
+
+function costruisciCarta(v, id) {
+  const c = { id, nome: v.nome.trim(), tipo: "oggetto", descrizione: v.descrizione.trim() };
+  if (v.bonus) c.modificatori = [{ abilita: v.bonus.abilita, valore: v.bonus.valore }];
+  if (v.tag.length) c.tag = [...v.tag];
+  const cons = { ...(v.orig && v.orig.consulta ? v.orig.consulta : {}) };
+  v.tutti.trim() ? (cons.tutti = v.tutti.trim()) : delete cons.tutti;
+  v.sc01.trim() ? (cons.SC01 = v.sc01.trim()) : delete cons.SC01;
+  if (Object.keys(cons).length) c.consulta = cons;
+  if (v.orig) for (const k of Object.keys(v.orig)) if (!(k in c) && !["modificatori", "tag", "consulta"].includes(k)) c[k] = v.orig[k];   // campi che questa pagina non tocca (es. codice)
+  return c;
+}
+function mostra(t, err) { const m = $("msg"); m.textContent = t; m.className = "msg" + (err ? " err" : ""); m.style.display = "block"; setTimeout(() => (m.style.display = "none"), err ? 7000 : 3500); }
+
+$("btnSalva").onclick = async () => {
+  const senzaNome = voci.filter(v => !v.eliminato && !v.nome.trim());
+  if (senzaNome.length) return mostra("Ci sono oggetti senza nome.", true);
+  const elim = voci.filter(v => !v.proposto && v.eliminato);
+  const nuovi = voci.filter(v => v.proposto && !v.eliminato);
+  let msg = `Scrivere nel database: ${nuovi.length} nuovi oggetti, ${voci.filter(v => !v.proposto && !v.eliminato && !uguale(v, iniziale.get(v))).length} modificati.`;
+  if (elim.length) msg += `\n\nVERRANNO ELIMINATI: ${elim.map(v => v.nome).join(", ")}.\n(Se un eroe li ha nel kit di partenza in eroi_base.json, non comparirà più nel suo inventario.)`;
+  if (!confirm(msg)) return;
+  const nums = dbOriginale.filter(c => c.id.startsWith("OG")).map(c => +c.id.slice(2)); let prossimo = Math.max(0, ...nums) + 1;
+  const risultato = [];
+  for (const c of dbOriginale) {
+    if (c.tipo !== "oggetto") { risultato.push(c); continue; }   // le abilità restano invariate
+    const v = voci.find(x => x.id === c.id); if (v && !v.eliminato) risultato.push(costruisciCarta(v, c.id));
+  }
+  nuovi.forEach(v => risultato.push(costruisciCarta(v, "OG" + String(prossimo++).padStart(2, "0"))));
+  const r = await fetch("/api/catalogo", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(risultato) });
+  if (!r.ok) return mostra("Salvataggio rifiutato: " + ((await r.json().catch(() => ({}))).errore || r.status), true);
+  voci = voci.filter(v => !(v.proposto && v.eliminato));   // le proposte tenute ora sono nel database; quelle eliminate spariscono
+  voci = voci.filter(v => !v.proposto);
+  await carica(false);
+  mostra("Salvato in oggetti_base.json.");
+};
+$("btnAnnulla").onclick = () => { if (confirm("Annullare tutte le modifiche non salvate (e rimettere le 20 proposte)?")) carica(true); };
+window.addEventListener("beforeunload", e => { if (!$("btnSalva").disabled) { e.preventDefault(); e.returnValue = ""; } });
+carica(true);
+</script>
+</body>
+</html>

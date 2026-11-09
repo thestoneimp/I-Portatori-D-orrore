@@ -82,7 +82,7 @@
   },
   {
     "id": "OG02",
-    "nome": "Mappa del Bosco",
+    "nome": "Mappa",
     "tipo": "oggetto",
     "descrizione": "(Effetto da definire.)"
   },
@@ -130,7 +130,7 @@
   },
   {
     "id": "OG08",
-    "nome": "Radio Militare",
+    "nome": "Radio",
     "tipo": "oggetto",
     "descrizione": "(Effetto da definire.)"
   },
@@ -185,13 +185,9 @@
   },
   {
     "id": "OG13",
-    "nome": "Diario Strappato",
+    "nome": "Diario",
     "tipo": "oggetto",
-    "descrizione": "Poche pagine rimaste, scritte in fretta.",
-    "consulta": {
-      "SC01": "«Hanno bussato alla porta tutta la notte. Non aprite a nessuno, qualunque cosa dicano.»",
-      "tutti": "«Le pagine successive sono state strappate via. Resta solo una data e un nome illeggibile.»"
-    }
+    "descrizione": "Poche pagine rimaste, scritte in fretta."
   },
   {
     "id": "OG14",
@@ -201,5 +197,160 @@
     "tag": [
       "chiave"
     ]
+  },
+  {
+    "id": "OG15",
+    "nome": "Coltello da Cucina",
+    "tipo": "oggetto",
+    "descrizione": "Lama corta e affilata, ancora macchiata di ruggine.",
+    "tag": [
+      "tagliente"
+    ]
+  },
+  {
+    "id": "OG16",
+    "nome": "Mazza da Baseball",
+    "tipo": "oggetto",
+    "descrizione": "Legno massiccio e segnato dai colpi: fa male a chi la riceve e alla porta che la subisce.",
+    "modificatori": [
+      {
+        "abilita": "forza",
+        "valore": 1
+      }
+    ]
+  },
+  {
+    "id": "OG17",
+    "nome": "Cesoie da Giardino",
+    "tipo": "oggetto",
+    "descrizione": "Tagliano rami, catene sottili e fili di ferro.",
+    "tag": [
+      "tagliente",
+      "leva"
+    ]
+  },
+  {
+    "id": "OG18",
+    "nome": "Tanica di Benzina",
+    "tipo": "oggetto",
+    "descrizione": "Mezza piena. Basta una scintilla."
+  },
+  {
+    "id": "OG19",
+    "nome": "Bottiglia Molotov",
+    "tipo": "oggetto",
+    "descrizione": "Bottiglia, benzina e uno straccio. Si usa una volta sola.",
+    "tag": [
+      "fuoco"
+    ]
+  },
+  {
+    "id": "OG20",
+    "nome": "Scatola di Fiammiferi",
+    "tipo": "oggetto",
+    "descrizione": "Ne restano pochi. Accendono una candela, o un incendio.",
+    "tag": [
+      "fuoco",
+      "luce"
+    ]
+  },
+  {
+    "id": "OG21",
+    "nome": "Fucile da Caccia",
+    "tipo": "oggetto",
+    "descrizione": "Pesante e rumoroso: ogni colpo si sente per tutta la casa.",
+    "tag": [
+      "sparo"
+    ]
+  },
+  {
+    "id": "OG22",
+    "nome": "Acqua Santa",
+    "tipo": "oggetto",
+    "descrizione": "Una fiala benedetta, tiepida come se fosse appena stata scaldata.",
+    "tag": [
+      "sacro"
+    ]
+  },
+  {
+    "id": "OG23",
+    "nome": "Rosario di Legno",
+    "tipo": "oggetto",
+    "descrizione": "Grani consumati da mani che hanno pregato a lungo.",
+    "modificatori": [
+      {
+        "abilita": "tempra",
+        "valore": 1
+      }
+    ],
+    "tag": [
+      "sacro"
+    ]
+  },
+  {
+    "id": "OG24",
+    "nome": "Set di Grimaldelli",
+    "tipo": "oggetto",
+    "descrizione": "Ferri sottili per serrature che non vogliono aprirsi.",
+    "tag": [
+      "chiave"
+    ]
+  },
+  {
+    "id": "OG25",
+    "nome": "Mazzo di Chiavi",
+    "tipo": "oggetto",
+    "descrizione": "Dieci chiavi, nessuna etichetta. Una potrebbe servire.",
+    "tag": [
+      "chiave"
+    ]
+  },
+  {
+    "id": "OG26",
+    "nome": "Giubbotto antiproiettile",
+    "tipo": "oggetto",
+    "descrizione": "Pesante e rigido: attutisce i colpi e il freddo.",
+    "modificatori": [
+      {
+        "abilita": "tempra",
+        "valore": 1
+      }
+    ]
+  },
+  {
+    "id": "OG27",
+    "nome": "Corda",
+    "tipo": "oggetto",
+    "descrizione": "Venti metri di corda robusta, buona per calarsi o legare.",
+    "modificatori": [
+      {
+        "abilita": "atletica",
+        "valore": 1
+      }
+    ]
+  },
+  {
+    "id": "OG28",
+    "nome": "Kit di Pronto Soccorso",
+    "tipo": "oggetto",
+    "descrizione": "Bende, disinfettante e un po' di cotone: per rimettere in piedi qualcuno."
+  },
+  {
+    "id": "OG29",
+    "nome": "Registratore a Cassette",
+    "tipo": "oggetto",
+    "descrizione": "Un nastro è ancora inserito. Premi play."
+  },
+  {
+    "id": "OG30",
+    "nome": "Lettera Sigillata",
+    "tipo": "oggetto",
+    "descrizione": "Ceralacca rossa spezzata a metà, carta ingiallita."
+  },
+  {
+    "id": "OG31",
+    "nome": "Fotografia Sbiadita",
+    "tipo": "oggetto",
+    "descrizione": "Una famiglia davanti alla casa. Qualcuno ha graffiato un volto."
   }
 ]

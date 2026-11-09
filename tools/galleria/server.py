@@ -14,6 +14,34 @@ PAGINA = os.path.join(os.path.dirname(__file__), "index.html")
 RADICE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 ZONE = os.path.join(RADICE, "assets", "carte", "zone.json")                       # zone cliccabili degli elementi (lette dal gioco)
 ELEMENTI = os.path.join(RADICE, "elementi_interagibili_base.json")                # catalogo degli elementi interagibili
+CATALOGO = os.path.join(RADICE, "oggetti_base.json")                              # carte oggetto e abilità del gioco
+TAG_VALIDI = ("tagliente", "leva", "fuoco", "luce", "chiave", "sacro", "sparo")   # come TAG in oggetto.js e ICONE_TAG in script.js
+ABILITA_VALIDE = ("forza", "tempra", "atletica", "intelletto", "rapidita", "carisma", "tutte")
+
+
+def catalogo_valido(carte):
+    """Controllo prima di scrivere sul file del gioco: id univoci, nome presente, modificatori e tag noti, testi non enormi."""
+    if not isinstance(carte, list) or not 1 <= len(carte) <= 500:
+        return False
+    visti = set()
+    for c in carte:
+        if (not isinstance(c, dict) or not isinstance(c.get("id"), str) or not re.fullmatch(r"(AB|OG)\d{2,3}", c["id"]) or c["id"] in visti
+                or c.get("tipo") not in ("oggetto", "abilita") or not isinstance(c.get("nome"), str) or not 1 <= len(c["nome"].strip()) <= 60
+                or not isinstance(c.get("descrizione", ""), str) or len(c.get("descrizione", "")) > 600):
+            return False
+        visti.add(c["id"])
+        for m in c.get("modificatori") or []:
+            if (not isinstance(m, dict) or m.get("abilita") not in ABILITA_VALIDE or isinstance(m.get("valore"), bool)
+                    or not isinstance(m.get("valore"), int) or not -9 <= m["valore"] <= 9):
+                return False
+        t = c.get("tag") or []
+        if not isinstance(t, list) or len(t) > 2 or any(x not in TAG_VALIDI for x in t):
+            return False
+        cons = c.get("consulta")
+        if cons is not None and (not isinstance(cons, dict) or len(cons) > 20
+                                 or any(not isinstance(k, str) or not isinstance(v, str) or len(v) > 1500 for k, v in cons.items())):
+            return False
+    return True
 
 
 def leggi_zone():
@@ -117,6 +145,12 @@ class Gestore(BaseHTTPRequestHandler):
         if percorso == "/oggetti":   # anteprima delle varianti di layout delle carte oggetto
             with open(os.path.join(os.path.dirname(__file__), "oggetti.html"), "rb") as f:
                 return self._invia(200, f.read(), "text/html; charset=utf-8")
+        if percorso == "/catalogo":   # elenco modificabile degli oggetti del gioco (legge e scrive oggetti_base.json)
+            with open(os.path.join(os.path.dirname(__file__), "catalogo.html"), "rb") as f:
+                return self._invia(200, f.read(), "text/html; charset=utf-8")
+        if percorso == "/api/catalogo":
+            with open(CATALOGO, encoding="utf-8") as f:
+                return self._invia(200, json.load(f))
         if percorso == "/esporta":   # pagina usata da esporta.py
             with open(os.path.join(os.path.dirname(__file__), "esporta.html"), "rb") as f:
                 return self._invia(200, f.read(), "text/html; charset=utf-8")
@@ -156,6 +190,12 @@ class Gestore(BaseHTTPRequestHandler):
             d = json.loads(self.rfile.read(n) or b"{}")
         except ValueError:
             return self._invia(400, {"errore": "JSON non valido"})
+        if urlparse(self.path).path == "/api/catalogo":
+            if not catalogo_valido(d):
+                return self._invia(400, {"errore": "catalogo non valido"})
+            with open(CATALOGO, "w", encoding="utf-8", newline="") as f:   # stesso formato del file (2 spazi, accenti, CRLF)
+                f.write(json.dumps(d, indent=2, ensure_ascii=False).replace(chr(10), chr(13) + chr(10)))
+            return self._invia(200, {"ok": True, "carte": len(d)})
         with G._lock:
             dati = G.carica()
             carta = G.trova(dati, d.get("carta", ""))
