@@ -114,6 +114,9 @@ class Gestore(BaseHTTPRequestHandler):
         if percorso == "/stats":
             with open(os.path.join(os.path.dirname(__file__), "stats.html"), "rb") as f:
                 return self._invia(200, f.read(), "text/html; charset=utf-8")
+        if percorso == "/oggetti":   # anteprima delle varianti di layout delle carte oggetto
+            with open(os.path.join(os.path.dirname(__file__), "oggetti.html"), "rb") as f:
+                return self._invia(200, f.read(), "text/html; charset=utf-8")
         if percorso == "/esporta":   # pagina usata da esporta.py
             with open(os.path.join(os.path.dirname(__file__), "esporta.html"), "rb") as f:
                 return self._invia(200, f.read(), "text/html; charset=utf-8")
@@ -186,7 +189,7 @@ class Gestore(BaseHTTPRequestHandler):
             elif p == "/api/layout":
                 elementi, im = d.get("elementi"), d.get("imm")
                 if elementi is not None:
-                    tipi = ("immagine", "sfumatura", "cornice", "testo", "statistiche")
+                    tipi = ("immagine", "sfumatura", "cornice", "testo", "statistiche", "oggetto")
                     if (not isinstance(elementi, list) or len(elementi) > 40 or len(json.dumps(elementi)) > 40000
                             or any(not isinstance(e, dict) or e.get("tipo") not in tipi or not isinstance(e.get("id"), str) for e in elementi)):
                         return self._invia(400, {"errore": "elementi non validi"})

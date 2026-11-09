@@ -1,6 +1,7 @@
 """Esporta nel gioco le carte APPROVATE nella galleria (arte/ non è nel repo: qui nascono le immagini che il gioco usa davvero).
  - personaggi: la carta completa (illustrazione + nome + statistiche, con le icone che sporgono: margine trasparente) -> assets/carte/personaggi/<Pnn>.webp
  - minacce: la carta completa come i personaggi (nome, cornice rossa; senza statistiche) -> assets/carte/minacce/<Mnn>.webp
+ - oggetti: la carta completa (nome, bonus, tag, codice; icone che sporgono) -> assets/carte/oggetti/<Onn>.webp
  - luoghi "abbandonati": solo l'illustrazione ritagliata come nella galleria, 3:2 -> assets/carte/luoghi/<Ann>.webp
    (i luoghi "_abitata" sono volutamente esclusi: se ne riparlerà)
  - assets/carte/indice.json (elenco dei luoghi con immagine, letto dal gioco) e il blocco <carte> di service-worker.js (precache)
@@ -66,8 +67,8 @@ if __name__ == "__main__":
     for c in dati["carte"]:
         if not c.get("approvata"):
             continue
-        if c["tipo"] in ("personaggio", "minaccia"):
-            cod, dest, w, h, q = c["id"].split("_")[0], "personaggi" if c["tipo"] == "personaggio" else "minacce", LARGH_PG + 2 * MARGINE_PG, round(LARGH_PG * 4 / 3) + 2 * MARGINE_PG, f"&larghezza={LARGH_PG}&margine={MARGINE_PG}"
+        if c["tipo"] in ("personaggio", "minaccia", "oggetto"):
+            cod, dest, w, h, q = c["id"].split("_")[0], {"personaggio": "personaggi", "minaccia": "minacce", "oggetto": "oggetti"}[c["tipo"]], LARGH_PG + 2 * MARGINE_PG, round(LARGH_PG * 4 / 3) + 2 * MARGINE_PG, f"&larghezza={LARGH_PG}&margine={MARGINE_PG}"
         elif c["tipo"] == "luogo" and not c["id"].endswith("_abitata"):
             cod, dest, w, h, q = c["id"].split("_")[0], "luoghi", LARGH_LUOGO, round(LARGH_LUOGO / 1.5), f"&larghezza={LARGH_LUOGO}&solo=1"
         else:
@@ -76,7 +77,7 @@ if __name__ == "__main__":
             continue
         png = os.path.join(tmp, cod + ".png")
         url = f"http://127.0.0.1:{PORTA}/esporta?carta={c['id']}{q}"
-        if dest in ("personaggi", "minacce"):
+        if dest in ("personaggi", "minacce", "oggetti"):
             im = trasparente(url, png, w, h)
         else:   # i luoghi sono rettangoli pieni: niente trasparenza
             for _ in range(3):   # a volte l'immagine grande non è ancora decodificata allo scatto: si riprova se è tutto nero
@@ -93,10 +94,13 @@ if __name__ == "__main__":
     luoghi = sorted(f[:-5] for f in os.listdir(os.path.join(cartella, "luoghi")) if f.endswith(".webp"))
     personaggi = sorted(f[:-5] for f in os.listdir(os.path.join(cartella, "personaggi")) if f.endswith(".webp"))
     minacce = sorted(f[:-5] for f in os.listdir(os.path.join(cartella, "minacce")) if f.endswith(".webp"))
+    dir_oggetti = os.path.join(cartella, "oggetti")
+    oggetti = sorted(f[:-5] for f in os.listdir(dir_oggetti) if f.endswith(".webp")) if os.path.isdir(dir_oggetti) else []
     with open(os.path.join(cartella, "indice.json"), "w", encoding="utf-8", newline="") as f:
-        json.dump({"luoghi": luoghi, "personaggi": personaggi, "minacce": minacce}, f, indent=2)
+        json.dump({"luoghi": luoghi, "personaggi": personaggi, "minacce": minacce, "oggetti": oggetti}, f, indent=2)
     voci = (["assets/carte/indice.json"] + [f"assets/carte/luoghi/{x}.webp" for x in luoghi]
-            + [f"assets/carte/personaggi/{x}.webp" for x in personaggi] + [f"assets/carte/minacce/{x}.webp" for x in minacce])
+            + [f"assets/carte/personaggi/{x}.webp" for x in personaggi] + [f"assets/carte/minacce/{x}.webp" for x in minacce]
+            + [f"assets/carte/oggetti/{x}.webp" for x in oggetti])
     sw = os.path.join(RADICE, "service-worker.js")
     with open(sw, encoding="utf-8", newline="") as f:
         t = f.read()

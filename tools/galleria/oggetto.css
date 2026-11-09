@@ -1,0 +1,112 @@
+/* Carte oggetto: nome, bonus, due tag, codice (vedi oggetto.js). Tutto scala con la larghezza della carta (cqw).
+ * La carta è 100cqw × 133.3cqw; la cornice a marmo occupa 6cqw per lato (l'area utile va da 6.5 a 93.5 in larghezza e da 6.5 a 126.8 in altezza).
+ * Ogni layout (.ob-<id>) posiziona gli stessi blocchi: .ob-fascia/.ob-fascia2 (sfondi), .ob-nome, .ob-bonus (.ob-num + .ob-et), .ob-tags (2 × .ob-ico), .ob-codice. */
+.ob { inset: 0; pointer-events: none; --rosso: #d6281c; --rosso2: #a52a1f; --crema: #ecd9b4; --nero: #120b0b; --carta: #d8c8a2; }
+.ob > * { position: absolute; }
+.ob-fascia, .ob-fascia2 { display: none; }
+.ob-nome { white-space: nowrap; line-height: 1; font-family: "Bebas Neue", Impact, sans-serif; text-transform: uppercase; }
+.ob-bonus { display: flex; align-items: baseline; gap: 1.6cqw; white-space: nowrap; line-height: 1; }
+.ob-num { font-family: "Bebas Neue", Impact, sans-serif; }
+.ob-et { font-family: "Oswald", sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: .25cqw; }
+.ob-tags { display: flex; gap: 3cqw; }
+.ob-ico { position: relative; width: var(--u); height: var(--u); display: grid; place-items: center; flex: none; }
+.ob-ico svg { width: 62%; height: 62%; overflow: visible; }
+.ob-ico svg .f { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.ob-ico svg .l { fill: none; stroke: var(--ln, currentColor); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.ob-codice { white-space: nowrap; line-height: 1; display: flex; align-items: baseline; gap: 1cqw; }
+
+/* ---------- stili delle icone ---------- */
+/* medaglione tondo: linea crema su fondo scuro con anello rosso */
+.ob-ico-med .ob-ico { border-radius: 50%; color: #eadfcf; background: radial-gradient(circle at 35% 30%, #2b1a19, #0c0707 72%);
+  box-shadow: 0 0 0 calc(var(--u) * .045) var(--rosso2), 0 0 0 calc(var(--u) * .085) #140b0a, 0 .7cqw 1.4cqw rgba(0,0,0,.75); }
+.ob-ico-med .ob-ico svg { filter: url(#cx-ruvido); }
+/* rombo (sigillo): simbolo rosso pieno su rombo scuro bordato di crema */
+.ob-ico-sig .ob-ico { color: var(--rosso); --ln: var(--nero); background: var(--carta); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.ob-ico-sig .ob-ico::before { content: ""; position: absolute; inset: 7%; background: radial-gradient(circle at 50% 35%, #2a1514, #0d0707 75%); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.ob-ico-sig .ob-ico svg { position: relative; width: 54%; height: 54%; filter: url(#cx-ruvido); }
+.ob-ico-sig .ob-ico svg .f { fill: currentColor; stroke: currentColor; stroke-width: .6; }
+/* quadrato arrotondato: linea crema su fondo nero, filo crema */
+.ob-ico-quad .ob-ico { color: var(--crema); background: rgba(8, 5, 5, .9); border: calc(var(--u) * .035) solid var(--carta); border-radius: calc(var(--u) * .16); box-shadow: 0 .6cqw 1.4cqw rgba(0,0,0,.7); }
+.ob-ico-quad .ob-ico svg { width: 66%; height: 66%; }
+/* glifo nudo con alone rosso (stile display) */
+.ob-ico-osd .ob-ico { color: #f2f2f2; }
+.ob-ico-osd .ob-ico svg { width: 100%; height: 100%; filter: drop-shadow(calc(var(--u) * .05) 0 0 rgba(255, 30, 60, .8)) drop-shadow(0 .4cqw .6cqw rgba(0,0,0,.85)); }
+.ob-ico-osd .ob-ico svg .f { stroke-width: 1.8; }
+
+/* ---------- 1. TARGHETTA IN BASSO: pannello scuro con nome, poi bonus · tag · codice su una riga ---------- */
+.ob-targhetta { --u: 13cqw; }
+.ob-targhetta .ob-fascia { display: block; left: 6.5cqw; right: 6.5cqw; bottom: 6.5cqw; height: 35cqw; background: linear-gradient(180deg, rgba(10,6,6,.55), rgba(10,6,6,.86) 38%); border-top: .35cqw solid rgba(216,200,162,.55); }
+.ob-targhetta .ob-nome { left: 50%; top: 95cqw; transform: translateX(-50%); font-size: 11cqw; letter-spacing: .5cqw; color: var(--crema); text-shadow: 0 .5cqw 0 rgba(0,0,0,.75), 0 0 2cqw rgba(0,0,0,.9); }
+.ob-targhetta .ob-bonus { left: 11cqw; top: 109.5cqw; flex-direction: column; align-items: flex-start; gap: 1cqw; }
+.ob-targhetta .ob-num { font-size: 11cqw; color: #e0463a; text-shadow: 0 .4cqw 0 #000; }
+.ob-targhetta .ob-et { font-size: 3.8cqw; color: var(--crema); }
+.ob-targhetta .ob-tags { left: 37cqw; top: 108.5cqw; gap: 3cqw; }
+.ob-targhetta .ob-codice { right: 11cqw; top: 111cqw; flex-direction: column; align-items: center; gap: .8cqw; padding: 1.4cqw 2.2cqw; background: var(--nero); border: .3cqw solid var(--carta); }
+.ob-targhetta .ob-cod-et { font: 400 2.8cqw/1 "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .3cqw; color: #b9a98a; }
+.ob-targhetta .ob-cod-v { font: 700 5cqw/1 "Cinzel", serif; letter-spacing: .1cqw; color: var(--crema); }
+
+/* ---------- 2. COLONNA DI SIGILLI: due rombi sul lato sinistro, codice su targhetta in alto a destra, nastro rosso col bonus in basso ---------- */
+.ob-colonna { --u: 17cqw; }
+.ob-colonna .ob-fascia { display: block; left: 6.5cqw; right: 6.5cqw; bottom: 6.5cqw; height: 15cqw; background: linear-gradient(180deg, #7a1812, #3a0b09); border-top: .45cqw solid var(--carta); box-shadow: 0 -1cqw 2.5cqw rgba(0,0,0,.55); }
+.ob-colonna .ob-nome { left: 50%; top: 97cqw; transform: translateX(-50%); font-size: 14cqw; letter-spacing: .6cqw; color: var(--rosso); text-shadow: 0 .5cqw 0 rgba(0,0,0,.75), 0 0 3cqw color-mix(in srgb, var(--rosso) 75%, transparent), 0 0 .8cqw #000; }
+.ob-colonna .ob-bonus { left: 50%; top: 115.4cqw; transform: translateX(-50%); gap: 2cqw; }
+.ob-colonna .ob-num { font-size: 9.5cqw; color: var(--crema); }
+.ob-colonna .ob-et { font-size: 4.6cqw; color: var(--crema); }
+.ob-colonna .ob-tags { left: 3cqw; top: 14cqw; flex-direction: column; gap: 3cqw; }
+.ob-colonna .ob-codice { right: 8cqw; top: 9cqw; padding: 1.2cqw 2.4cqw; background: var(--carta); color: var(--nero); border: .3cqw solid var(--nero); box-shadow: .6cqw .6cqw 0 #000; }
+.ob-colonna .ob-cod-et { font: 400 2.8cqw/1 "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .25cqw; }
+.ob-colonna .ob-cod-v { font: 700 4.6cqw/1 "Cinzel", serif; }
+
+/* ---------- 3. SIGILLI D'ANGOLO: il bonus in un rombo grande in alto a sinistra, i due tag in alto a destra (sporgono dal bordo), nome e codice in basso ---------- */
+.ob-angoli { --u: 15cqw; }
+.ob-angoli .ob-bonus { left: -1.5cqw; top: -1.5cqw; width: 28cqw; height: 28cqw; display: grid; place-items: center; color: var(--rosso); background: var(--carta);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.ob-angoli .ob-bonus::before { content: ""; position: absolute; inset: 7%; background: radial-gradient(circle at 50% 35%, #2a1514, #0d0707 75%); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.ob-angoli .ob-num { position: relative; font-size: 13cqw; line-height: 1; margin-top: -2cqw; color: var(--rosso); text-shadow: 0 .4cqw 0 #000; }
+.ob-angoli_icona .ob-num { margin-top: -7cqw; font-size: 12.5cqw; }
+.ob-bico { position: absolute; left: 50%; bottom: 17%; width: 11.5cqw; height: 11.5cqw; transform: translateX(-50%); color: var(--crema); --ln: var(--crema); }
+.ob-bico svg { width: 100%; height: 100%; overflow: visible; filter: url(#cx-ruvido); }
+.ob-bico svg .f { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; stroke-linecap: round; }
+.ob-bico svg .l { fill: none; stroke: var(--ln); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.ob-angoli .ob-et { position: absolute; left: 50%; bottom: 25%; transform: translateX(-50%); font-size: 3.2cqw; color: var(--crema); }
+.ob-angoli .ob-tags { right: -1.5cqw; top: -1.5cqw; gap: .5cqw; }
+.ob-angoli .ob-nome { left: 50%; top: 102cqw; transform: translateX(-50%); font-size: 14cqw; letter-spacing: .6cqw; color: var(--rosso); text-shadow: 0 .5cqw 0 rgba(0,0,0,.75), 0 0 3cqw color-mix(in srgb, var(--rosso) 75%, transparent), 0 0 .8cqw #000; }
+.ob-angoli .ob-codice { left: 50%; top: 119cqw; transform: translateX(-50%); padding: 1cqw 3cqw; background: var(--nero); border: .3cqw solid var(--carta); color: #ecd9b4; }
+.ob-angoli .ob-cod-et { font: 400 2.8cqw/1 "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .25cqw; color: #b9a98a; }
+.ob-angoli .ob-cod-v { font: 700 4.6cqw/1 "Cinzel", serif; letter-spacing: .1cqw; }
+
+/* ---------- 4. CARTIGLIO: striscia di pergamena in basso con nome, bonus e codice; i due tag a cavallo del suo bordo ---------- */
+.ob-cartiglio { --u: 16cqw; }
+.ob-cartiglio .ob-fascia { display: block; left: 6.5cqw; right: 6.5cqw; bottom: 6.5cqw; height: 31cqw; background: radial-gradient(ellipse at 30% 20%, #e4d5b0, #cdbb91 80%); border-top: .6cqw solid var(--nero); box-shadow: inset 0 0 0 1.1cqw #d3c39b, inset 0 0 0 1.4cqw rgba(18,11,11,.55), 0 -1cqw 2.5cqw rgba(0,0,0,.5); }
+.ob-cartiglio .ob-nome { left: 12cqw; top: 100.5cqw; font: 700 6.6cqw/1 "Cinzel", serif; letter-spacing: .3cqw; color: #1a0f0e; text-shadow: none; }
+.ob-cartiglio .ob-bonus { left: 12cqw; top: 110cqw; gap: 1.6cqw; }
+.ob-cartiglio .ob-num { font-size: 10cqw; color: var(--rosso2); }
+.ob-cartiglio .ob-et { font-size: 4.6cqw; color: #2a1a16; }
+.ob-cartiglio .ob-tags { right: 10cqw; top: 82.5cqw; gap: 3cqw; }
+.ob-cartiglio .ob-codice { left: 12cqw; top: 121.4cqw; color: #4b3a28; }
+.ob-cartiglio .ob-cod-et { font: 400 3.2cqw/1 "Special Elite", monospace; text-transform: uppercase; }
+.ob-cartiglio .ob-cod-v { font: 400 3.6cqw/1 "Special Elite", monospace; letter-spacing: .2cqw; }
+
+/* ---------- 5. BARRE ALTO E BASSO: barra superiore con nome e codice, barra inferiore con bonus e tag (carta da gioco classica) ---------- */
+.ob-barre { --u: 14cqw; }
+.ob-barre .ob-fascia { display: block; left: 6.5cqw; right: 6.5cqw; top: 6.5cqw; height: 15cqw; background: linear-gradient(180deg, rgba(8,5,5,.92), rgba(8,5,5,.7)); border-bottom: .4cqw solid var(--rosso2); }
+.ob-barre .ob-fascia2 { display: block; left: 6.5cqw; right: 6.5cqw; bottom: 6.5cqw; height: 19cqw; background: linear-gradient(0deg, rgba(8,5,5,.92), rgba(8,5,5,.72)); border-top: .4cqw solid var(--rosso2); }
+.ob-barre .ob-nome { left: 11cqw; top: 11.2cqw; font-size: 7.4cqw; letter-spacing: .4cqw; color: var(--crema); }
+.ob-barre .ob-codice { right: 11cqw; top: 10.2cqw; padding: .9cqw 2cqw; border: .35cqw solid var(--carta); color: var(--crema); }
+.ob-barre .ob-cod-et { font: 400 2.6cqw/1 "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .25cqw; color: #b9a98a; }
+.ob-barre .ob-cod-v { font: 700 4.2cqw/1 "Cinzel", serif; }
+.ob-barre .ob-bonus { left: 11cqw; top: 112.2cqw; }
+.ob-barre .ob-num { font-size: 11cqw; color: #ff5a4a; }
+.ob-barre .ob-et { font-size: 4.8cqw; color: var(--crema); }
+.ob-barre .ob-tags { right: 10cqw; top: 109.7cqw; gap: 2.5cqw; }
+
+/* ---------- 6. OSD / VHS: bonus e codice in alto in stile display, nome al centro in basso fra i due tag ---------- */
+.ob-osd { --u: 12cqw; }
+.ob-osd .ob-bonus { left: 9.5cqw; top: 9cqw; gap: 2cqw; }
+.ob-osd .ob-num { font: 400 17cqw/1 "VT323", monospace; color: #f2f2f2; text-shadow: .9cqw 0 rgba(255,30,60,.75), 0 .5cqw .8cqw rgba(0,0,0,.9); }
+.ob-osd .ob-et { font: 400 7.6cqw/1 "VT323", monospace; letter-spacing: .3cqw; color: #f2f2f2; text-shadow: .5cqw 0 rgba(255,30,60,.75), 0 .5cqw .8cqw rgba(0,0,0,.9); }
+.ob-osd .ob-codice { right: 9.5cqw; top: 10.5cqw; font: 400 8cqw/1 "VT323", monospace; color: #f2f2f2; text-shadow: .6cqw 0 rgba(255,30,60,.75), 0 .5cqw .8cqw rgba(0,0,0,.9); }
+.ob-osd .ob-cod-et { display: none; }
+.ob-osd .ob-cod-v::before { content: "["; } .ob-osd .ob-cod-v::after { content: "]"; }
+.ob-osd .ob-nome { left: 50%; top: 111cqw; transform: translateX(-50%); font-size: 8.6cqw; letter-spacing: .4cqw; color: #f4ecdc; text-shadow: .7cqw 0 rgba(255,30,60,.8), 0 .5cqw 0 rgba(0,0,0,.75), 0 0 2cqw #000; }
+.ob-osd .ob-tags { left: 9.5cqw; right: 9.5cqw; top: 109.5cqw; justify-content: space-between; }

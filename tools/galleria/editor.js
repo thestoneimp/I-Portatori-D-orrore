@@ -20,6 +20,7 @@ const Editor = (() => {
   const CAR_MINACCIA = [["pf", "PF"], ["pa", "PA"], ["forza", "Forza"], ["intelletto", "Intelletto"], ["rapidita", "Rapidità"], ["carisma", "Carisma"]];
   const CAR_MINACCIA_VUOTE = { pf: null, pa: null, forza: null, intelletto: null, rapidita: null, carisma: null };
   const cerca = id => st.elementi.find(e => e.id === id);
+  const selIniziale = () => (cerca("nome") ? "nome" : cerca("oggetto") ? "oggetto" : "immagine");   // le carte oggetto non hanno un testo "nome" separato
   const sporco = () => JSON.stringify(st) !== salvato;
 
   /* ---------- apertura / chiusura ---------- */
@@ -30,7 +31,7 @@ const Editor = (() => {
     if (carta.tipo === "minaccia") st.caratteristiche = { ...CAR_MINACCIA_VUOTE, ...(carta.caratteristiche || {}) };   // valori di gioco: non compaiono sulla carta
     modoZone = false; zonaSel = null; puntoSel = null; zoneOk = false; nomiCat = [];
     if (carta.tipo === "luogo") st.zone = {};   // riempito da caricaZone()
-    salvato = JSON.stringify(st); storia = [salvato]; hi = 0; sel = "nome"; soloImg = false;
+    salvato = JSON.stringify(st); storia = [salvato]; hi = 0; sel = selIniziale(); soloImg = false;
     costruisci(); tutto();
     if (carta.tipo === "luogo") caricaZone();
     document.addEventListener("keydown", tasti, true);
@@ -95,7 +96,7 @@ const Editor = (() => {
     const box = el("div", "ed-box" + (e.tipo === "sfumatura" ? " ed-tratt" : ""));
     Object.assign(box.style, { left: r.left - sr.left + "px", top: r.top - sr.top + "px", width: r.width + "px", height: r.height + "px" });
     ov.append(box);
-    if (e.tipo === "sfumatura") return;
+    if (e.tipo === "sfumatura" || e.tipo === "oggetto") return;   // sfumatura e oggetto non si trascinano: si regolano dal pannello
     const pos = { nw: [0, 0], n: [50, 0], ne: [100, 0], e: [100, 50], se: [100, 100], s: [50, 100], sw: [0, 100], w: [0, 50] };
     for (const [h, [px, py]] of Object.entries(pos)) {
       if (e.tipo === "statistiche" && h.length === 1) continue;   // le statistiche si scalano solo dagli angoli
@@ -115,11 +116,11 @@ const Editor = (() => {
     if (s !== storia[hi]) { storia = storia.slice(0, hi + 1); storia.push(s); hi++; }
     barra();
   }
-  function vai(i) { spingi(); if (i < 0 || i >= storia.length) return; hi = i; st = JSON.parse(storia[hi]); if (!cerca(sel)) sel = "nome"; tutto(); }
+  function vai(i) { spingi(); if (i < 0 || i >= storia.length) return; hi = i; st = JSON.parse(storia[hi]); if (!cerca(sel)) sel = selIniziale(); tutto(); }
   const annulla = () => vai(hi - 1), ripeti = () => vai(hi + 1);
   function reimposta() {
     if (!confirm("Riportare tutti gli elementi e la posizione dell'immagine ai valori predefiniti?")) return;
-    st = { elementi: Carta.predefiniti(ctx.carta), imm: { ...Carta.IMM_DEF }, ...(st.caratteristiche ? { caratteristiche: st.caratteristiche } : {}), ...(st.zone ? { zone: st.zone } : {}) }; sel = "nome"; spingi(); tutto();
+    st = { elementi: Carta.predefiniti(ctx.carta), imm: { ...Carta.IMM_DEF }, ...(st.caratteristiche ? { caratteristiche: st.caratteristiche } : {}), ...(st.zone ? { zone: st.zone } : {}) }; sel = selIniziale(); spingi(); tutto();
   }
   function barra() {
     const a = $("#edAnnulla"); if (!a) return;
@@ -248,7 +249,7 @@ const Editor = (() => {
       const su = el("button", "ed-mini", "▲"), giu = el("button", "ed-mini", "▼"); su.title = "Porta avanti"; giu.title = "Porta indietro";
       su.onclick = () => muovi(e, 1); giu.onclick = () => muovi(e, -1);
       li.append(cb, nm, su, giu);
-      if (e.tipo === "testo" && e.id !== "nome") { const x = el("button", "ed-mini", "🗑"); x.title = "Elimina"; x.onclick = () => { st.elementi = st.elementi.filter(z => z !== e); if (sel === e.id) sel = "nome"; cambiato(); tutto(); }; li.append(x); }
+      if (e.tipo === "testo" && e.id !== "nome") { const x = el("button", "ed-mini", "🗑"); x.title = "Elimina"; x.onclick = () => { st.elementi = st.elementi.filter(z => z !== e); if (sel === e.id) sel = selIniziale(); cambiato(); tutto(); }; li.append(x); }
       ul.append(li);
     });
   }
@@ -337,6 +338,24 @@ const Editor = (() => {
       const bw = el("div", "ed-riga"); bw.append(bz, bp); p.append(bw);
       p.append(el("div", "ed-sugg", "Le icone possono sporgere dal bordo: nella carta fisica non compaiono. Trascina il gruppo per spostarlo, angoli per ingrandirlo."));
       aggiornaValori = () => { sc.set(Math.round((e.scala || 1) * 100)); dx.set(e.dx || 0); dy.set(e.dy || 0); };
+    } else if (e.tipo === "oggetto") {
+      // bonus (testo scritto sulla carta: lo somma a mano il giocatore), due tag (icone d'uso) e codice di consultazione; vedi oggetto.js
+      e.dati = e.dati || {}; const d = e.dati;
+      const stile = i => (i.style.cssText = "background:#241818;color:#e9dfd6;border:1px solid #3a2626;border-radius:6px;padding:4px 7px;width:100%;box-sizing:border-box");
+      const sl = document.createElement("select"); Oggetto.LAYOUT.forEach(([i, n]) => sl.append(new Option(n, i, false, i === e.layout)));
+      sl.onchange = () => { e.layout = sl.value; cambiato(); };
+      const tb = Object.assign(document.createElement("input"), { type: "text", value: d.bonus || "", placeholder: "es. +1 Forza (vuoto = nessun bonus)" }); stile(tb);
+      tb.oninput = () => { d.bonus = tb.value; cambiato(); };
+      const selTag = [0, 1].map(i => {
+        const s = document.createElement("select"); s.append(new Option("— nessuno —", ""));
+        Oggetto.TAG.forEach(([t, n]) => s.append(new Option(n, t, false, (d.tag || [])[i] === t)));
+        return s;
+      });
+      selTag.forEach(s => (s.onchange = () => { d.tag = selTag.map(x => x.value).filter(Boolean); cambiato(); }));
+      const co = Object.assign(document.createElement("input"), { type: "text", value: d.codice || "", placeholder: "es. OG09" }); stile(co);
+      co.oninput = () => { d.codice = co.value.trim(); cambiato(); };
+      p.append(riga("Disposizione", sl), riga("Bonus", tb), riga("Tag 1", selTag[0]), riga("Tag 2", selTag[1]), riga("Codice", co));
+      p.append(el("div", "ed-sugg", "Il bonus è solo scritto sulla carta (nelle prove lo somma a mano il giocatore): se comincia con un numero e continua con una caratteristica (Forza, Intelletto, Rapidità, Carisma) il nome diventa la sua icona. Il codice è l'id della carta in oggetti_base.json (OGxx)."));
     } else if (e.tipo === "sfumatura") {
       p.append(riga("Altezza in basso", slider(5, 100, 1, e.altezza, v => (e.altezza = v), v => v + "%")), riga("Intensità", slider(0, 1.5, 0.05, e.intensita, v => (e.intensita = v), v => Math.round(v * 100) + "%")));
     }

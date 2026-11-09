@@ -15,6 +15,7 @@ const Carta = (() => {
 
   // colore (chiaro, per dare contrasto sull'illustrazione) con cui si tinge la cornice di ogni personaggio
   const TINTE_PG = { P01: "#9cc26b", P02: "#f2bb4d", P03: "#c98fd6", P04: "#76aee0", P05: "#ec7f6f", P06: "#62c9bf" };
+  const TINTA_OGGETTI = "#d8c08a";   // cornice a marmo delle carte oggetto: ocra (provvisoria)
   const TINTA_MINACCE = "#e0463a";   // le minacce hanno la stessa cornice a marmo dei personaggi, ma sempre rossa
   const MATERIALI = [["", "Nessuno (filo colorato)"], ["marmo_venato", "Marmo venato"]];   // texture in tools/galleria/texture/<id>.png (+ _r = ruotata di 90 gradi)
 
@@ -23,6 +24,14 @@ const Carta = (() => {
   const clona = o => JSON.parse(JSON.stringify(o));
 
   function predefiniti(c) {
+    // carta oggetto: il nome è disegnato dall'elemento "oggetto" stesso (oggetto.js), insieme a bonus, tag e codice.
+    // I dati (c.oggetto = {bonus, tag, codice}) sono il punto di partenza: una volta salvato il layout valgono quelli dell'elemento.
+    if (c.tipo === "oggetto") return [
+      { id: "immagine", tipo: "immagine", nome: "Immagine", visibile: true },
+      { id: "sfumatura", tipo: "sfumatura", nome: "Sfumatura", visibile: true, altezza: 48, intensita: 1 },
+      { id: "cornice", tipo: "cornice", nome: "Cornice", visibile: true, inset: 0, spessore: 6, colore: TINTA_OGGETTI, opacita: 1, raggio: 4.2, materiale: "marmo_venato" },
+      { id: "oggetto", tipo: "oggetto", nome: "Oggetto", visibile: true, layout: "angoli_icona", dati: c.oggetto ? clona(c.oggetto) : null },
+    ];
     const vert = c.formato !== "orizzontale", pg = c.tipo === "personaggio", min = c.tipo === "minaccia";
     const els = [
       { id: "immagine", tipo: "immagine", nome: "Immagine", visibile: true },
@@ -82,6 +91,7 @@ const Carta = (() => {
       return n;
     }
     if (e.tipo === "statistiche") return Statistiche.crea(e, c);   // vedi statistiche.js
+    if (e.tipo === "oggetto") return Oggetto.crea(e, c);   // nome, bonus, tag e codice delle carte oggetto: vedi oggetto.js
     // testo
     const n = div("cx-el cx-testo");
     n.textContent = e.testo == null ? c.nome : e.testo;
@@ -105,7 +115,7 @@ const Carta = (() => {
     els.forEach((e, i) => {
       if (!e.visibile || (o.soloImmagine && e.tipo !== "immagine")) return;
       const n = nodo(c, v, e, im, o); n.dataset.id = e.id; n.style.zIndex = i + 1;
-      (e.tipo === "statistiche" ? fuori : carta).append(n);   // le statistiche stanno sullo strato che può sporgere dal bordo
+      (e.tipo === "statistiche" || e.tipo === "oggetto" ? fuori : carta).append(n);   // statistiche e blocchi dell'oggetto stanno sullo strato che può sporgere dal bordo
     });
     return wrap;
   }

@@ -103,5 +103,5 @@ const Statistiche = (() => {
   }
 
   const PREDEFINITO = { id: "statistiche", tipo: "statistiche", nome: "Statistiche", visibile: true, disposizione: "pf", stile: "sigillo", scala: 1.3, margine: 0, dx: 0, dy: 0, valori: null };
-  return { STAT, STILI, DISPOSIZIONI, VALORI_ESEMPIO, PREDEFINITO, crea };
+  return { STAT, STILI, DISPOSIZIONI, VALORI_ESEMPIO, PREDEFINITO, GLIFI, crea };
 })();

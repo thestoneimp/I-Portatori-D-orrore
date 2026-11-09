@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anteprima carte oggetto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@600;700&family=Oswald:wght@400;500;700&family=Special+Elite&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/s/carta.css">
+<link rel="stylesheet" href="/s/oggetto.css">
+<style>
+  :root { --bg:#0f0a0a; --bordo:#3a2626; --testo:#e9dfd6; --tenue:#a89488; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--testo); font:15px/1.4 "Segoe UI", system-ui, sans-serif; }
+  header { padding:12px 20px; border-bottom:1px solid var(--bordo); position:sticky; top:0; background:rgba(15,10,10,.97); z-index:5; display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; }
+  h1 { margin:0; font-size:18px; }
+  label { color:var(--tenue); font-size:13px; display:flex; gap:6px; align-items:center; }
+  select, input[type=text] { background:#241818; color:var(--testo); border:1px solid var(--bordo); border-radius:6px; padding:4px 8px; font:inherit; }
+  input[type=text] { width:110px; }
+  a { color:var(--tenue); font-size:13px; }
+  main { padding:6px 20px 60px; max-width:1600px; margin:0 auto; }
+  h2 { font-size:14px; letter-spacing:.5px; text-transform:uppercase; color:var(--tenue); margin:26px 0 4px; }
+  .nota { color:var(--tenue); font-size:13px; margin:0 0 12px; max-width:920px; }
+  .fila { display:flex; flex-wrap:wrap; gap:22px 24px; align-items:flex-start; }
+  figure { margin:0; } figcaption { color:var(--tenue); font-size:12px; margin-top:8px; text-align:center; } figcaption b { color:var(--testo); }
+  .matrice { display:grid; grid-template-columns: 110px repeat(4, 1fr); gap:12px; align-items:start; }
+  .matrice .tit { font-size:12px; color:var(--tenue); text-align:center; } .matrice .rig { font-size:13px; color:var(--testo); align-self:center; }
+  .icone { display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start; }
+  .icone figure { text-align:center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Anteprima carte oggetto</h1>
+  <label>Oggetto <select id="selOgg"></select></label>
+  <label>Bonus <input type="text" id="bonus" value="+1 Forza"></label>
+  <label>Tag 1 <select id="tag1"></select></label>
+  <label>Tag 2 <select id="tag2"></select></label>
+  <label>Codice <input type="text" id="codice" value="OG09"></label>
+  <a href="/">← Galleria</a>
+</header>
+<main>
+  <h2>Le disposizioni</h2>
+  <p class="nota">Ogni carta ha: nome, testo del bonus (scritto sulla carta, lo somma il giocatore), due icone tag (indicano gli usi possibili) e il codice di consultazione. Illustrazione e testi sono quelli scelti in alto; i valori sono d'esempio.</p>
+  <div class="fila" id="fila"></div>
+  <h2>Le disposizioni con oggetti diversi</h2>
+  <p class="nota">Per vedere la leggibilità su illustrazioni più chiare o più scure. Nella colonna "senza bonus" il blocco del bonus sparisce.</p>
+  <div class="matrice" id="matrice"></div>
+  <h2>Sigilli d'angolo con icona: le caratteristiche</h2>
+  <p class="nota">Il nome della caratteristica nel testo del bonus diventa la sua icona (le stesse delle statistiche dei personaggi). Se una caratteristica non ha ancora un'icona (come Tempra) resta il nome scritto.</p>
+  <div class="fila" id="caratt"></div>
+  <h2>Le icone dei tag da vicino</h2>
+  <div class="icone" id="icone"></div>
+</main>
+<script src="/s/statistiche.js"></script>
+<script src="/s/carta.js"></script>
+<script src="/s/oggetto.js"></script>
+<script>
+let dati = { carte: [] };
+const $ = id => document.getElementById(id);
+const TINTA_OGGETTI = "#d8c08a";   // tinta provvisoria della cornice a marmo delle carte oggetto
+
+function carta(c, layout, d, larghezza) {
+  const els = [
+    { id: "immagine", tipo: "immagine", nome: "Immagine", visibile: true },
+    { id: "sfumatura", tipo: "sfumatura", nome: "Sfumatura", visibile: true, altezza: 48, intensita: 1 },
+    { id: "cornice", tipo: "cornice", nome: "Cornice", visibile: true, inset: 0, spessore: 6, colore: TINTA_OGGETTI, opacita: 1, raggio: 4.2, materiale: "marmo_venato" },
+    { id: "oggetto", tipo: "oggetto", nome: "Oggetto", visibile: true, layout, dati: d },
+  ];
+  const v = c.varianti.find(x => x.id === c.approvata) || c.varianti.find(x => !x.scartata) || c.varianti[0];
+  const w = Carta.render(c, v, { elementi: els, src: "/media/" + v.file });
+  w.style.width = larghezza + "px"; return w;
+}
+function fig(c, layout, d, nome, larghezza) {
+  const f = document.createElement("figure"); f.append(carta(c, layout, d, larghezza));
+  const cap = document.createElement("figcaption"); cap.innerHTML = `<b>${nome}</b>`; f.append(cap); return f;
+}
+const ESEMPI = {   // dati d'esempio per la griglia con oggetti diversi
+  O01_balestra: { bonus: "+1 Agilità", tag: ["sparo", "tagliente"], codice: "OG01" },
+  O05_pugnale_rituale: { bonus: "+1 Forza", tag: ["tagliente", "sacro"], codice: "OG05" },
+  O09_chiave: { bonus: "", tag: ["chiave", "leva"], codice: "OG14" },
+  O04_bibbia: { bonus: "+2 Tempra", tag: ["sacro", "luce"], codice: "OG04" },
+};
+function disegna() {
+  const c = dati.carte.find(x => x.id === $("selOgg").value); if (!c) return;
+  const d = { bonus: $("bonus").value, tag: [$("tag1").value, $("tag2").value].filter(Boolean), codice: $("codice").value };
+  $("fila").replaceChildren(...Oggetto.LAYOUT.map(([id, nome]) => fig(c, id, d, nome, 300)));
+
+  const m = $("matrice"), ids = Object.keys(ESEMPI).filter(id => dati.carte.some(x => x.id === id));
+  m.style.gridTemplateColumns = `110px repeat(${ids.length}, 1fr)`;
+  m.replaceChildren(document.createElement("div"));
+  ids.forEach(id => { const t = document.createElement("div"); t.className = "tit"; t.textContent = dati.carte.find(x => x.id === id).nome + (ESEMPI[id].bonus ? "" : " (senza bonus)"); m.append(t); });
+  Oggetto.LAYOUT.forEach(([lid, nome]) => {
+    const r = document.createElement("div"); r.className = "rig"; r.textContent = nome; m.append(r);
+    ids.forEach(id => { const cell = document.createElement("div"); cell.append(carta(dati.carte.find(x => x.id === id), lid, ESEMPI[id], 150)); cell.firstChild.style.width = "100%"; m.append(cell); });
+  });
+
+  const car = [["+1 Forza", "Forza"], ["+1 Intelletto", "Intelletto"], ["+1 Rapidità", "Rapidità"], ["+1 Carisma", "Carisma"], ["+2 Tempra", "Tempra (senza icona)"]];
+  $("caratt").replaceChildren(...car.map(([b, n]) => fig(c, "angoli_icona", { ...d, bonus: b }, n, 190)));
+
+  $("icone").replaceChildren(...[["med", "Medaglione"], ["sig", "Rombo"], ["quad", "Quadrato"], ["osd", "Glifo nudo"]].map(([s, n]) => {
+    const f = document.createElement("figure");
+    const riga = document.createElement("div"); riga.className = `ob ob-ico-${s}`; riga.style.cssText = "position:static;display:flex;gap:12px;width:560px;container-type:inline-size;background:radial-gradient(circle at 30% 40%,#3a1a18,#150c0c 70%);padding:14px;border-radius:8px;--u:50px";
+    Oggetto.TAG.forEach(([t, nm]) => { const i = document.createElement("div"); i.className = "ob-ico"; i.title = nm; i.innerHTML = Oggetto.svg(t); riga.append(i); });
+    const cap = document.createElement("figcaption"); cap.innerHTML = `<b>${n}</b>`; f.append(riga, cap); return f;
+  }));
+}
+function init() {
+  const ogg = dati.carte.filter(c => c.tipo === "oggetto" && c.varianti.length);
+  $("selOgg").replaceChildren(...ogg.map(c => new Option(c.nome, c.id)));
+  const opz = () => Oggetto.TAG.map(([t, n]) => new Option(n, t));
+  $("tag1").replaceChildren(...opz()); $("tag2").replaceChildren(...opz()); $("tag2").value = "leva";
+  const p = new URLSearchParams(location.search);
+  [["ogg", "selOgg"], ["bonus", "bonus"], ["tag1", "tag1"], ["tag2", "tag2"], ["codice", "codice"]].forEach(([k, id]) => { if (p.get(k)) $(id).value = p.get(k); });
+  ["selOgg", "bonus", "tag1", "tag2", "codice"].forEach(id => ($(id).oninput = disegna));
+  disegna();
+}
+fetch("/api/galleria").then(r => r.json()).then(d => { dati = d; init(); });
+</script>
+</body>
+</html>
